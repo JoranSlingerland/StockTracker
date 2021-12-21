@@ -128,5 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# API
-/.api/apikey.json
+# Persitent data
+/.data/api/apikey.json
+/.data/transactions/transactions.json
