@@ -21,7 +21,7 @@ The script requires you to put a .json file of your transactions in '.\\.data\tr
         "date": "2019-01-21",
         "price": 100.00,
         "quantity": 100,
-        "TransactionType": "Buy",
+        "transaction_type": "Buy",
         "transaction_cost": 0.50
     },
     {
@@ -29,7 +29,7 @@ The script requires you to put a .json file of your transactions in '.\\.data\tr
         "date": "2020-01-24",
         "price": 125.00,
         "quantity": 100,
-        "TransactionType": "Buy",
+        "transaction_type": "Buy",
         "transaction_cost": 0.50 
     },
     {
@@ -37,7 +37,7 @@ The script requires you to put a .json file of your transactions in '.\\.data\tr
         "date": "2020-05-26",
         "price": 75.54,
         "quantity": 75,
-        "TransactionType": "Sell",
+        "transaction_type": "Sell",
         "transaction_cost": 0.50 
     }
 ]
