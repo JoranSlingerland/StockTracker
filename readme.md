@@ -15,7 +15,7 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 The script requires you to put a .json file of your transactions in '.\\.data\transactions\transactions.json' using the structure below:
 
 ``` json
-{"transactions": [
+[
     {
         "symbol": "AAPL",
         "date": "2019-01-21",
@@ -40,5 +40,5 @@ The script requires you to put a .json file of your transactions in '.\\.data\tr
         "TransactionType": "Sell",
         "transaction_cost": 0.50 
     }
-]}
+]
 ```

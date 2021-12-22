@@ -22,7 +22,7 @@ def get_api_key():
 
 def get_daily_adjusted(symbol, api_key):
     """Get daily adjusted data from API"""
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact'
+    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact' # pylint: disable=line-too-long
     request = requests.get(url)
     data = request.json()
     return data
@@ -45,11 +45,11 @@ def compute_transactions(transactions):
 #main
 def main():
     """Main function"""
-    api_key = get_api_key()
-    symbol = 'MSFT'
-    data = get_daily_adjusted(symbol, api_key)
+    # api_key = get_api_key()
+    # symbol = 'MSFT'
+    # data = get_daily_adjusted(symbol, api_key)
     transactions = get_transactions()
-    compute_transactions(transactions['transactions'])
+    compute_transactions(transactions)
 
 if __name__ == '__main__':
     main()

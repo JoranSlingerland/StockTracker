@@ -1,4 +1,4 @@
-{"transactions": [
+[
     {
         "symbol": "AAPL",
         "date": "2019-01-21",
@@ -23,4 +23,4 @@
         "TransactionType": "Sell",
         "transaction_cost": 0.50 
     }
-]}
+]
