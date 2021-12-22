@@ -15,6 +15,11 @@ def read_jsonfile(filename):
         data = json.load(json_file)
     return data
 
+def write_jsonfile(data, filename):
+    """Write data to file"""
+    with open(filename, "w+", encoding="utf-8") as filename:
+        json.dump(data, filename)
+
 def get_api_key():
     """Get API key from file"""
     api_key = read_jsonfile('./.data/api/apikey.json')
@@ -34,13 +39,23 @@ def get_transactions():
 
 def compute_transactions(transactions):
     """Compute transactions"""
-    transactions = sorted(transactions, key=lambda k: k['date'])
+    transactions = sorted(transactions, key=lambda k: k['transaction_date'])
     end_date = date.today()
-    start_date = transactions[0]['date']
-    print(start_date, end_date)
+    start_date = transactions[0]['transaction_date']
+    stock_held = []
     daterange = pd.date_range(start_date, end_date)
     for single_date in daterange:
-        print (single_date)
+        single_date = single_date.strftime("%Y-%m-%d")
+        stock_held.append(stock_held_per_day(transactions, single_date))
+    write_jsonfile(stock_held, './.data/transactions/stock_held.json')
+
+def stock_held_per_day(transactions, single_date):
+    """Get stock held per day"""
+    stocks_held = {'date_held': single_date}
+    for transaction in transactions:
+        if single_date >= transaction['transaction_date']:
+            stocks_held.update(transaction)
+            return stocks_held
 
 #main
 def main():
