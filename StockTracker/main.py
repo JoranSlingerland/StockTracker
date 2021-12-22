@@ -20,6 +20,11 @@ def write_jsonfile(data, filename):
     with open(filename, "w+", encoding="utf-8") as file:
         json.dump(data, file)
 
+# def convert(list):
+#     list = iter(list)
+#     dictionary = dict(zip(list, list))
+#     return dictionary
+
 def get_api_key():
     """Get API key from file"""
     api_key = read_jsonfile('./.data/api/apikey.json')
@@ -42,20 +47,19 @@ def compute_transactions(transactions):
     transactions = sorted(transactions, key=lambda k: k['transaction_date'])
     end_date = date.today()
     start_date = transactions[0]['transaction_date']
-    stock_held = []
+    stocks_held = []
     daterange = pd.date_range(start_date, end_date)
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        stock_held.append(stock_held_per_day(transactions, single_date))
-    write_jsonfile(stock_held, './.data/transactions/stock_held.json')
+        for transaction in transactions:
+            if single_date >= transaction['transaction_date']:
+                transaction.update({'date_held': single_date})
+                stocks_held.append(transactions)
+    #calculate_sells_and_buys(stocks_held, daterange)
 
-def stock_held_per_day(transactions, single_date): # pylint: disable=inconsistent-return-statements
-    """Get stock held per day"""
-    stocks_held = {'date_held': single_date}
-    for transaction in transactions:
-        if single_date >= transaction['transaction_date']:
-            stocks_held.update(transaction)
-            return stocks_held
+def calculate_sells_and_buys(stocks_held, daterange):
+    for stock_held in stocks_held:
+        pass
 
 #main
 def main():
