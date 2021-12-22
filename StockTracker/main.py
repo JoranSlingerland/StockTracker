@@ -53,7 +53,7 @@ def stock_held_per_day(transactions, single_date): # pylint: disable=inconsisten
     """Get stock held per day"""
     stocks_held = {'date_held': single_date}
     for transaction in transactions:
-        if single_date >= transaction['transaction_date']: 
+        if single_date >= transaction['transaction_date']:
             stocks_held.update(transaction)
             return stocks_held
 
