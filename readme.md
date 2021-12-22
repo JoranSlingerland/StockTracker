@@ -2,6 +2,11 @@
 
 The target of this project is to get data of stocks and write this to a readable format for a BI tool to analyze.
 
+## Build status
+![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pylint.yml/badge.svg)
+
+![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg)
+
 ## API
 
 This project will be using the [Alpha vantage API](https://www.alphavantage.co/) to get stock data. You can get a free key on there site and place it in '.\\.data\api\apikey.json.' using the structure below:
