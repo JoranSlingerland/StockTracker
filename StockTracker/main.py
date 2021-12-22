@@ -17,8 +17,8 @@ def read_jsonfile(filename):
 
 def write_jsonfile(data, filename):
     """Write data to file"""
-    with open(filename, "w+", encoding="utf-8") as filename:
-        json.dump(data, filename)
+    with open(filename, "w+", encoding="utf-8") as file:
+        json.dump(data, file)
 
 def get_api_key():
     """Get API key from file"""
@@ -49,11 +49,11 @@ def compute_transactions(transactions):
         stock_held.append(stock_held_per_day(transactions, single_date))
     write_jsonfile(stock_held, './.data/transactions/stock_held.json')
 
-def stock_held_per_day(transactions, single_date):
+def stock_held_per_day(transactions, single_date): # pylint: disable=inconsistent-return-statements
     """Get stock held per day"""
     stocks_held = {'date_held': single_date}
     for transaction in transactions:
-        if single_date >= transaction['transaction_date']:
+        if single_date >= transaction['transaction_date']: 
             stocks_held.update(transaction)
             return stocks_held
 
