@@ -40,6 +40,12 @@ def get_transactions():
 def compute_transactions(transactions):
     """Compute transactions"""
     transactions = sorted(transactions, key=lambda k: k['transaction_date'])
+    stocks_held = get_transactions_by_day(transactions)
+    write_jsonfile(stocks_held, './.data/output/stocks_held.json')
+    #calculate_sells_and_buys(stocks_held)
+
+def get_transactions_by_day(transactions):
+    """Get transactions by day"""
     end_date = date.today()
     start_date = transactions[0]['transaction_date']
     stocks_held = []
@@ -61,8 +67,7 @@ def compute_transactions(transactions):
             }
             temp_list.append(temp_object)
         stocks_held.append(temp_list)
-    write_jsonfile(stocks_held, './.data/output/stocks_held.json')
-    #calculate_sells_and_buys(stocks_held)
+    return stocks_held
 
 # def calculate_sells_and_buys(stocks_held):
 #     """Merge sells and buys together"""
