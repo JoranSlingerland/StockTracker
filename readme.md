@@ -9,7 +9,7 @@ The target of this project is to get data of stocks and write this to a readable
 
 ## API
 
-This project will be using the [Alpha vantage API](https://www.alphavantage.co/) to get stock data. You can get a free key on there site and place it in '.\\.data\api\apikey.json.' using the structure below:
+This project will be using the [Alpha vantage API](https://www.alphavantage.co/) to get stock data. You can get a free key on there site and place it in `.\\.data\api\apikey.json` using the structure below:
 
 ```json
 {"apikey":"key value here"}
@@ -17,7 +17,7 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 
 ## Input
 
-The script requires you to put a .json file of your transactions in '.\\.data\transactions\transactions.json' using the structure below:
+The script requires you to put a .json file of your transactions in `.\\.data\transactions\transactions.json` using the structure below:
 
 ``` json
 [
