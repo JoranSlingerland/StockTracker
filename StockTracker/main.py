@@ -20,11 +20,6 @@ def write_jsonfile(data, filename):
     with open(filename, "w+", encoding="utf-8") as file:
         json.dump(data, file)
 
-# def convert(list):
-#     list = iter(list)
-#     dictionary = dict(zip(list, list))
-#     return dictionary
-
 def get_api_key():
     """Get API key from file"""
     api_key = read_jsonfile('./.data/api/apikey.json')
@@ -51,16 +46,36 @@ def compute_transactions(transactions):
     daterange = pd.date_range(start_date, end_date)
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        for transaction in transactions:
-            if single_date >= transaction['transaction_date']:
-                transaction.update({'date_held': single_date})
-                stocks_held.append(transactions)
-    #calculate_sells_and_buys(stocks_held, daterange)
+        filterd_stocks_held = [d for d in transactions if d['transaction_date'] <= single_date]
+        #date_held = {'date_held': single_date}
+        temp_list = []
+        for filterd_stock_held in filterd_stocks_held:
+            temp_object = {
+                'symbol': filterd_stock_held['symbol'],
+                'transaction_date': filterd_stock_held['transaction_date'],
+                'price': filterd_stock_held['price'],
+                'quantity': filterd_stock_held['quantity'],
+                'transaction_type': filterd_stock_held['transaction_type'],
+                'transaction_cost': filterd_stock_held['transaction_cost'],
+                'date_held': single_date
+            }
+            temp_list.append(temp_object)
+        stocks_held.append(temp_list)
+    write_jsonfile(stocks_held, './.data/output/stocks_held.json')
+    #calculate_sells_and_buys(stocks_held)
 
-def calculate_sells_and_buys(stocks_held, daterange):
-    for stock_held in stocks_held:
-        pass
-
+# def calculate_sells_and_buys(stocks_held):
+#     """Merge sells and buys together"""
+#     date_stocks_held_buys = []
+#     date_stocks_held_sells = []
+#     for i, date_stocks_held in enumerate(stocks_held):
+#         print(i)
+#         print(date_stocks_held)
+#         filterd_date_stocks_held_buys = [d for d in date_stocks_held if d['transaction_type'] == 'buy'] # pylint: disable=line-too-long
+#         print(filterd_date_stocks_held_buys)
+#         # for date_stock_held in date_stocks_held:
+#         #     if date_stock_held['transaction_type'] == 'Buy':
+#         #         print(date_stock_held)
 #main
 def main():
     """Main function"""
