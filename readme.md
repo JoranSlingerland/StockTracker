@@ -3,6 +3,7 @@
 The target of this project is to get data of stocks and write this to a readable format for a BI tool to analyze.
 
 ## Build status
+
 ![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pylint.yml/badge.svg)
 
 ![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg)
