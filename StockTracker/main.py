@@ -6,7 +6,7 @@
 import json
 from datetime import date
 import requests
-import pandas as pd
+import pandas
 
 
 #modules
@@ -43,6 +43,8 @@ def compute_transactions(transactions):
     transactions = sorted(transactions, key=lambda k: k['transaction_date'])
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
+    stocks_held = merge_sells_and_buys(stocks_held)
+
 
 def get_transactions_by_day(transactions):
     """Get transactions by day"""
@@ -52,7 +54,7 @@ def get_transactions_by_day(transactions):
     #grab dates
     end_date = date.today()
     start_date = transactions[0]['transaction_date']
-    daterange = pd.date_range(start_date, end_date)
+    daterange = pandas.date_range(start_date, end_date)
 
     #loop through dates
     for single_date in daterange:
@@ -134,9 +136,58 @@ def calculate_sells_and_buys(stocks_held):
 
     #remove empty lists
     computed_date_stocks_held = [x for x in computed_date_stocks_held if x]
-    write_jsonfile(computed_date_stocks_held, './.data/output/computed_date_stocks_held.json')
-    #return both lists
+    #return list
     return computed_date_stocks_held
+
+def merge_sells_and_buys(stocks_held):
+    """Loop through buys and sells and merge them together"""
+    #initialize variables
+    merged_stocks_held = []
+
+    #loop through dates
+    for date_stocks_held in stocks_held:
+        #initialize variables
+        symbols = []
+        temp_list = []
+
+        #get symbols
+        for temp_loop in date_stocks_held:
+            symbols.append(temp_loop['symbol'])
+            symbols = list(dict.fromkeys(symbols))
+        #print(symbols)
+        #loop through symbols
+        for symbol in symbols:
+            single_stock_list = [d for d in date_stocks_held if d['symbol'] == symbol]
+            #print(single_stock_list)
+            if len(single_stock_list) == 1 and single_stock_list[0]['transaction_type'] == 'Buy':
+                temp_object = {
+                'symbol': symbol,
+                'average_cost': single_stock_list[0]['average_cost'],
+                'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
+                'quantity': single_stock_list[0]['quantity'],
+                'transaction_cost': single_stock_list[0]['transaction_cost'],
+                'date_held': single_stock_list[0]['date_held']
+                }
+                temp_list.append(temp_object)
+            elif len(single_stock_list) == 2:
+                single_stock_list = sorted(single_stock_list, key=lambda k: k['transaction_type'])
+                temp_object = {
+                'symbol': symbol,
+                'average_cost': single_stock_list[0]['average_cost'],
+                'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
+                'quantity': single_stock_list[0]['quantity'] - single_stock_list[1]['quantity'],
+                'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
+                'date_held': single_stock_list[0]['date_held']
+                }
+                if temp_object['quantity'] > 0:
+                    temp_list.append(temp_object)
+
+        merged_stocks_held.append(temp_list)
+    #remove empty lists
+    merged_stocks_held = [x for x in merged_stocks_held if x]
+    write_jsonfile(merged_stocks_held,'./.data/output/merged_stocks_held.json')
+    return merged_stocks_held
+
 
 #main
 def main():
