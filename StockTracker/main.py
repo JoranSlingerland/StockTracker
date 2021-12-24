@@ -65,7 +65,7 @@ def get_transactions_by_day(transactions):
             temp_object = {
                 'symbol': filterd_stock_held['symbol'],
                 'transaction_date': filterd_stock_held['transaction_date'],
-                'price': filterd_stock_held['price'],
+                'cost': filterd_stock_held['cost'],
                 'quantity': filterd_stock_held['quantity'],
                 'transaction_type': filterd_stock_held['transaction_type'],
                 'transaction_cost': filterd_stock_held['transaction_cost'],
@@ -100,7 +100,7 @@ def calculate_sells_and_buys(stocks_held):
             filterd_date_stock_held_buys = [d for d in filterd_date_stocks_held_buys if d['symbol'] == symbol_buys]
             temp_object = {
                 'symbol': symbol_buys,
-                'average_price': sum([d['price'] * d['quantity'] for d in filterd_date_stock_held_buys]) / sum([d['quantity'] for d in filterd_date_stock_held_buys]),
+                'average_cost': sum([d['cost'] * d['quantity'] for d in filterd_date_stock_held_buys]) / sum([d['quantity'] for d in filterd_date_stock_held_buys]),
                 'quantity': sum([d['quantity'] for d in filterd_date_stock_held_buys]),
                 'transaction_type': 'Buy',
                 'transaction_cost': sum([d['transaction_cost'] for d in filterd_date_stock_held_buys]),
@@ -124,7 +124,7 @@ def calculate_sells_and_buys(stocks_held):
             filterd_date_stock_held_sells = [d for d in filterd_date_stocks_held_sells if d['symbol'] == symbol_sells]
             temp_object = {
                 'symbol': symbol_sells,
-                'average_price': sum([d['price'] * d['quantity'] for d in filterd_date_stock_held_sells]) / sum([d['quantity'] for d in filterd_date_stock_held_sells]),
+                'average_cost': sum([d['cost'] * d['quantity'] for d in filterd_date_stock_held_sells]) / sum([d['quantity'] for d in filterd_date_stock_held_sells]),
                 'quantity': sum([d['quantity'] for d in filterd_date_stock_held_sells]),
                 'transaction_type': 'Sell',
                 'transaction_cost': sum([d['transaction_cost'] for d in filterd_date_stock_held_sells]),
