@@ -21,30 +21,32 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 The script requires you to put a .json file of your transactions in `.\\.data\transactions\transactions.json` using the structure below:
 
 ``` json
-[
-    {
-        "symbol": "AAPL",
-        "date": "2019-01-21",
-        "cost": 100.00,
-        "quantity": 100,
-        "transaction_type": "Buy",
-        "transaction_cost": 0.50
-    },
-    {
-        "symbol": "MSFT",
-        "date": "2020-01-24",
-        "cost": 125.00,
-        "quantity": 100,
-        "transaction_type": "Buy",
-        "transaction_cost": 0.50 
-    },
-    {
-        "symbol": "AMD",
-        "date": "2020-05-26",
-        "cost": 75.54,
-        "quantity": 75,
-        "transaction_type": "Sell",
-        "transaction_cost": 0.50 
-    }
-]
+{
+    "transactions": [
+        {
+            "symbol": "AAPL",
+            "date": "2019-01-21",
+            "cost": 100.00,
+            "quantity": 100,
+            "transaction_type": "Buy",
+            "transaction_cost": 0.50
+        },
+        {
+            "symbol": "MSFT",
+            "date": "2020-01-24",
+            "cost": 125.00,
+            "quantity": 100,
+            "transaction_type": "Buy",
+            "transaction_cost": 0.50
+        },
+        {
+            "symbol": "AMD",
+            "date": "2020-05-26",
+            "cost": 75.54,
+            "quantity": 75,
+            "transaction_type": "Sell",
+            "transaction_cost": 0.50
+        }
+    ]
+}
 ```

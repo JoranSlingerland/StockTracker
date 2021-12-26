@@ -129,6 +129,13 @@ dmypy.json
 .pyre/
 
 # Persistent data
-/.data/*
+.data/transactions/*
 !.data/transactions/sample.json
+!.data/transactions/transactions_schema.json
+
+.data/api/*
 !.date/api/sample.json
+!.data/api/api_schema.json
+
+/.data/output/*
+!.data/output/.gitkeep

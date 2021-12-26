@@ -7,6 +7,7 @@ import json
 from datetime import date
 import requests
 import pandas
+from jsonschema import validate
 
 
 #modules
@@ -24,6 +25,8 @@ def write_jsonfile(data, filename):
 def get_api_key():
     """Get API key from file"""
     api_key = read_jsonfile('./.data/api/apikey.json')
+    schema = read_jsonfile('./.data/api/apikey_schema.json')
+    validate(api_key, schema)
     return api_key['api_key']
 
 def get_daily_adjusted(symbol, api_key):
@@ -36,17 +39,18 @@ def get_daily_adjusted(symbol, api_key):
 def get_transactions():
     """Get transactions from file"""
     transactions = read_jsonfile('./.data/transactions/transactions.json')
+    schema = read_jsonfile('./.data/transactions/transactions_schema.json')
+    validate(transactions, schema)
     return transactions
 
 def compute_transactions(transactions):
     """Compute transactions"""
-    transactions = sorted(transactions, key=lambda k: k['transaction_date'])
+    transactions = sorted(transactions['transactions'], key=lambda k: k['transaction_date'])
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     stocks_held = calculate_totals(stocks_held)
     write_jsonfile(stocks_held, './.data/output/stocks_held.json')
-
 
 def get_transactions_by_day(transactions):
     """Get transactions by day"""

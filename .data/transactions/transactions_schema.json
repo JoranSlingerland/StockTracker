@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "transactions": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "description": "The ticker symbol of the stock",
+                "type": "string"
+              },
+              "transaction_date": {
+                "description": "The date of the transaction",
+                "type": "string",
+                "format": "date"
+              },
+              "cost": {
+                "description": "The cost of the transaction",
+                "type": "number"
+              },
+              "quantity": {
+                "description": "The quantity of the transaction",
+                "type": "integer"
+              },
+              "transaction_type": {
+                "description": "The type of transaction",
+                "type": "string",
+                "enum": [
+                  "Buy",
+                  "Sell"
+                ]
+              },
+              "transaction_cost": {
+                "description": "The cost of the transaction",
+                "type": "number"
+              }
+            },
+            "required": [
+              "symbol",
+              "transaction_date",
+              "cost",
+              "quantity",
+              "transaction_type",
+              "transaction_cost"
+            ]
+          }
+        ]
+      }
+    },
+    "required": [
+      "transactions"
+    ]
+  }
