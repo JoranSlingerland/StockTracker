@@ -1,1 +1,4 @@
-{"apikey":"key value here"}
+{
+    "$schema": "http://raw.githubusercontent.com/JoranSlingerland/StockTracker/main/.data/api/api_schema.json",
+    "apikey": "key value here"
+}

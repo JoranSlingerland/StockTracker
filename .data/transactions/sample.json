@@ -1,28 +1,29 @@
 {
+    "$schema": "https://raw.githubusercontent.com/JoranSlingerland/StockTracker/main/.data/transactions/transactions_schema.json",
     "transactions": [
         {
             "symbol": "AAPL",
-            "date": "2019-01-21",
+            "transaction_date": "2019-01-21",
             "cost": 100.00,
             "quantity": 100,
             "transaction_type": "Buy",
             "transaction_cost": 0.50
         },
         {
-            "symbol": "MSFT",
-            "date": "2020-01-24",
+            "symbol": "AAPL",
+            "transaction_date": "2020-01-21",
             "cost": 125.00,
             "quantity": 100,
             "transaction_type": "Buy",
             "transaction_cost": 0.50
         },
         {
-            "symbol": "AMD",
-            "date": "2020-05-26",
-            "cost": 75.54,
-            "quantity": 75,
-            "transaction_type": "Sell",
-            "transaction_cost": 0.50
+            "symbol": "MSFT",
+            "transaction_date": "2021-10-24",
+            "cost": 100.00,
+            "quantity": 100,
+            "transaction_type": "Buy",
+            "transaction_cost": 0.50 
         }
     ]
 }
