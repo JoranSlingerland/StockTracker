@@ -7,6 +7,6 @@
       }
     },
     "required": [
-      "apikey"
+      "api_key"
     ]
   }
