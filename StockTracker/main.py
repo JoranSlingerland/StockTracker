@@ -44,6 +44,7 @@ def compute_transactions(transactions):
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
+    stocks_held = calculate_totals(stocks_held)
     write_jsonfile(stocks_held, './.data/output/stocks_held.json')
 
 
@@ -184,6 +185,19 @@ def merge_sells_and_buys(stocks_held):
         merged_stocks_held.update({single_date: temp_list})
     merged_stocks_held = {"stocks_held": merged_stocks_held}
     return merged_stocks_held
+
+def calculate_totals(stocks_held):
+    """Calculate totals"""
+    #initialize variables
+    perm_object = {}
+
+    for single_date, date_stocks_held in stocks_held['stocks_held'].items():
+        temp_object = {
+            'total_cost': sum([d['total_cost'] for d in date_stocks_held]),
+        }
+        perm_object.update({single_date: temp_object})
+    stocks_held_and_totals = {**stocks_held, "totals": perm_object}
+    return stocks_held_and_totals
 
 
 #main
