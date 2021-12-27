@@ -8,7 +8,7 @@ from datetime import date
 import requests
 import pandas
 from jsonschema import validate
-from ratelimit import limits, RateLimitException, sleep_and_retry
+from ratelimit import limits, sleep_and_retry
 
 
 # modules
@@ -42,7 +42,7 @@ def call_alphavantage(symbol, api_key, query):
     data = requests.get(url)
 
     if data.status_code != 200:
-        raise Exception('API response: {}'.format(data.status_code))
+        raise Exception(f'API response: {data.status_code}')
 
     return data.json()
 
@@ -231,11 +231,11 @@ def calculate_totals(stocks_held):
 # main
 def main():
     """Main function"""
-    #api_key = get_api_key()
-    #symbol = 'MSFT'
-    #data = get_daily_adjusted(symbol, api_key)
+    # api_key = get_api_key()
+    # symbol = 'MSFT'
+    # data = get_daily_adjusted(symbol, api_key)
     # print(data)
-    #write_jsonfile(data, './.data/output/daily_adjusted.json')
+    # write_jsonfile(data, './.data/output/daily_adjusted.json')
     # data = read_jsonfile('./.data/output/daily_adjusted.json')
     # data = data['Time Series (Daily)']
     # write_jsonfile(data, './.data/output/daily_adjusted_filtered.json')
