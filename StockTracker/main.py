@@ -27,8 +27,8 @@ def write_jsonfile(data, filename):
 
 def get_api_key():
     """Get API key from file"""
-    api_key = read_jsonfile('./.data/api/apikey.json')
-    schema = read_jsonfile('./.data/api/apikey_schema.json')
+    api_key = read_jsonfile('./.data/api/api_key.json')
+    schema = read_jsonfile('./.data/api/api_schema.json')
     validate(api_key, schema)
     return api_key['api_key']
 
@@ -63,7 +63,7 @@ def compute_transactions(transactions):
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     stocks_held = calculate_totals(stocks_held)
-    write_jsonfile(stocks_held, './.data/output/stocks_held.json')
+    return stocks_held
 
 
 def get_transactions_by_day(transactions):
@@ -228,21 +228,47 @@ def calculate_totals(stocks_held):
     return stocks_held_and_totals
 
 
+def get_stock_data(stocks_held, api_key):
+    """get data for all stocks from api"""
+    # initialize variables
+    symbols = []
+    query='TIME_SERIES_DAILY'
+    stock_data = {}
+
+    # get unique symbols
+    for single_data ,date_stocks_held in stocks_held['stocks_held'].items(): #pylint: disable=unused-variable
+        for temp_loop in date_stocks_held:
+            symbols.append(temp_loop['symbol'])
+    symbols = list(dict.fromkeys(symbols))
+
+    #get data for all symbols
+    for symbol in symbols:
+        temp_data = call_alphavantage(symbol, api_key, query)
+        stock_data.update({symbol: temp_data})
+
+    write_jsonfile(stock_data, './.data/output/stock_data.json')
+    # return dictionary
+    return stock_data
+
+def add_stock_data_to_stocks_held(stocks_held, stock_data):
+    """add data to stocks held"""
+    # initialize variables
+    
+
 # main
 def main():
     """Main function"""
-    # api_key = get_api_key()
-    # symbol = 'MSFT'
+    api_key = get_api_key()
     # data = get_daily_adjusted(symbol, api_key)
     # print(data)
     # write_jsonfile(data, './.data/output/daily_adjusted.json')
     # data = read_jsonfile('./.data/output/daily_adjusted.json')
     # data = data['Time Series (Daily)']
     # write_jsonfile(data, './.data/output/daily_adjusted_filtered.json')
-
     transactions = get_transactions()
-    compute_transactions(transactions)
-
+    stock_held = compute_transactions(transactions)
+    stock_data = get_stock_data(stock_held, api_key)
+    print(stock_data)
 
 if __name__ == '__main__':
     main()
