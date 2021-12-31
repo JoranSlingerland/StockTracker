@@ -4,7 +4,7 @@
 
 # Import modules
 import json
-from datetime import date
+from datetime import date, datetime, timedelta
 import requests
 import pandas
 from jsonschema import validate
@@ -63,6 +63,7 @@ def compute_transactions(transactions):
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     stocks_held = calculate_totals(stocks_held)
+    write_jsonfile(stocks_held, './.data/output/stocks_held_test.json')
     return stocks_held
 
 
@@ -253,22 +254,46 @@ def get_stock_data(stocks_held, api_key):
 def add_stock_data_to_stocks_held(stocks_held, stock_data):
     """add data to stocks held"""
     # initialize variables
-    
+    data = {}
+    updated_stocks_held = {}
+
+    for single_date, date_stocks_held in stocks_held['stocks_held'].items():
+        #initialize variables
+        stock_list = []
+        for stock in date_stocks_held:
+            days_to_substract = 0
+            while True:
+                try:
+                    date_string = f"{single_date} 00:00:00"
+                    date_object = (datetime.fromisoformat(date_string))
+                    date_object = date_object - timedelta(days=days_to_substract)
+                    date_object = date_object.strftime("%Y-%m-%d")
+
+                    stock.update({'open_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open'])})
+                    stock.update({'high_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high'])})
+                    stock.update({'low_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low'])})
+                    stock.update({'close_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close'])})
+                    stock.update({'volume': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])})
+
+                    break
+                except KeyError:
+                    days_to_substract += 1
+            stock_list.append(stock)
+        updated_stocks_held.update({single_date: stock_list})
+    data.update({'stocks_held': updated_stocks_held})
+    data.update({'totals': stocks_held['totals']})
+    return data
 
 # main
 def main():
     """Main function"""
     api_key = get_api_key()
-    # data = get_daily_adjusted(symbol, api_key)
-    # print(data)
-    # write_jsonfile(data, './.data/output/daily_adjusted.json')
-    # data = read_jsonfile('./.data/output/daily_adjusted.json')
-    # data = data['Time Series (Daily)']
-    # write_jsonfile(data, './.data/output/daily_adjusted_filtered.json')
     transactions = get_transactions()
     stock_held = compute_transactions(transactions)
     stock_data = get_stock_data(stock_held, api_key)
-    print(stock_data)
+    #stock_data = read_jsonfile('./.data/output/stock_data.json')
+    data = add_stock_data_to_stocks_held(stock_held, stock_data)
+    write_jsonfile(data, './.data/output/data.json')
 
 if __name__ == '__main__':
     main()
