@@ -36,9 +36,8 @@ def get_api_key():
 @sleep_and_retry
 @limits(calls=5, period=60)
 @limits(calls=500, period=86400)
-def call_alphavantage(symbol, api_key, query):
-    """Get data from alphavantage API"""
-    url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact'
+def call_api(url):
+    """Get data from API"""
     data = requests.get(url)
 
     if data.status_code != 200:
@@ -234,22 +233,23 @@ def calculate_totals(stocks_held):
     return stocks_held_and_totals
 
 
-def get_stock_data(stocks_held, api_key):
+def get_stock_data(transactions, api_key):
     """get data for all stocks from api"""
     # initialize variables
     symbols = []
     query='TIME_SERIES_DAILY'
     stock_data = {}
 
+
     # get unique symbols
-    for single_data ,date_stocks_held in stocks_held['stocks_held'].items(): #pylint: disable=unused-variable
-        for temp_loop in date_stocks_held:
-            symbols.append(temp_loop['symbol'])
-    symbols = list(dict.fromkeys(symbols))
+    for temp_loop in transactions['transactions']:
+        symbols.append(temp_loop['symbol'])
+        symbols = list(dict.fromkeys(symbols))
 
     #get data for all symbols
     for symbol in symbols:
-        temp_data = call_alphavantage(symbol, api_key, query)
+        url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact'
+        temp_data = call_api(url)
         stock_data.update({symbol: temp_data})
 
     write_jsonfile(stock_data, './.data/output/stock_data.json')
@@ -295,7 +295,7 @@ def main():
     api_key = get_api_key()
     transactions = get_transactions()
     stock_held = compute_transactions(transactions)
-    stock_data = get_stock_data(stock_held, api_key)
+    stock_data = get_stock_data(transactions, api_key)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data)
     write_jsonfile(data, './.data/output/data.json')
