@@ -92,6 +92,7 @@ def get_transactions_by_day(transactions):
                 'quantity': filterd_stock_held['quantity'],
                 'transaction_type': filterd_stock_held['transaction_type'],
                 'transaction_cost': filterd_stock_held['transaction_cost'],
+                'currency': filterd_stock_held['currency']
             }
             temp_list.append(temp_object)
 
@@ -134,7 +135,8 @@ def calculate_sells_and_buys(stocks_held):
                 'average_cost': sum([d['cost'] * d['quantity'] for d in date_stock_held_buys]) / sum([d['quantity'] for d in date_stock_held_buys]),
                 'quantity': sum([d['quantity'] for d in date_stock_held_buys]),
                 'transaction_type': 'Buy',
-                'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_buys])
+                'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_buys]),
+                'currency': date_stock_held_buys[0]['currency']
             }
             temp_list.append(temp_object)
 
@@ -158,7 +160,8 @@ def calculate_sells_and_buys(stocks_held):
                 'average_cost': sum([d['cost'] * d['quantity'] for d in date_stock_held_sells]) / sum([d['quantity'] for d in date_stock_held_sells]),
                 'quantity': sum([d['quantity'] for d in date_stock_held_sells]),
                 'transaction_type': 'Sell',
-                'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_sells])
+                'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_sells]),
+                'currency': date_stock_held_sells[0]['currency']
             }
             temp_list.append(temp_object)
         computed_date_stocks_held.update({single_date: temp_list})
@@ -196,6 +199,7 @@ def merge_sells_and_buys(stocks_held):
                     'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
                     'quantity': single_stock_list[0]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'],
+                    'currency': single_stock_list[0]['currency'],
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
@@ -207,6 +211,7 @@ def merge_sells_and_buys(stocks_held):
                     'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
                     'quantity': single_stock_list[0]['quantity'] - single_stock_list[1]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
+                    'currency': single_stock_list[0]['currency']
                 }
                 if temp_object['quantity'] > 0:
                     temp_list.append(temp_object)
