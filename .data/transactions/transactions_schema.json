@@ -39,7 +39,7 @@
               },
               "currency": {
                 "description": "The currency of the stock",
-                "type": "number"
+                "type": "string"
 
               }
             },
