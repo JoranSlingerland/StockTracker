@@ -256,6 +256,29 @@ def get_stock_data(transactions, api_key):
     # return dictionary
     return stock_data
 
+
+def get_forex_data(transactions, api_key):
+    """get data for all currencies from api"""
+    # initialize variables
+    currencies = []
+    query='FX_DAILY'
+    forex_data = {}
+    base_currency = 'EUR'
+
+    # get unique currencies
+    for temp_loop in transactions['transactions']:
+        currencies.append(temp_loop['currency'])
+        currencies = list(dict.fromkeys(currencies))
+
+    #get data for all currencies
+    for currency in currencies:
+        url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full'
+        temp_data = call_api(url)
+        forex_data.update({currency: temp_data})
+
+    # return dictionary
+    return forex_data
+
 def add_stock_data_to_stocks_held(stocks_held, stock_data):
     """add data to stocks held"""
     # initialize variables
@@ -296,6 +319,7 @@ def main():
     transactions = get_transactions()
     stock_held = compute_transactions(transactions)
     stock_data = get_stock_data(transactions, api_key)
+    forex_data = get_forex_data(transactions, api_key)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data)
     write_jsonfile(data, './.data/output/data.json')
