@@ -279,7 +279,7 @@ def get_forex_data(transactions, api_key):
     # return dictionary
     return forex_data
 
-def add_stock_data_to_stocks_held(stocks_held, stock_data):
+def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     """add data to stocks held"""
     # initialize variables
     data = {}
@@ -297,10 +297,10 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data):
                     date_object = date_object - timedelta(days=days_to_substract)
                     date_object = date_object.strftime("%Y-%m-%d")
 
-                    stock.update({'open_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open'])})
-                    stock.update({'high_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high'])})
-                    stock.update({'low_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low'])})
-                    stock.update({'close_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close'])})
+                    stock.update({'open_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
+                    stock.update({'high_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
+                    stock.update({'low_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
+                    stock.update({'close_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
                     stock.update({'volume': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])})
 
                     break
@@ -321,7 +321,7 @@ def main():
     stock_data = get_stock_data(transactions, api_key)
     forex_data = get_forex_data(transactions, api_key)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
-    data = add_stock_data_to_stocks_held(stock_held, stock_data)
+    data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     write_jsonfile(data, './.data/output/data.json')
 
 if __name__ == '__main__':
