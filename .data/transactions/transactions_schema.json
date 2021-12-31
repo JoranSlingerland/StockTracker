@@ -23,7 +23,7 @@
               },
               "quantity": {
                 "description": "The quantity of the transaction",
-                "type": "integer"
+                "type": "number"
               },
               "transaction_type": {
                 "description": "The type of transaction",
@@ -36,6 +36,11 @@
               "transaction_cost": {
                 "description": "The cost of the transaction",
                 "type": "number"
+              },
+              "currency": {
+                "description": "The currency of the stock",
+                "type": "number"
+
               }
             },
             "required": [
@@ -44,7 +49,8 @@
               "cost",
               "quantity",
               "transaction_type",
-              "transaction_cost"
+              "transaction_cost",
+              "currency"
             ]
           }
         ]

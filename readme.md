@@ -33,7 +33,8 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "cost": 100.00,
             "quantity": 100,
             "transaction_type": "Buy",
-            "transaction_cost": 0.50
+            "transaction_cost": 0.50,
+            "currency": "USD"
         },
         {
             "symbol": "AAPL",
@@ -41,7 +42,8 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "cost": 125.00,
             "quantity": 100,
             "transaction_type": "Buy",
-            "transaction_cost": 0.50
+            "transaction_cost": 0.50,
+            "currency": "USD"
         },
         {
             "symbol": "MSFT",
@@ -49,7 +51,8 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "cost": 100.00,
             "quantity": 100,
             "transaction_type": "Buy",
-            "transaction_cost": 0.50 
+            "transaction_cost": 0.50,
+            "currency": "USD"
         }
     ]
 }
