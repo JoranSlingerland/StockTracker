@@ -48,7 +48,7 @@ def compute_transactions(transactions):
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
-    stocks_held = calculate_totals(stocks_held)
+    #stocks_held = calculate_totals(stocks_held)
     #write_jsonfile(stocks_held, './.data/output/stocks_held_test.json')
     return stocks_held
 
@@ -216,6 +216,7 @@ def calculate_totals(stocks_held):
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
         temp_object = {
             'total_cost': sum([d['total_cost'] for d in date_stocks_held]),
+            'total_value': sum([d['total_value'] for d in date_stocks_held]),
         }
         perm_object.update({single_date: temp_object})
     stocks_held_and_totals = {**stocks_held, "totals": perm_object}
@@ -294,19 +295,18 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                     stock_volume = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])
                     forex_high = float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
 
-                    stock.update({'open_price': stock_open * forex_high})
-                    stock.update({'high_price': stock_high * forex_high})
-                    stock.update({'low_price': stock_low * forex_high})
-                    stock.update({'close_price': stock_close * forex_high})
+                    stock.update({'open_value': stock_open * forex_high})
+                    stock.update({'high_value': stock_high * forex_high})
+                    stock.update({'low_value': stock_low * forex_high})
+                    stock.update({'close_value': stock_close * forex_high})
                     stock.update({'volume': stock_volume})
-
+                    stock.update({'total_value': stock_close * stock['quantity']})
                     break
                 except KeyError:
                     days_to_substract += 1
             stock_list.append(stock)
         updated_stocks_held.update({single_date: stock_list})
     data.update({'stocks_held': updated_stocks_held})
-    data.update({'totals': stocks_held['totals']})
     return data
 
 # main
@@ -319,6 +319,7 @@ def main():
     forex_data = get_forex_data(input_data)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
+    data = calculate_totals(data)
     write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
 if __name__ == '__main__':
