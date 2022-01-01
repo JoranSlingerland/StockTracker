@@ -31,7 +31,7 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "symbol": "AAPL",
             "transaction_date": "2019-01-21",
             "cost": 100.00,
-            "quantity": 100,
+            "quantity": 100.00,
             "transaction_type": "Buy",
             "transaction_cost": 0.50,
             "currency": "USD"
@@ -40,7 +40,7 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "symbol": "AAPL",
             "transaction_date": "2020-01-21",
             "cost": 125.00,
-            "quantity": 100,
+            "quantity": 100.00,
             "transaction_type": "Buy",
             "transaction_cost": 0.50,
             "currency": "USD"
@@ -49,7 +49,7 @@ The script requires you to put a .json file of your transactions in `.\\.data\tr
             "symbol": "MSFT",
             "transaction_date": "2021-10-24",
             "cost": 100.00,
-            "quantity": 100,
+            "quantity": 100.00,
             "transaction_type": "Buy",
             "transaction_cost": 0.50,
             "currency": "USD"
