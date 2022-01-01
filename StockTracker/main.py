@@ -297,11 +297,18 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                     date_object = date_object - timedelta(days=days_to_substract)
                     date_object = date_object.strftime("%Y-%m-%d")
 
-                    stock.update({'open_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
-                    stock.update({'high_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
-                    stock.update({'low_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
-                    stock.update({'close_price': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close']) * float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['4. close'])})
-                    stock.update({'volume': float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])})
+                    stock_open = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open'])
+                    stock_high = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high'])
+                    stock_low = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low'])
+                    stock_close = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close'])
+                    stock_volume = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])
+                    forex_high = float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
+
+                    stock.update({'open_price': stock_open * forex_high})
+                    stock.update({'high_price': stock_high * forex_high})
+                    stock.update({'low_price': stock_low * forex_high})
+                    stock.update({'close_price': stock_close * forex_high})
+                    stock.update({'volume': stock_volume})
 
                     break
                 except KeyError:
