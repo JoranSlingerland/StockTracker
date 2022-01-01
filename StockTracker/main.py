@@ -1,4 +1,3 @@
-#!/user/bin/env python
 """StockTracker Main.py"""
 # pylint: disable=line-too-long
 
@@ -9,7 +8,6 @@ import requests
 import pandas
 from jsonschema import validate
 from ratelimit import limits, sleep_and_retry
-
 
 # modules
 def read_jsonfile(filename):
@@ -25,10 +23,10 @@ def write_jsonfile(data, filename):
         json.dump(data, file, indent=4, sort_keys=True)
 
 
-def get_api_key():
+def get_api_key(rootdir):
     """Get API key from file"""
-    api_key = read_jsonfile('./.data/api/api_key.json')
-    schema = read_jsonfile('./.data/api/api_schema.json')
+    api_key = read_jsonfile(f'{rootdir}\\.data\\api\\api_key.json')
+    schema = read_jsonfile(f'{rootdir}\\.data\\api\\api_schema.json')
     validate(api_key, schema)
     return api_key['api_key']
 
@@ -46,10 +44,10 @@ def call_api(url):
     return data.json()
 
 
-def get_transactions():
+def get_transactions(rootdir):
     """Get transactions from file"""
-    transactions = read_jsonfile('./.data/transactions/transactions.json')
-    schema = read_jsonfile('./.data/transactions/transactions_schema.json')
+    transactions = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions.json')
+    schema = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions_schema.json')
     validate(transactions, schema)
     return transactions
 
@@ -62,7 +60,7 @@ def compute_transactions(transactions):
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     stocks_held = calculate_totals(stocks_held)
-    write_jsonfile(stocks_held, './.data/output/stocks_held_test.json')
+    #write_jsonfile(stocks_held, './.data/output/stocks_held_test.json')
     return stocks_held
 
 
@@ -172,6 +170,8 @@ def calculate_sells_and_buys(stocks_held):
 
 def merge_sells_and_buys(stocks_held):
     """Loop through buys and sells and merge them together"""
+    # pylint: disable=too-many-locals
+
     # initialize variables
     merged_stocks_held = {}
 
@@ -252,7 +252,7 @@ def get_stock_data(transactions, api_key):
         temp_data = call_api(url)
         stock_data.update({symbol: temp_data})
 
-    write_jsonfile(stock_data, './.data/output/stock_data.json')
+    #write_jsonfile(stock_data, './.data/output/stock_data.json')
     # return dictionary
     return stock_data
 
@@ -322,14 +322,15 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
 # main
 def main():
     """Main function"""
-    api_key = get_api_key()
-    transactions = get_transactions()
+    rootdir = __file__.replace('\\StockTracker\\main.py', '')
+    api_key = get_api_key(rootdir)
+    transactions = get_transactions(rootdir)
     stock_held = compute_transactions(transactions)
     stock_data = get_stock_data(transactions, api_key)
     forex_data = get_forex_data(transactions, api_key)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
-    write_jsonfile(data, './.data/output/data.json')
+    write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
 if __name__ == '__main__':
     main()
