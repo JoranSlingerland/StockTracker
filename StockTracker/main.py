@@ -43,8 +43,7 @@ def get_input_data(rootdir):
 
 def compute_transactions(transactions):
     """Compute transactions"""
-    transactions = sorted(
-        transactions['transactions'], key=lambda k: k['transaction_date'])
+    transactions = sorted(transactions['transactions'], key=lambda k: k['transaction_date'])
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
@@ -66,8 +65,7 @@ def get_transactions_by_day(transactions):
     # loop through dates
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        filterd_stocks_held = [
-            d for d in transactions if d['transaction_date'] <= single_date]
+        filterd_stocks_held = [d for d in transactions if d['transaction_date'] <= single_date]
 
         # create object
         temp_list = []
@@ -191,8 +189,7 @@ def merge_sells_and_buys(stocks_held):
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
-                single_stock_list = sorted(
-                    single_stock_list, key=lambda k: k['transaction_type'])
+                single_stock_list = sorted(single_stock_list, key=lambda k: k['transaction_type'])
                 temp_object = {
                     'symbol': symbol,
                     'average_cost': single_stock_list[0]['average_cost'],
@@ -201,7 +198,7 @@ def merge_sells_and_buys(stocks_held):
                     'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
                     'currency': single_stock_list[0]['currency']
                 }
-                if temp_object['quantity'] > 0:
+                if temp_object['quantity'] > 0: #todo make sure it will always output something
                     temp_list.append(temp_object)
         merged_stocks_held.update({single_date: temp_list})
     merged_stocks_held = {"stocks_held": merged_stocks_held}
@@ -311,18 +308,129 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     data.update({'stocks_held': updated_stocks_held})
     return data
 
+def get_cash_data(input_data):
+    """Get the day by day cash data"""
+    cash = get_cash_day_by_day(input_data)
+    cash = calculate_deposits_and_withdrawals(cash)
+    cash = merge_deposits_and_withdrawals(cash)
+    return cash
+
+
+def get_cash_day_by_day(input_data):
+    """Get the day by day cash data"""
+    # initialize variables
+    cash_held = {}
+
+    transactions = sorted(input_data['transactions'], key=lambda k: k['transaction_date'])
+    end_date = date.today()
+    start_date = transactions[0]['transaction_date']
+    daterange = pandas.date_range(start_date, end_date)
+
+    for single_date in daterange:
+        single_date = single_date.strftime("%Y-%m-%d")
+        filterd_cash_held = [d for d in input_data['cash'] if d['transaction_date'] <= single_date]
+
+        # create object
+        temp_list = []
+        for filterd_c_held in filterd_cash_held:
+            temp_object = {
+                "transaction_date": filterd_c_held['transaction_date'],
+                "transaction_type": filterd_c_held['transaction_type'],
+                "amount": filterd_c_held['amount']
+            }
+            temp_list.append(temp_object)
+        cash_held.update({single_date: temp_list})
+    # return dictionary
+    cash_held = {"cash_held": cash_held}
+
+    return cash_held
+
+def calculate_deposits_and_withdrawals(cash):
+    """calculate depoisits and withdrawals"""
+
+    # initialize variables
+    computed_date_cash_held = {}
+
+    for single_date, date_cash_held in cash['cash_held'].items():
+        #intialize variables
+        temp_list = []
+
+        # get deposits
+        deposits = [d for d in date_cash_held if d['transaction_type'] == 'Deposit']
+        if deposits:
+            temp_object = {
+                "amount": sum([d['amount'] for d in deposits]),
+                "transaction_type": "Deposit"
+            }
+            temp_list.append(temp_object)
+
+        # get withdrawals
+        withdrawals = [d for d in date_cash_held if d['transaction_type'] == 'Withdrawal']
+        if withdrawals:
+            temp_object = {
+                "amount": sum([d['amount'] for d in withdrawals]),
+                "transaction_type": "Withdrawal"
+            }
+            temp_list.append(temp_object)
+
+        if not temp_list:
+            continue
+
+        # return dictionary
+        computed_date_cash_held.update({single_date: temp_list})
+    computed_date_cash_held = {"cash_held": computed_date_cash_held}
+    return computed_date_cash_held
+
+def merge_deposits_and_withdrawals(cash):
+    """merge deposits and withdrawals"""
+    # initialize variables
+    merged_cash_held = {}
+
+    for single_date, date_cash_held in cash['cash_held'].items():
+        #intialize variables
+        temp_list = []
+
+        if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
+            temp_object = {
+                single_date: date_cash_held[0]['amount'],
+            }
+            temp_list.append(temp_object)
+        elif len(date_cash_held) == 2:
+            date_cash_held = sorted(date_cash_held, key=lambda k: k['transaction_type'])
+            temp_object = {
+                single_date: date_cash_held[0]['amount'] - date_cash_held[1]['amount'],
+            }
+        merged_cash_held.update({**temp_object})
+    merged_cash_held = {"cash_held": merged_cash_held}
+    return merged_cash_held
+
 # main
 def main():
     """Main function"""
+    # initialize variables
+    output_json = True
+    output_sql = True
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
+
+    # get input data
     input_data = get_input_data(rootdir)
+
+    # get stock data
     stock_held = compute_transactions(input_data)
     stock_data = get_stock_data(input_data)
     forex_data = get_forex_data(input_data)
+    cash_data = get_cash_data(input_data)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
-    write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
+    data.update(**cash_data)
+
+    #write output
+    if output_json:
+        write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
+
+    if output_sql:
+        pass
 
 if __name__ == '__main__':
     main()
