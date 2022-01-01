@@ -295,12 +295,14 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                     stock_volume = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])
                     forex_high = float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
 
-                    stock.update({'open_value': stock_open * forex_high})
-                    stock.update({'high_value': stock_high * forex_high})
-                    stock.update({'low_value': stock_low * forex_high})
-                    stock.update({'close_value': stock_close * forex_high})
-                    stock.update({'volume': stock_volume})
-                    stock.update({'total_value': stock_close * stock['quantity']})
+                    stock.update({
+                        'open_value': stock_open * forex_high,
+                        'high_value': stock_high * forex_high,
+                        'low_value': stock_low * forex_high,
+                        'close_value': stock_close * forex_high,
+                        'volume': stock_volume,
+                        'total_value': stock_close * forex_high * stock['quantity'],
+                    })
                     break
                 except KeyError:
                     days_to_substract += 1
