@@ -22,15 +22,6 @@ def write_jsonfile(data, filename):
     with open(filename, "w+", encoding="utf-8") as file:
         json.dump(data, file, indent=4, sort_keys=True)
 
-
-# def get_api_key(rootdir):
-#     """Get API key from file"""
-#     api_key = read_jsonfile(f'{rootdir}\\.data\\api\\api_key.json')
-#     schema = read_jsonfile(f'{rootdir}\\.data\\api\\api_schema.json')
-#     validate(api_key, schema)
-#     return api_key['api_key']
-
-
 @sleep_and_retry
 @limits(calls=5, period=60)
 @limits(calls=500, period=86400)
@@ -49,14 +40,6 @@ def get_input_data(rootdir):
     schema = read_jsonfile(f'{rootdir}\\.data\\input\\input_schema.json')
     validate(input_data, schema)
     return input_data
-
-# def get_transactions(rootdir):
-#     """Get transactions from file"""
-#     transactions = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions.json')
-#     schema = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions_schema.json')
-#     validate(transactions, schema)
-#     return transactions
-
 
 def compute_transactions(transactions):
     """Compute transactions"""
@@ -286,6 +269,8 @@ def get_forex_data(input_data):
 
 def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     """add data to stocks held"""
+    #pylint: disable=too-many-locals
+
     # initialize variables
     data = {}
     updated_stocks_held = {}
