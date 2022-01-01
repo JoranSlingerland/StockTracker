@@ -217,10 +217,41 @@
         },
         "api_key": {
             "type": "string"
+        },
+        "cash": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "transaction_date": {
+                        "description": "The date of the transaction",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "transaction_type": {
+                        "description": "The type of transaction",
+                        "type": "string",
+                        "enum": [
+                            "Deposit",
+                            "Withdrawal"
+                        ]
+                    },
+                    "amount": {
+                        "description": "The amount of the transaction",
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "transaction_date",
+                    "transaction_type",
+                    "amount"
+                ]
+            }
         }
     },
     "required": [
         "transactions",
-        "api_key"
+        "api_key",
+        "cash"
     ]
 }
