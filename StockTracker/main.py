@@ -23,12 +23,12 @@ def write_jsonfile(data, filename):
         json.dump(data, file, indent=4, sort_keys=True)
 
 
-def get_api_key(rootdir):
-    """Get API key from file"""
-    api_key = read_jsonfile(f'{rootdir}\\.data\\api\\api_key.json')
-    schema = read_jsonfile(f'{rootdir}\\.data\\api\\api_schema.json')
-    validate(api_key, schema)
-    return api_key['api_key']
+# def get_api_key(rootdir):
+#     """Get API key from file"""
+#     api_key = read_jsonfile(f'{rootdir}\\.data\\api\\api_key.json')
+#     schema = read_jsonfile(f'{rootdir}\\.data\\api\\api_schema.json')
+#     validate(api_key, schema)
+#     return api_key['api_key']
 
 
 @sleep_and_retry
@@ -43,13 +43,19 @@ def call_api(url):
 
     return data.json()
 
+def get_input_data(rootdir):
+    """Get input from file"""
+    input_data = read_jsonfile(f'{rootdir}\\.data\\input\\input.json')
+    schema = read_jsonfile(f'{rootdir}\\.data\\input\\input_schema.json')
+    validate(input_data, schema)
+    return input_data
 
-def get_transactions(rootdir):
-    """Get transactions from file"""
-    transactions = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions.json')
-    schema = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions_schema.json')
-    validate(transactions, schema)
-    return transactions
+# def get_transactions(rootdir):
+#     """Get transactions from file"""
+#     transactions = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions.json')
+#     schema = read_jsonfile(f'{rootdir}\\.data\\transactions\\transactions_schema.json')
+#     validate(transactions, schema)
+#     return transactions
 
 
 def compute_transactions(transactions):
@@ -233,22 +239,21 @@ def calculate_totals(stocks_held):
     return stocks_held_and_totals
 
 
-def get_stock_data(transactions, api_key):
+def get_stock_data(input_data):
     """get data for all stocks from api"""
     # initialize variables
     symbols = []
     query='TIME_SERIES_DAILY'
     stock_data = {}
 
-
     # get unique symbols
-    for temp_loop in transactions['transactions']:
+    for temp_loop in input_data['transactions']:
         symbols.append(temp_loop['symbol'])
         symbols = list(dict.fromkeys(symbols))
 
     #get data for all symbols
     for symbol in symbols:
-        url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact'
+        url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={input_data["api_key"]}&outputsize=full&datatype=compact'
         temp_data = call_api(url)
         stock_data.update({symbol: temp_data})
 
@@ -257,7 +262,7 @@ def get_stock_data(transactions, api_key):
     return stock_data
 
 
-def get_forex_data(transactions, api_key):
+def get_forex_data(input_data):
     """get data for all currencies from api"""
     # initialize variables
     currencies = []
@@ -266,13 +271,13 @@ def get_forex_data(transactions, api_key):
     base_currency = 'EUR'
 
     # get unique currencies
-    for temp_loop in transactions['transactions']:
+    for temp_loop in input_data['transactions']:
         currencies.append(temp_loop['currency'])
         currencies = list(dict.fromkeys(currencies))
 
     #get data for all currencies
     for currency in currencies:
-        url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full'
+        url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full'
         temp_data = call_api(url)
         forex_data.update({currency: temp_data})
 
@@ -323,11 +328,10 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
 def main():
     """Main function"""
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
-    api_key = get_api_key(rootdir)
-    transactions = get_transactions(rootdir)
-    stock_held = compute_transactions(transactions)
-    stock_data = get_stock_data(transactions, api_key)
-    forex_data = get_forex_data(transactions, api_key)
+    input_data = get_input_data(rootdir)
+    stock_held = compute_transactions(input_data)
+    stock_data = get_stock_data(input_data)
+    forex_data = get_forex_data(input_data)
     #stock_data = read_jsonfile('./.data/output/stock_data.json')
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')

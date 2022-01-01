@@ -1,11 +1,11 @@
 {
-    "$schema": "https://raw.githubusercontent.com/JoranSlingerland/StockTracker/main/.data/transactions/transactions_schema.json",
+    "$schema": "https://raw.githubusercontent.com/JoranSlingerland/StockTracker/main/.data/input/input_schema.json",
     "transactions": [
         {
             "symbol": "AAPL",
             "transaction_date": "2019-01-21",
             "cost": 100.00,
-            "quantity": 100.00,
+            "quantity": 100,
             "transaction_type": "Buy",
             "transaction_cost": 0.50,
             "currency": "USD"
@@ -14,7 +14,7 @@
             "symbol": "AAPL",
             "transaction_date": "2020-01-21",
             "cost": 125.00,
-            "quantity": 100.00,
+            "quantity": 100,
             "transaction_type": "Buy",
             "transaction_cost": 0.50,
             "currency": "USD"
@@ -23,10 +23,11 @@
             "symbol": "MSFT",
             "transaction_date": "2021-10-24",
             "cost": 100.00,
-            "quantity": 100.00,
+            "quantity": 100,
             "transaction_type": "Buy",
-            "transaction_cost": 0.50,
+            "transaction_cost": 0.50 ,
             "currency": "USD"
         }
-    ]
+    ],
+    "api_key": "ABCD1234EFGH5678"
 }
