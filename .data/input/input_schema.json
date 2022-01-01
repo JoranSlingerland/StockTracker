@@ -215,9 +215,6 @@
                 }
             ]
         },
-        "api_key": {
-            "type": "string"
-        },
         "cash": {
             "type": "array",
             "items": {
@@ -247,6 +244,9 @@
                     "amount"
                 ]
             }
+        },
+        "api_key": {
+            "type": "string"
         }
     },
     "required": [

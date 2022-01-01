@@ -10,7 +10,7 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 
 ## Input
 
-The script requires you to put a .json file of your transactions and api key in `.\\.data\input\input.json` using the structure below:
+The script requires you to put a .json file of your transactions, cash deposits and api key in `.\\.data\input\input.json` using the structure below:
 
 ``` json
 {
@@ -42,6 +42,23 @@ The script requires you to put a .json file of your transactions and api key in 
             "transaction_type": "Buy",
             "transaction_cost": 0.50 ,
             "currency": "USD"
+        }
+    ],
+    "cash": [
+        {
+            "transaction_date": "2019-01-21",
+            "transaction_type": "Deposit",
+            "amount": 125.00
+        },
+        {
+            "transaction_date": "2020-01-21",
+            "transaction_type": "withdrawal",
+            "amount": 100.00
+        },
+        {
+            "transaction_date": "2021-10-24",
+            "transaction_type": "Deposit",
+            "amount": 100.00
         }
     ],
     "api_key": "ABCD1234EFGH5678"
