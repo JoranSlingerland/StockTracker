@@ -432,6 +432,25 @@ def output_to_sql(input_data, data):
             END
             """)
 
+    # insert cash_held data
+    with conn:
+        crs = conn.cursor()
+        for single_date, cash_held in data['cash_held'].items():
+            crs.execute(f"""
+            IF NOT EXISTS(SELECT 1 FROM sys.columns 
+                    WHERE Name = N'amount'
+                    AND Object_ID = Object_ID(N'dbo.cash_held'))
+            BEGIN
+                ALTER TABLE cash_held
+                ADD amount MONEY;
+            END
+
+            IF NOT EXISTS ( SELECT 1 FROM cash_held WHERE date = '{single_date}' )
+            BEGIN
+                INSERT INTO cash_held (date, amount) VALUES ('{single_date}', {cash_held})
+            END
+            """)
+
 
 # main
 def main():
