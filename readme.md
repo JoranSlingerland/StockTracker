@@ -61,6 +61,12 @@ The script requires you to put a .json file of your transactions, cash deposits 
             "amount": 100.00
         }
     ],
-    "api_key": "ABCD1234EFGH5678"
+    "api_key": "ABCD1234EFGH5678",
+    "sql_server": {
+        "server": "localhost",
+        "database": "StockTracker",
+        "user": "sa",
+        "password": "Password123"
+    }
 }
 ```

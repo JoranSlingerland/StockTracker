@@ -247,6 +247,33 @@
         },
         "api_key": {
             "type": "string"
+        },
+        "sql_server": {
+            "type": "object",
+            "properties": {
+                "server": {
+                    "type": "string",
+                    "description": "The SQL Server name"
+                },
+                "database": {
+                    "type": "string",
+                    "description": "The SQL Server database"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "The SQL Server user"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "The SQL Server password"
+                }
+            },
+            "required": [
+                "server",
+                "database",
+                "user",
+                "password"
+            ]
         }
     },
     "required": [
