@@ -4,6 +4,7 @@
 # Import modules
 import json
 from datetime import date, datetime, timedelta
+import pyodbc
 import requests
 import pandas
 from jsonschema import validate
@@ -198,7 +199,7 @@ def merge_sells_and_buys(stocks_held):
                     'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
                     'currency': single_stock_list[0]['currency']
                 }
-                if temp_object['quantity'] > 0: #todo make sure it will always output something
+                if temp_object['quantity'] > 0:
                     temp_list.append(temp_object)
         merged_stocks_held.update({single_date: temp_list})
     merged_stocks_held = {"stocks_held": merged_stocks_held}
@@ -404,11 +405,39 @@ def merge_deposits_and_withdrawals(cash):
     merged_cash_held = {"cash_held": merged_cash_held}
     return merged_cash_held
 
+def output_to_sql(input_data, data):
+    """Output the data to a sql server"""
+    # initialize variables
+    server = input_data['sql_server']['server']
+    database = input_data['sql_server']['database']
+    username = input_data['sql_server']['user']
+    password = input_data['sql_server']['password']
+
+    # connect to database
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+
+    #create tables
+    with conn:
+        for table_name, temp_data in data.items(): #pylint: disable=unused-variable
+            crs = conn.cursor()
+            crs.execute(f"""
+            IF (NOT EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES 
+                 WHERE TABLE_SCHEMA = 'dbo' 
+                 AND  TABLE_NAME = '{table_name}'))
+            BEGIN
+                create table {table_name} (
+                    date date
+                )
+            END
+            """)
+
+
 # main
 def main():
     """Main function"""
     # initialize variables
-    output_json = True
+    output_json = False
     output_sql = True
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
 
@@ -416,21 +445,22 @@ def main():
     input_data = get_input_data(rootdir)
 
     # get stock data
-    stock_held = compute_transactions(input_data)
-    stock_data = get_stock_data(input_data)
-    forex_data = get_forex_data(input_data)
-    cash_data = get_cash_data(input_data)
-    #stock_data = read_jsonfile('./.data/output/stock_data.json')
-    data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
-    data = calculate_totals(data)
-    data.update(**cash_data)
+    # stock_held = compute_transactions(input_data)
+    # stock_data = get_stock_data(input_data)
+    # forex_data = get_forex_data(input_data)
+    # cash_data = get_cash_data(input_data)
+    # #stock_data = read_jsonfile('./.data/output/stock_data.json')
+    # data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
+    # data = calculate_totals(data)
+    # data.update(**cash_data)
+    data = read_jsonfile(f'{rootdir}\\.data\\output\\data.json')
 
     #write output
     if output_json:
         write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
     if output_sql:
-        pass
+        output_to_sql(input_data, data)
 
 if __name__ == '__main__':
     main()
