@@ -52,7 +52,7 @@ The script requires you to put a .json file of your transactions, cash deposits 
         },
         {
             "transaction_date": "2020-01-21",
-            "transaction_type": "withdrawal",
+            "transaction_type": "Withdrawal",
             "amount": 100.00
         },
         {
