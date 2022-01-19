@@ -54,8 +54,6 @@ def compute_transactions(transactions):
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
-    #stocks_held = calculate_totals(stocks_held)
-    #write_jsonfile(stocks_held, './.data/output/stocks_held_test.json')
     return stocks_held
 
 
@@ -169,7 +167,7 @@ def merge_sells_and_buys(stocks_held):
 
     # initialize variables
     merged_stocks_held = {}
-
+    uid = 0
     # loop through dates
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
         # initialize variables
@@ -194,6 +192,7 @@ def merge_sells_and_buys(stocks_held):
                     'quantity': single_stock_list[0]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'],
                     'currency': single_stock_list[0]['currency'],
+                    'uid': uid
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
@@ -205,10 +204,12 @@ def merge_sells_and_buys(stocks_held):
                     'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
                     'quantity': single_stock_list[0]['quantity'] - single_stock_list[1]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
-                    'currency': single_stock_list[0]['currency']
+                    'currency': single_stock_list[0]['currency'],
+                    'uid': uid
                 }
                 if temp_object['quantity'] > 0:
                     temp_list.append(temp_object)
+            uid += 1
         merged_stocks_held.update({single_date: temp_list})
     merged_stocks_held = {"stocks_held": merged_stocks_held}
     return merged_stocks_held
@@ -218,13 +219,16 @@ def calculate_totals(stocks_held):
     """Calculate totals"""
     # initialize variables
     perm_object = {}
+    uid = 0
 
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
         temp_object = {
             'total_cost': sum([d['total_cost'] for d in date_stocks_held]),
             'total_value': sum([d['total_value'] for d in date_stocks_held]),
+            'uid': uid
         }
         perm_object.update({single_date: temp_object})
+        uid += 1
     stocks_held_and_totals = {**stocks_held, "totals": perm_object}
     return stocks_held_and_totals
 
@@ -247,7 +251,6 @@ def get_stock_data(input_data):
         temp_data = call_api(url)
         stock_data.update({symbol: temp_data})
 
-    #write_jsonfile(stock_data, './.data/output/stock_data.json')
     # return dictionary
     return stock_data
 
@@ -409,23 +412,26 @@ def merge_deposits_and_withdrawals(cash):
     """merge deposits and withdrawals"""
     # initialize variables
     merged_cash_held = {}
-
+    uid = 0
     for single_date, date_cash_held in cash['cash_held'].items():
         # intialize variables
         temp_list = []
 
         if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
             temp_object = {
-                single_date: date_cash_held[0]['amount'],
+                'cash_held': date_cash_held[0]['amount'],
+                'uid': uid
             }
             temp_list.append(temp_object)
         elif len(date_cash_held) == 2:
             date_cash_held = sorted(
                 date_cash_held, key=lambda k: k['transaction_type'])
             temp_object = {
-                single_date: date_cash_held[0]['amount'] - date_cash_held[1]['amount'],
+                'cash_held': date_cash_held[0]['amount'] - date_cash_held[1]['amount'],
+                'uid': uid
             }
-        merged_cash_held.update({**temp_object})
+        merged_cash_held.update({single_date: temp_object})
+        uid += 1
     merged_cash_held = {"cash_held": merged_cash_held}
     return merged_cash_held
 
@@ -444,25 +450,7 @@ def output_to_sql(input_data, data):
 
     # create tables
     create_sql_table(input_data, conn)
-
-    # insert cash_held data
-    with conn:
-        crs = conn.cursor()
-        for single_date, cash_held in data['cash_held'].items():
-            crs.execute(f"""
-            IF NOT EXISTS(SELECT 1 FROM sys.columns 
-                    WHERE Name = N'amount'
-                    AND Object_ID = Object_ID(N'dbo.cash_held'))
-            BEGIN
-                ALTER TABLE cash_held
-                ADD amount MONEY;
-            END
-
-            IF NOT EXISTS ( SELECT 1 FROM cash_held WHERE date = '{single_date}' )
-            BEGIN
-                INSERT INTO cash_held (date, amount) VALUES ('{single_date}', {cash_held})
-            END
-            """)
+    fill_sql_table(data, conn)
 
 
 def create_sql_table(input_data, conn):
@@ -479,7 +467,7 @@ def create_sql_table(input_data, conn):
                  AND  TABLE_NAME = '{table["table_name"]}'))
             BEGIN
                 create table {table["table_name"]} (
-                    date date
+                    uid INT PRIMARY KEY,
                 )
             END
             """)
@@ -494,7 +482,41 @@ def create_sql_table(input_data, conn):
                 END
                 """)
 
-# main
+
+def fill_sql_table(data, conn):
+    """fill table"""
+
+    cash_held = data['cash_held']
+    stocks_held = data['stocks_held']
+    totals = data['totals']
+
+    with conn:
+        crs = conn.cursor()
+        for single_date, cash_held in cash_held.items():
+            crs.execute(f"""
+            IF NOT EXISTS ( SELECT 1 FROM cash_held WHERE uid = {cash_held['uid']} )
+            BEGIN
+                INSERT INTO cash_held (uid, date, amount) 
+                VALUES ({cash_held['uid']}, '{single_date}',{cash_held['cash_held']})
+            END
+            """)
+        for single_data, stocks_held in stocks_held.items():
+            for single_stock in stocks_held:
+                crs.execute(f"""
+                IF NOT EXISTS ( SELECT 1 FROM stocks_held WHERE uid = {single_stock['uid']} )
+                BEGIN
+                    INSERT INTO stocks_held (uid, date, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
+                    VALUES ({single_stock['uid']}, '{single_data}', {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']})
+                END
+                """)
+        for single_data, total in totals.items():
+            crs.execute(f"""
+            IF NOT EXISTS ( SELECT 1 FROM totals WHERE uid = {total['uid']} )
+            BEGIN
+                INSERT INTO totals (uid, date, total_cost, total_value)
+                VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
+            END
+            """)
 
 
 def main():
@@ -508,15 +530,13 @@ def main():
     input_data = get_input_data(rootdir)
 
     # get stock data
-    # stock_held = compute_transactions(input_data)
-    # stock_data = get_stock_data(input_data)
-    # forex_data = get_forex_data(input_data)
-    # cash_data = get_cash_data(input_data)
-    # #stock_data = read_jsonfile('./.data/output/stock_data.json')
-    # data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
-    # data = calculate_totals(data)
-    # data.update(**cash_data)
-    data = read_jsonfile(f'{rootdir}\\.data\\output\\data.json')
+    stock_held = compute_transactions(input_data)
+    stock_data = get_stock_data(input_data)
+    forex_data = get_forex_data(input_data)
+    cash_data = get_cash_data(input_data)
+    data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
+    data = calculate_totals(data)
+    data.update(**cash_data)
 
     # write output
     if output_json:
