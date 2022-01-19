@@ -266,6 +266,137 @@
                 "password": {
                     "type": "string",
                     "description": "The SQL Server password"
+                },
+                "tables": {
+                    "type": "array",
+                    "description": "The SQL Server tables",
+                    "items": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "table_name": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "properties": {
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "amount": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "date",
+                                        "amount"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "table_name",
+                                "columns"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "table_name": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "properties": {
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "average_cost": {
+                                            "type": "string"
+                                        },
+                                        "close_value": {
+                                            "type": "string"
+                                        },
+                                        "currency": {
+                                            "type": "string"
+                                        },
+                                        "high_value": {
+                                            "type": "string"
+                                        },
+                                        "low_value": {
+                                            "type": "string"
+                                        },
+                                        "open_value": {
+                                            "type": "string"
+                                        },
+                                        "quantity": {
+                                            "type": "string"
+                                        },
+                                        "symbol": {
+                                            "type": "string"
+                                        },
+                                        "total_cost": {
+                                            "type": "string"
+                                        },
+                                        "transaction_cost": {
+                                            "type": "string"
+                                        },
+                                        "volume": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "date",
+                                        "average_cost",
+                                        "close_value",
+                                        "currency",
+                                        "high_value",
+                                        "low_value",
+                                        "open_value",
+                                        "quantity",
+                                        "symbol",
+                                        "total_cost",
+                                        "transaction_cost",
+                                        "volume"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "table_name",
+                                "columns"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "table_name": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "properties": {
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "total_cost": {
+                                            "type": "string"
+                                        },
+                                        "total_value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "date",
+                                        "total_cost",
+                                        "total_value"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "table_name",
+                                "columns"
+                            ]
+                        }
+                    ]
                 }
             },
             "required": [

@@ -51,6 +51,40 @@
         "server": "localhost",
         "database": "StockTracker",
         "user": "sa",
-        "password": "Password123"
+        "password": "Password123",
+        "tables": [
+            {
+                "table_name": "cash_held",
+                "columns": {
+                    "date": "DATE",
+                    "amount": "MONEY"
+                }
+            },
+            {
+                "table_name": "stock_held",
+                "columns": {
+                    "date": "DATE",
+                    "average_cost": "MONEY",
+                    "close_value": "MONEY",
+                    "currency": "TEXT",
+                    "high_value": "MONEY",
+                    "low_value": "MONEY",
+                    "open_value": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "symbol": "TEXT",
+                    "total_cost": "MONEY",
+                    "transaction_cost": "MONEY",
+                    "volume": "DECIMAL(38,2)"
+                }
+            },
+            {
+                "table_name": "totals",
+                "columns": {
+                    "date": "DATE",
+                    "total_cost": "MONEY",
+                    "total_value": "MONEY"
+                }
+            }
+        ]
     }
 }

@@ -11,6 +11,8 @@ from jsonschema import validate
 from ratelimit import limits, sleep_and_retry
 
 # modules
+
+
 def read_jsonfile(filename):
     """Read data from file"""
     with open(filename, encoding='utf-8') as json_file:
@@ -22,6 +24,7 @@ def write_jsonfile(data, filename):
     """Write data to file"""
     with open(filename, "w+", encoding="utf-8") as file:
         json.dump(data, file, indent=4, sort_keys=True)
+
 
 @sleep_and_retry
 @limits(calls=5, period=60)
@@ -35,6 +38,7 @@ def call_api(url):
 
     return data.json()
 
+
 def get_input_data(rootdir):
     """Get input from file"""
     input_data = read_jsonfile(f'{rootdir}\\.data\\input\\input.json')
@@ -42,9 +46,11 @@ def get_input_data(rootdir):
     validate(input_data, schema)
     return input_data
 
+
 def compute_transactions(transactions):
     """Compute transactions"""
-    transactions = sorted(transactions['transactions'], key=lambda k: k['transaction_date'])
+    transactions = sorted(
+        transactions['transactions'], key=lambda k: k['transaction_date'])
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
@@ -66,7 +72,8 @@ def get_transactions_by_day(transactions):
     # loop through dates
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        filterd_stocks_held = [d for d in transactions if d['transaction_date'] <= single_date]
+        filterd_stocks_held = [
+            d for d in transactions if d['transaction_date'] <= single_date]
 
         # create object
         temp_list = []
@@ -190,7 +197,8 @@ def merge_sells_and_buys(stocks_held):
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
-                single_stock_list = sorted(single_stock_list, key=lambda k: k['transaction_type'])
+                single_stock_list = sorted(
+                    single_stock_list, key=lambda k: k['transaction_type'])
                 temp_object = {
                     'symbol': symbol,
                     'average_cost': single_stock_list[0]['average_cost'],
@@ -225,7 +233,7 @@ def get_stock_data(input_data):
     """get data for all stocks from api"""
     # initialize variables
     symbols = []
-    query='TIME_SERIES_DAILY'
+    query = 'TIME_SERIES_DAILY'
     stock_data = {}
 
     # get unique symbols
@@ -233,7 +241,7 @@ def get_stock_data(input_data):
         symbols.append(temp_loop['symbol'])
         symbols = list(dict.fromkeys(symbols))
 
-    #get data for all symbols
+    # get data for all symbols
     for symbol in symbols:
         url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={input_data["api_key"]}&outputsize=full&datatype=compact'
         temp_data = call_api(url)
@@ -248,7 +256,7 @@ def get_forex_data(input_data):
     """get data for all currencies from api"""
     # initialize variables
     currencies = []
-    query='FX_DAILY'
+    query = 'FX_DAILY'
     forex_data = {}
     base_currency = 'EUR'
 
@@ -257,7 +265,7 @@ def get_forex_data(input_data):
         currencies.append(temp_loop['currency'])
         currencies = list(dict.fromkeys(currencies))
 
-    #get data for all currencies
+    # get data for all currencies
     for currency in currencies:
         url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full'
         temp_data = call_api(url)
@@ -265,6 +273,7 @@ def get_forex_data(input_data):
 
     # return dictionary
     return forex_data
+
 
 def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     """add data to stocks held"""
@@ -275,7 +284,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     updated_stocks_held = {}
 
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
-        #initialize variables
+        # initialize variables
         stock_list = []
         for stock in date_stocks_held:
             days_to_substract = 0
@@ -283,15 +292,22 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                 try:
                     date_string = f"{single_date} 00:00:00"
                     date_object = (datetime.fromisoformat(date_string))
-                    date_object = date_object - timedelta(days=days_to_substract)
+                    date_object = date_object - \
+                        timedelta(days=days_to_substract)
                     date_object = date_object.strftime("%Y-%m-%d")
 
-                    stock_open = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open'])
-                    stock_high = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high'])
-                    stock_low = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low'])
-                    stock_close = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close'])
-                    stock_volume = float(stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])
-                    forex_high = float(forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
+                    stock_open = float(
+                        stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['1. open'])
+                    stock_high = float(
+                        stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['2. high'])
+                    stock_low = float(
+                        stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['3. low'])
+                    stock_close = float(
+                        stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['4. close'])
+                    stock_volume = float(
+                        stock_data[stock['symbol']]['Time Series (Daily)'][date_object]['5. volume'])
+                    forex_high = float(
+                        forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
 
                     stock.update({
                         'open_value': stock_open * forex_high,
@@ -309,6 +325,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     data.update({'stocks_held': updated_stocks_held})
     return data
 
+
 def get_cash_data(input_data):
     """Get the day by day cash data"""
     cash = get_cash_day_by_day(input_data)
@@ -322,14 +339,16 @@ def get_cash_day_by_day(input_data):
     # initialize variables
     cash_held = {}
 
-    transactions = sorted(input_data['transactions'], key=lambda k: k['transaction_date'])
+    transactions = sorted(
+        input_data['transactions'], key=lambda k: k['transaction_date'])
     end_date = date.today()
     start_date = transactions[0]['transaction_date']
     daterange = pandas.date_range(start_date, end_date)
 
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        filterd_cash_held = [d for d in input_data['cash'] if d['transaction_date'] <= single_date]
+        filterd_cash_held = [d for d in input_data['cash']
+                             if d['transaction_date'] <= single_date]
 
         # create object
         temp_list = []
@@ -346,6 +365,7 @@ def get_cash_day_by_day(input_data):
 
     return cash_held
 
+
 def calculate_deposits_and_withdrawals(cash):
     """calculate depoisits and withdrawals"""
 
@@ -353,11 +373,12 @@ def calculate_deposits_and_withdrawals(cash):
     computed_date_cash_held = {}
 
     for single_date, date_cash_held in cash['cash_held'].items():
-        #intialize variables
+        # intialize variables
         temp_list = []
 
         # get deposits
-        deposits = [d for d in date_cash_held if d['transaction_type'] == 'Deposit']
+        deposits = [
+            d for d in date_cash_held if d['transaction_type'] == 'Deposit']
         if deposits:
             temp_object = {
                 "amount": sum([d['amount'] for d in deposits]),
@@ -366,7 +387,8 @@ def calculate_deposits_and_withdrawals(cash):
             temp_list.append(temp_object)
 
         # get withdrawals
-        withdrawals = [d for d in date_cash_held if d['transaction_type'] == 'Withdrawal']
+        withdrawals = [
+            d for d in date_cash_held if d['transaction_type'] == 'Withdrawal']
         if withdrawals:
             temp_object = {
                 "amount": sum([d['amount'] for d in withdrawals]),
@@ -382,13 +404,14 @@ def calculate_deposits_and_withdrawals(cash):
     computed_date_cash_held = {"cash_held": computed_date_cash_held}
     return computed_date_cash_held
 
+
 def merge_deposits_and_withdrawals(cash):
     """merge deposits and withdrawals"""
     # initialize variables
     merged_cash_held = {}
 
     for single_date, date_cash_held in cash['cash_held'].items():
-        #intialize variables
+        # intialize variables
         temp_list = []
 
         if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
@@ -397,13 +420,15 @@ def merge_deposits_and_withdrawals(cash):
             }
             temp_list.append(temp_object)
         elif len(date_cash_held) == 2:
-            date_cash_held = sorted(date_cash_held, key=lambda k: k['transaction_type'])
+            date_cash_held = sorted(
+                date_cash_held, key=lambda k: k['transaction_type'])
             temp_object = {
                 single_date: date_cash_held[0]['amount'] - date_cash_held[1]['amount'],
             }
         merged_cash_held.update({**temp_object})
     merged_cash_held = {"cash_held": merged_cash_held}
     return merged_cash_held
+
 
 def output_to_sql(input_data, data):
     """Output the data to a sql server"""
@@ -414,23 +439,11 @@ def output_to_sql(input_data, data):
     password = input_data['sql_server']['password']
 
     # connect to database
-    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
+                          server+';DATABASE='+database+';UID='+username+';PWD=' + password)
 
-    #create tables
-    with conn:
-        for table_name, temp_data in data.items(): #pylint: disable=unused-variable
-            crs = conn.cursor()
-            crs.execute(f"""
-            IF (NOT EXISTS (SELECT * 
-                 FROM INFORMATION_SCHEMA.TABLES 
-                 WHERE TABLE_SCHEMA = 'dbo' 
-                 AND  TABLE_NAME = '{table_name}'))
-            BEGIN
-                create table {table_name} (
-                    date date
-                )
-            END
-            """)
+    # create tables
+    create_sql_table(input_data, conn)
 
     # insert cash_held data
     with conn:
@@ -452,7 +465,38 @@ def output_to_sql(input_data, data):
             """)
 
 
+def create_sql_table(input_data, conn):
+    """create table"""
+    # initialize variables
+    tables = input_data['sql_server']['tables']
+    with conn:
+        crs = conn.cursor()
+        for table in tables:
+            crs.execute(f"""
+            IF (NOT EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES 
+                 WHERE TABLE_SCHEMA = 'dbo' 
+                 AND  TABLE_NAME = '{table["table_name"]}'))
+            BEGIN
+                create table {table["table_name"]} (
+                    date date
+                )
+            END
+            """)
+            for column_name, column_type in table['columns'].items():
+                crs.execute(f"""
+                IF NOT EXISTS(SELECT 1 FROM sys.columns 
+                        WHERE Name = N'{column_name}'
+                        AND Object_ID = Object_ID(N'dbo.{table["table_name"]}'))
+                BEGIN
+                    ALTER TABLE {table["table_name"]}
+                    ADD {column_name} {column_type};
+                END
+                """)
+
 # main
+
+
 def main():
     """Main function"""
     # initialize variables
@@ -474,12 +518,13 @@ def main():
     # data.update(**cash_data)
     data = read_jsonfile(f'{rootdir}\\.data\\output\\data.json')
 
-    #write output
+    # write output
     if output_json:
         write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
     if output_sql:
         output_to_sql(input_data, data)
+
 
 if __name__ == '__main__':
     main()
