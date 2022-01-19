@@ -517,6 +517,16 @@ def fill_sql_table(data, conn):
                 VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
             END
             """)
+        uid = 0
+        crs.execute("""truncate table single_day""")
+        last_data = list(stocks_held)[-1]
+
+        for stock_held in stocks_held[last_data]:
+            crs.execute(f"""
+            INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
+            VALUES ({uid}, {stock_held['average_cost']}, {stock_held['close_value']}, '{stock_held['currency']}', {stock_held['high_value']}, {stock_held['low_value']}, {stock_held['open_value']}, {stock_held['quantity']}, '{stock_held['symbol']}', {stock_held['total_cost']}, {stock_held['transaction_cost']}, {stock_held['volume']})
+            """)
+            uid += 1
 
 
 def main():
@@ -537,6 +547,7 @@ def main():
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
     data.update(**cash_data)
+
 
     # write output
     if output_json:
