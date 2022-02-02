@@ -500,8 +500,8 @@ def fill_sql_table(data, conn):
                 VALUES ({cash_held['uid']}, '{single_date}',{cash_held['cash_held']})
             END
             """)
-        for single_data, stocks_held in stocks_held.items():
-            for single_stock in stocks_held:
+        for single_data, stock_held in stocks_held.items():
+            for single_stock in stock_held:
                 crs.execute(f"""
                 IF NOT EXISTS ( SELECT 1 FROM stocks_held WHERE uid = {single_stock['uid']} )
                 BEGIN
@@ -517,16 +517,17 @@ def fill_sql_table(data, conn):
                 VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
             END
             """)
-        #uid = 0
+
         crs.execute("""truncate table single_day""")
-        last_data = list(stocks_held)[-1]
-        print(last_data)
-        # for stock_held in stocks_held[last_data]:
-        #     crs.execute(f"""
-        #     INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume)
-        #     VALUES ({uid}, {stock_held['average_cost']}, {stock_held['close_value']}, '{stock_held['currency']}', {stock_held['high_value']}, {stock_held['low_value']}, {stock_held['open_value']}, {stock_held['quantity']}, '{stock_held['symbol']}', {stock_held['total_cost']}, {stock_held['transaction_cost']}, {stock_held['volume']})
-        #     """)
-        #     uid += 1
+
+        uid = 0
+
+        for single_stock in stock_held: # pylint: disable=undefined-loop-variable
+            crs.execute(f"""
+            INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume, total_value)
+            VALUES ({uid}, {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
+            """)
+            uid += 1
 
 def delete_sql_tables(input_data):
     """delete table"""
@@ -540,8 +541,6 @@ def delete_sql_tables(input_data):
     # connect to database
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
                           server+';DATABASE='+database+';UID='+username+';PWD=' + password)
-
-
     with conn:
         crs = conn.cursor()
         for table in tables:
@@ -573,8 +572,8 @@ def main():
     """Main function"""
     # initialize variables
     output_json = False
-    output_sql = False
-    truncate_tables = False
+    output_sql = True
+    truncate_tables = True
     delete_tables = False
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
 
@@ -589,8 +588,6 @@ def main():
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
     data.update(**cash_data)
-
-
 
     #clear old data
     if delete_tables:
