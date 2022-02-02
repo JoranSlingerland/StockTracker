@@ -122,7 +122,7 @@ def calculate_sells_and_buys(stocks_held):
                 continue
             temp_object = {
                 'symbol': symbol_buys,
-                'average_cost': sum([d['cost'] * d['quantity'] for d in date_stock_held_buys]) / sum([d['quantity'] for d in date_stock_held_buys]),
+                'average_cost': sum([d['cost'] for d in date_stock_held_buys]) / sum([d['quantity'] for d in date_stock_held_buys]),
                 'quantity': sum([d['quantity'] for d in date_stock_held_buys]),
                 'transaction_type': 'Buy',
                 'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_buys]),
@@ -147,7 +147,7 @@ def calculate_sells_and_buys(stocks_held):
                 continue
             temp_object = {
                 'symbol': symbol_sells,
-                'average_cost': sum([d['cost'] * d['quantity'] for d in date_stock_held_sells]) / sum([d['quantity'] for d in date_stock_held_sells]),
+                'average_cost': sum([d['cost'] for d in date_stock_held_sells]) / sum([d['quantity'] for d in date_stock_held_sells]),
                 'quantity': sum([d['quantity'] for d in date_stock_held_sells]),
                 'transaction_type': 'Sell',
                 'transaction_cost': sum([d['transaction_cost'] for d in date_stock_held_sells]),
@@ -505,8 +505,8 @@ def fill_sql_table(data, conn):
                 crs.execute(f"""
                 IF NOT EXISTS ( SELECT 1 FROM stocks_held WHERE uid = {single_stock['uid']} )
                 BEGIN
-                    INSERT INTO stocks_held (uid, date, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
-                    VALUES ({single_stock['uid']}, '{single_data}', {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']})
+                    INSERT INTO stocks_held (uid, date, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume, total_value) 
+                    VALUES ({single_stock['uid']}, '{single_data}', {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
                 END
                 """)
         for single_data, total in totals.items():
@@ -517,22 +517,22 @@ def fill_sql_table(data, conn):
                 VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
             END
             """)
-        uid = 0
+        #uid = 0
         crs.execute("""truncate table single_day""")
-        last_data = list(stocks_held)[-1]
+        #last_data = list(stocks_held)[-1]
 
-        for stock_held in stocks_held[last_data]:
-            crs.execute(f"""
-            INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
-            VALUES ({uid}, {stock_held['average_cost']}, {stock_held['close_value']}, '{stock_held['currency']}', {stock_held['high_value']}, {stock_held['low_value']}, {stock_held['open_value']}, {stock_held['quantity']}, '{stock_held['symbol']}', {stock_held['total_cost']}, {stock_held['transaction_cost']}, {stock_held['volume']})
-            """)
-            uid += 1
+        # for stock_held in stocks_held[last_data]:
+        #     crs.execute(f"""
+        #     INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
+        #     VALUES ({uid}, {stock_held['average_cost']}, {stock_held['close_value']}, '{stock_held['currency']}', {stock_held['high_value']}, {stock_held['low_value']}, {stock_held['open_value']}, {stock_held['quantity']}, '{stock_held['symbol']}', {stock_held['total_cost']}, {stock_held['transaction_cost']}, {stock_held['volume']})
+        #     """)
+        #     uid += 1
 
 
 def main():
     """Main function"""
     # initialize variables
-    output_json = False
+    output_json = True
     output_sql = True
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
 
