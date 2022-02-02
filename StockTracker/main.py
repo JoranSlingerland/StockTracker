@@ -519,21 +519,63 @@ def fill_sql_table(data, conn):
             """)
         #uid = 0
         crs.execute("""truncate table single_day""")
-        #last_data = list(stocks_held)[-1]
-
+        last_data = list(stocks_held)[-1]
+        print(last_data)
         # for stock_held in stocks_held[last_data]:
         #     crs.execute(f"""
-        #     INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume) 
+        #     INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume)
         #     VALUES ({uid}, {stock_held['average_cost']}, {stock_held['close_value']}, '{stock_held['currency']}', {stock_held['high_value']}, {stock_held['low_value']}, {stock_held['open_value']}, {stock_held['quantity']}, '{stock_held['symbol']}', {stock_held['total_cost']}, {stock_held['transaction_cost']}, {stock_held['volume']})
         #     """)
         #     uid += 1
 
+def delete_sql_tables(input_data):
+    """delete table"""
+    # initialize variables
+    server = input_data['sql_server']['server']
+    database = input_data['sql_server']['database']
+    username = input_data['sql_server']['user']
+    password = input_data['sql_server']['password']
+    tables = input_data['sql_server']['tables']
+
+    # connect to database
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
+                          server+';DATABASE='+database+';UID='+username+';PWD=' + password)
+
+
+    with conn:
+        crs = conn.cursor()
+        for table in tables:
+            crs.execute(f"""
+            drop table {table["table_name"]}
+            """)
+
+def truncate_sql_tables(input_data):
+    """delete table"""
+    # initialize variables
+    server = input_data['sql_server']['server']
+    database = input_data['sql_server']['database']
+    username = input_data['sql_server']['user']
+    password = input_data['sql_server']['password']
+    tables = input_data['sql_server']['tables']
+
+    # connect to database
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
+                          server+';DATABASE='+database+';UID='+username+';PWD=' + password)
+
+    with conn:
+        crs = conn.cursor()
+        for table in tables:
+            crs.execute(f"""
+            truncate table {table["table_name"]}
+            """)
 
 def main():
     """Main function"""
     # initialize variables
-    output_json = True
-    output_sql = True
+    output_json = False
+    output_sql = False
+    truncate_tables = False
+    delete_tables = False
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
 
     # get input data
@@ -548,6 +590,15 @@ def main():
     data = calculate_totals(data)
     data.update(**cash_data)
 
+
+
+    #clear old data
+    if delete_tables:
+        delete_sql_tables(input_data)
+
+    if truncate_tables:
+        if not delete_tables:
+            truncate_sql_tables(input_data)
 
     # write output
     if output_json:
