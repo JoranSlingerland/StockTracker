@@ -186,26 +186,26 @@ def merge_sells_and_buys(stocks_held):
 
             if len(single_stock_list) == 1 and single_stock_list[0]['transaction_type'] == 'Buy':
                 temp_object = {
+                    'uid': uid,
                     'symbol': symbol,
                     'average_cost': single_stock_list[0]['average_cost'],
                     'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
                     'quantity': single_stock_list[0]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'],
-                    'currency': single_stock_list[0]['currency'],
-                    'uid': uid
+                    'currency': single_stock_list[0]['currency']
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
                 single_stock_list = sorted(
                     single_stock_list, key=lambda k: k['transaction_type'])
                 temp_object = {
+                    'uid': uid,
                     'symbol': symbol,
                     'average_cost': single_stock_list[0]['average_cost'],
                     'total_cost': single_stock_list[0]['average_cost'] * single_stock_list[0]['quantity'],
                     'quantity': single_stock_list[0]['quantity'] - single_stock_list[1]['quantity'],
                     'transaction_cost': single_stock_list[0]['transaction_cost'] + single_stock_list[1]['transaction_cost'],
-                    'currency': single_stock_list[0]['currency'],
-                    'uid': uid
+                    'currency': single_stock_list[0]['currency']
                 }
                 if temp_object['quantity'] > 0:
                     temp_list.append(temp_object)
@@ -223,9 +223,9 @@ def calculate_totals(stocks_held):
 
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
         temp_object = {
+            'uid': uid,
             'total_cost': sum([d['total_cost'] for d in date_stocks_held]),
-            'total_value': sum([d['total_value'] for d in date_stocks_held]),
-            'uid': uid
+            'total_value': sum([d['total_value'] for d in date_stocks_held])
         }
         perm_object.update({single_date: temp_object})
         uid += 1
@@ -419,16 +419,16 @@ def merge_deposits_and_withdrawals(cash):
 
         if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
             temp_object = {
-                'cash_held': date_cash_held[0]['amount'],
-                'uid': uid
+                'uid': uid,
+                'cash_held': date_cash_held[0]['amount']      
             }
             temp_list.append(temp_object)
         elif len(date_cash_held) == 2:
             date_cash_held = sorted(
                 date_cash_held, key=lambda k: k['transaction_type'])
             temp_object = {
-                'cash_held': date_cash_held[0]['amount'] - date_cash_held[1]['amount'],
-                'uid': uid
+                'uid': uid,
+                'cash_held': date_cash_held[0]['amount'] - date_cash_held[1]['amount']
             }
         merged_cash_held.update({single_date: temp_object})
         uid += 1
@@ -450,7 +450,7 @@ def output_to_sql(input_data, data):
 
     # create tables
     create_sql_table(input_data, conn)
-    fill_sql_table(data, conn)
+    fill_sql_table(input_data, data, conn)
 
 
 def create_sql_table(input_data, conn):
@@ -482,38 +482,65 @@ def create_sql_table(input_data, conn):
                 END
                 """)
 
+def list_to_string(list_to_convert):
+    """convert list to string"""
+    return ", ".join(str(e) for e in list_to_convert)
 
-def fill_sql_table(data, conn):
+def fill_sql_table(input_data, data, conn):
     """fill table"""
 
     cash_held = data['cash_held']
     stocks_held = data['stocks_held']
     totals = data['totals']
 
+    #input lists
+    cash_held_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][0]['columns'].keys())
+    stocks_held_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][1]['columns'].keys())
+    totals_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][2]['columns'].keys())
+    single_day_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][3]['columns'].keys())
+
     with conn:
         crs = conn.cursor()
         for single_date, cash_held in cash_held.items():
+            cash_held_values = list(cash_held.values())
+            single_date = "'" + single_date + "'"
+            cash_held_values.insert(1, single_date)
+            cash_held_values = list_to_string(cash_held_values)
             crs.execute(f"""
             IF NOT EXISTS ( SELECT 1 FROM cash_held WHERE uid = {cash_held['uid']} )
             BEGIN
-                INSERT INTO cash_held (uid, date, amount) 
-                VALUES ({cash_held['uid']}, '{single_date}',{cash_held['cash_held']})
+                INSERT INTO cash_held ({cash_held_columns}) 
+                VALUES ({cash_held_values})
             END
             """)
         for single_data, stock_held in stocks_held.items():
             for single_stock in stock_held:
+                stock_held_values = list(single_stock.values())
+
+                temp_list = []
+                for stock_held_value in stock_held_values:
+                    if isinstance(stock_held_value, str):
+                        temp_list.append("'" + stock_held_value + "'")
+                    else:
+                        temp_list.append(stock_held_value)
+
+                single_date = "'" + single_data + "'"
+                temp_list.insert(1, single_date)
+                stock_held_values = list_to_string(temp_list)
+
                 crs.execute(f"""
                 IF NOT EXISTS ( SELECT 1 FROM stocks_held WHERE uid = {single_stock['uid']} )
                 BEGIN
-                    INSERT INTO stocks_held (uid, date, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume, total_value) 
-                    VALUES ({single_stock['uid']}, '{single_data}', {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
+                    INSERT INTO stocks_held ({stocks_held_columns}) 
+                    VALUES ({stock_held_values})
                 END
                 """)
+
         for single_data, total in totals.items():
             crs.execute(f"""
             IF NOT EXISTS ( SELECT 1 FROM totals WHERE uid = {total['uid']} )
             BEGIN
-                INSERT INTO totals (uid, date, total_cost, total_value)
+                INSERT INTO totals ({totals_columns})
                 VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
             END
             """)
@@ -524,7 +551,7 @@ def fill_sql_table(data, conn):
 
         for single_stock in stock_held: # pylint: disable=undefined-loop-variable
             crs.execute(f"""
-            INSERT INTO single_day (uid, average_cost, close_value, currency, high_value, low_value, open_value, quantity, symbol, total_cost, transaction_cost, volume, total_value)
+            INSERT INTO single_day ({single_day_columns})
             VALUES ({uid}, {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
             """)
             uid += 1
@@ -574,7 +601,7 @@ def main():
     output_json = False
     output_sql = True
     truncate_tables = True
-    delete_tables = False
+    delete_tables = True
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
 
     # get input data
