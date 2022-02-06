@@ -420,7 +420,7 @@ def merge_deposits_and_withdrawals(cash):
         if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
             temp_object = {
                 'uid': uid,
-                'cash_held': date_cash_held[0]['amount']      
+                'cash_held': date_cash_held[0]['amount']
             }
             temp_list.append(temp_object)
         elif len(date_cash_held) == 2:
@@ -503,6 +503,14 @@ def fill_sql_table(input_data, data, conn):
         crs = conn.cursor()
         for single_date, cash_held in cash_held.items():
             cash_held_values = list(cash_held.values())
+
+            temp_list = []
+            for cash_held_value in cash_held_values:
+                if isinstance(cash_held_value, str):
+                    temp_list.append("'" + cash_held_value + "'")
+                else:
+                    temp_list.append(cash_held_value)
+
             single_date = "'" + single_date + "'"
             cash_held_values.insert(1, single_date)
             cash_held_values = list_to_string(cash_held_values)
@@ -513,6 +521,7 @@ def fill_sql_table(input_data, data, conn):
                 VALUES ({cash_held_values})
             END
             """)
+        
         for single_data, stock_held in stocks_held.items():
             for single_stock in stock_held:
                 stock_held_values = list(single_stock.values())
@@ -537,11 +546,25 @@ def fill_sql_table(input_data, data, conn):
                 """)
 
         for single_data, total in totals.items():
+            total_values = list(total.values())
+
+            temp_list = []
+            for total_value in total_values:
+                if isinstance(total_value, str):
+                    temp_list.append("'" + total_value + "'")
+                else:
+                    temp_list.append(total_value)
+            
+            single_date = "'" + single_data + "'"
+            temp_list.insert(1, single_date)
+            total_values = list_to_string(temp_list)
+
+
             crs.execute(f"""
             IF NOT EXISTS ( SELECT 1 FROM totals WHERE uid = {total['uid']} )
             BEGIN
                 INSERT INTO totals ({totals_columns})
-                VALUES ({total['uid']}, '{single_data}', {total['total_cost']}, {total['total_value']})
+                VALUES ({total_values})
             END
             """)
 
@@ -555,6 +578,33 @@ def fill_sql_table(input_data, data, conn):
             VALUES ({uid}, {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
             """)
             uid += 1
+
+def insert_sql_data(single_data, input_values, columns, table, conn):
+    """insert data into sql"""
+    values = list(input_values.values())
+
+    temp_list = []
+    for value in values:
+        if isinstance(value, str):
+            temp_list.append("'" + value + "'")
+        else:
+            temp_list.append(value)
+    
+    single_data = "'" + single_data + "'"
+    temp_list.insert(1, single_data)
+    values = list_to_string(temp_list)
+
+    with conn:
+        crs = conn.cursor()
+        crs.execute(f"""
+        IF NOT EXISTS ( SELECT 1 FROM {table} WHERE uid = {input_values['uid']} )
+        BEGIN
+            INSERT INTO totals ({columns})
+            VALUES ({values})
+        END
+        """)
+    
+
 
 def delete_sql_tables(input_data):
     """delete table"""
