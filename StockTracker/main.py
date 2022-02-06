@@ -488,7 +488,7 @@ def list_to_string(list_to_convert):
     return ", ".join(str(e) for e in list_to_convert)
 
 
-def fill_sql_table(input_data, data, conn):
+def fill_sql_table(input_data, data, conn): # pylint: disable=R0914
     """fill table"""
 
     cash_held = data['cash_held']
