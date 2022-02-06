@@ -538,12 +538,12 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
     temp_list = []
     for value in values:
         if isinstance(value, str):
-            temp_list.append("'" + value + "'")
+            temp_list.append(f"'{value}'")
         else:
             temp_list.append(value)
 
     if single_date is not None:
-        single_date = "'" + single_date + "'"
+        single_date = f"'{single_date}'"
         temp_list.insert(1, single_date)
     values = list_to_string(temp_list)
 
