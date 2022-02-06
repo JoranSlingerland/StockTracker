@@ -482,9 +482,11 @@ def create_sql_table(input_data, conn):
                 END
                 """)
 
+
 def list_to_string(list_to_convert):
     """convert list to string"""
     return ", ".join(str(e) for e in list_to_convert)
+
 
 def fill_sql_table(input_data, data, conn):
     """fill table"""
@@ -493,94 +495,44 @@ def fill_sql_table(input_data, data, conn):
     stocks_held = data['stocks_held']
     totals = data['totals']
 
-    #input lists
-    cash_held_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][0]['columns'].keys())
-    stocks_held_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][1]['columns'].keys())
-    totals_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][2]['columns'].keys())
-    single_day_columns = 'uid, ' + list_to_string(input_data['sql_server']['tables'][3]['columns'].keys())
+    # input lists
+    cash_held_columns = 'uid, ' + \
+        list_to_string(input_data['sql_server']['tables'][0]['columns'].keys())
+    stocks_held_columns = 'uid, ' + \
+        list_to_string(input_data['sql_server']['tables'][1]['columns'].keys())
+    totals_columns = 'uid, ' + \
+        list_to_string(input_data['sql_server']['tables'][2]['columns'].keys())
+    single_day_columns = 'uid, ' + \
+        list_to_string(input_data['sql_server']['tables'][3]['columns'].keys())
+
+    for single_date, cash_held in cash_held.items():
+        insert_sql_data(cash_held, cash_held_columns,
+                        'cash_held', conn, single_date)
+
+    for single_date, stock_held in stocks_held.items():
+        for single_stock in stock_held:
+            insert_sql_data(single_stock, stocks_held_columns,
+                            'stocks_held', conn, single_date)
+
+    for single_date, total in totals.items():
+        insert_sql_data(total, totals_columns, 'totals', conn, single_date)
 
     with conn:
         crs = conn.cursor()
-        for single_date, cash_held in cash_held.items():
-            cash_held_values = list(cash_held.values())
-
-            temp_list = []
-            for cash_held_value in cash_held_values:
-                if isinstance(cash_held_value, str):
-                    temp_list.append("'" + cash_held_value + "'")
-                else:
-                    temp_list.append(cash_held_value)
-
-            single_date = "'" + single_date + "'"
-            cash_held_values.insert(1, single_date)
-            cash_held_values = list_to_string(cash_held_values)
-            crs.execute(f"""
-            IF NOT EXISTS ( SELECT 1 FROM cash_held WHERE uid = {cash_held['uid']} )
-            BEGIN
-                INSERT INTO cash_held ({cash_held_columns}) 
-                VALUES ({cash_held_values})
-            END
-            """)
-        
-        for single_data, stock_held in stocks_held.items():
-            for single_stock in stock_held:
-                stock_held_values = list(single_stock.values())
-
-                temp_list = []
-                for stock_held_value in stock_held_values:
-                    if isinstance(stock_held_value, str):
-                        temp_list.append("'" + stock_held_value + "'")
-                    else:
-                        temp_list.append(stock_held_value)
-
-                single_date = "'" + single_data + "'"
-                temp_list.insert(1, single_date)
-                stock_held_values = list_to_string(temp_list)
-
-                crs.execute(f"""
-                IF NOT EXISTS ( SELECT 1 FROM stocks_held WHERE uid = {single_stock['uid']} )
-                BEGIN
-                    INSERT INTO stocks_held ({stocks_held_columns}) 
-                    VALUES ({stock_held_values})
-                END
-                """)
-
-        for single_data, total in totals.items():
-            total_values = list(total.values())
-
-            temp_list = []
-            for total_value in total_values:
-                if isinstance(total_value, str):
-                    temp_list.append("'" + total_value + "'")
-                else:
-                    temp_list.append(total_value)
-            
-            single_date = "'" + single_data + "'"
-            temp_list.insert(1, single_date)
-            total_values = list_to_string(temp_list)
-
-
-            crs.execute(f"""
-            IF NOT EXISTS ( SELECT 1 FROM totals WHERE uid = {total['uid']} )
-            BEGIN
-                INSERT INTO totals ({totals_columns})
-                VALUES ({total_values})
-            END
-            """)
-
         crs.execute("""truncate table single_day""")
 
-        uid = 0
+    uid = 0
 
-        for single_stock in stock_held: # pylint: disable=undefined-loop-variable
-            crs.execute(f"""
-            INSERT INTO single_day ({single_day_columns})
-            VALUES ({uid}, {single_stock['average_cost']}, {single_stock['close_value']}, '{single_stock['currency']}', {single_stock['high_value']}, {single_stock['low_value']}, {single_stock['open_value']}, {single_stock['quantity']}, '{single_stock['symbol']}', {single_stock['total_cost']}, {single_stock['transaction_cost']}, {single_stock['volume']}, {single_stock['total_value']})
-            """)
-            uid += 1
+    for single_stock in stock_held:  # pylint: disable=undefined-loop-variable
+        single_stock.update({'uid': uid})
+        insert_sql_data(single_stock, single_day_columns,
+                        'single_day', conn)
+        uid += 1
 
-def insert_sql_data(single_data, input_values, columns, table, conn):
+
+def insert_sql_data(input_values, columns, table, conn, single_date=None):
     """insert data into sql"""
+
     values = list(input_values.values())
 
     temp_list = []
@@ -589,9 +541,10 @@ def insert_sql_data(single_data, input_values, columns, table, conn):
             temp_list.append("'" + value + "'")
         else:
             temp_list.append(value)
-    
-    single_data = "'" + single_data + "'"
-    temp_list.insert(1, single_data)
+
+    if single_date is not None:
+        single_date = "'" + single_date + "'"
+        temp_list.insert(1, single_date)
     values = list_to_string(temp_list)
 
     with conn:
@@ -599,11 +552,10 @@ def insert_sql_data(single_data, input_values, columns, table, conn):
         crs.execute(f"""
         IF NOT EXISTS ( SELECT 1 FROM {table} WHERE uid = {input_values['uid']} )
         BEGIN
-            INSERT INTO totals ({columns})
+            INSERT INTO {table} ({columns})
             VALUES ({values})
         END
         """)
-    
 
 
 def delete_sql_tables(input_data):
@@ -625,6 +577,7 @@ def delete_sql_tables(input_data):
             drop table {table["table_name"]}
             """)
 
+
 def truncate_sql_tables(input_data):
     """delete table"""
     # initialize variables
@@ -644,6 +597,7 @@ def truncate_sql_tables(input_data):
             crs.execute(f"""
             truncate table {table["table_name"]}
             """)
+
 
 def main():
     """Main function"""
@@ -666,7 +620,7 @@ def main():
     data = calculate_totals(data)
     data.update(**cash_data)
 
-    #clear old data
+    # clear old data
     if delete_tables:
         delete_sql_tables(input_data)
 
