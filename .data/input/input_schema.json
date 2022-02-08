@@ -269,7 +269,6 @@
                 },
                 "tables": {
                     "type": "array",
-                    "description": "The SQL Server tables",
                     "items": [
                         {
                             "type": "object",
@@ -310,13 +309,25 @@
                                         "date": {
                                             "type": "string"
                                         },
+                                        "symbol": {
+                                            "type": "string"
+                                        },
                                         "average_cost": {
                                             "type": "string"
                                         },
-                                        "close_value": {
+                                        "total_cost": {
+                                            "type": "string"
+                                        },
+                                        "quantity": {
+                                            "type": "string"
+                                        },
+                                        "transaction_cost": {
                                             "type": "string"
                                         },
                                         "currency": {
+                                            "type": "string"
+                                        },
+                                        "close_value": {
                                             "type": "string"
                                         },
                                         "high_value": {
@@ -328,35 +339,27 @@
                                         "open_value": {
                                             "type": "string"
                                         },
-                                        "quantity": {
-                                            "type": "string"
-                                        },
-                                        "symbol": {
-                                            "type": "string"
-                                        },
-                                        "total_cost": {
-                                            "type": "string"
-                                        },
-                                        "transaction_cost": {
-                                            "type": "string"
-                                        },
                                         "volume": {
+                                            "type": "string"
+                                        },
+                                        "total_value": {
                                             "type": "string"
                                         }
                                     },
                                     "required": [
                                         "date",
+                                        "symbol",
                                         "average_cost",
-                                        "close_value",
+                                        "total_cost",
+                                        "quantity",
+                                        "transaction_cost",
                                         "currency",
+                                        "close_value",
                                         "high_value",
                                         "low_value",
                                         "open_value",
-                                        "quantity",
-                                        "symbol",
-                                        "total_cost",
-                                        "transaction_cost",
-                                        "volume"
+                                        "volume",
+                                        "total_value"
                                     ]
                                 }
                             },
@@ -395,6 +398,73 @@
                                 "table_name",
                                 "columns"
                             ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "table_name": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "object",
+                                    "properties": {
+                                        "symbol": {
+                                            "type": "string"
+                                        },
+                                        "average_cost": {
+                                            "type": "string"
+                                        },
+                                        "total_cost": {
+                                            "type": "string"
+                                        },
+                                        "quantity": {
+                                            "type": "string"
+                                        },
+                                        "transaction_cost": {
+                                            "type": "string"
+                                        },
+                                        "currency": {
+                                            "type": "string"
+                                        },
+                                        "close_value": {
+                                            "type": "string"
+                                        },
+                                        "high_value": {
+                                            "type": "string"
+                                        },
+                                        "low_value": {
+                                            "type": "string"
+                                        },
+                                        "open_value": {
+                                            "type": "string"
+                                        },
+                                        "volume": {
+                                            "type": "string"
+                                        },
+                                        "total_value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "symbol",
+                                        "average_cost",
+                                        "total_cost",
+                                        "quantity",
+                                        "transaction_cost",
+                                        "currency",
+                                        "close_value",
+                                        "high_value",
+                                        "low_value",
+                                        "open_value",
+                                        "volume",
+                                        "total_value"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "table_name",
+                                "columns"
+                            ]
                         }
                     ]
                 }
@@ -403,7 +473,8 @@
                 "server",
                 "database",
                 "user",
-                "password"
+                "password",
+                "tables"
             ]
         }
     },

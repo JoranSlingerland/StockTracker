@@ -506,7 +506,7 @@ def output_to_sql(input_data, data):
 
 def create_sql_table(input_data, conn):
     """create table"""
-    logging.info('Creating sql table')
+    logging.info('Creating sql tables')
     # initialize variables
     tables = input_data['sql_server']['tables']
     with conn:
@@ -545,7 +545,7 @@ def list_to_string(list_to_convert):
 
 def fill_sql_table(input_data, data, conn):  # pylint: disable=R0914
     """fill table"""
-    logging.info('Filling sql table')
+    logging.info('Filling sql tables')
 
     cash_held = data['cash_held']
     stocks_held = data['stocks_held']

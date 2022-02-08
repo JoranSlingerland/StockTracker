@@ -76,20 +76,21 @@ The script requires you to put a .json file of your transactions, cash deposits 
                 }
             },
             {
-                "table_name": "stock_held",
+                "table_name": "stocks_held",
                 "columns": {
                     "date": "DATE",
+                    "symbol": "TEXT",
                     "average_cost": "MONEY",
-                    "close_value": "MONEY",
+                    "total_cost": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "transaction_cost": "MONEY",
                     "currency": "TEXT",
+                    "close_value": "MONEY",
                     "high_value": "MONEY",
                     "low_value": "MONEY",
                     "open_value": "MONEY",
-                    "quantity": "DECIMAL(38,2)",
-                    "symbol": "TEXT",
-                    "total_cost": "MONEY",
-                    "transaction_cost": "MONEY",
-                    "volume": "DECIMAL(38,2)"
+                    "volume": "DECIMAL(38,2)",
+                    "total_value": "MONEY"
                 }
             },
             {
@@ -97,6 +98,23 @@ The script requires you to put a .json file of your transactions, cash deposits 
                 "columns": {
                     "date": "DATE",
                     "total_cost": "MONEY",
+                    "total_value": "MONEY"
+                }
+            },
+            {
+                "table_name": "single_day",
+                "columns": {
+                    "symbol": "TEXT",
+                    "average_cost": "MONEY",
+                    "total_cost": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "transaction_cost": "MONEY",
+                    "currency": "TEXT",
+                    "close_value": "MONEY",
+                    "high_value": "MONEY",
+                    "low_value": "MONEY",
+                    "open_value": "MONEY",
+                    "volume": "DECIMAL(38,2)",
                     "total_value": "MONEY"
                 }
             }
