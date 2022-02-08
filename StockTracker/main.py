@@ -1,7 +1,9 @@
 """StockTracker Main.py"""
 # pylint: disable=line-too-long
+# pylint: disable=logging-fstring-interpolation
 
 # Import modules
+import logging
 import json
 from datetime import date, datetime, timedelta
 import pyodbc
@@ -15,6 +17,7 @@ from ratelimit import limits, sleep_and_retry
 
 def read_jsonfile(filename):
     """Read data from file"""
+    logging.info(f'Reading file: {filename}')
     with open(filename, encoding='utf-8') as json_file:
         data = json.load(json_file)
     return data
@@ -22,6 +25,7 @@ def read_jsonfile(filename):
 
 def write_jsonfile(data, filename):
     """Write data to file"""
+    logging.info(f'Writing file: {filename}')
     with open(filename, "w+", encoding="utf-8") as file:
         json.dump(data, file, indent=4, sort_keys=True)
 
@@ -31,10 +35,18 @@ def write_jsonfile(data, filename):
 @limits(calls=500, period=86400)
 def call_api(url):
     """Get data from API"""
+    logging.info(f'Calling API: {url}')
     data = requests.get(url)
 
     if data.status_code != 200:
+        logging.error(f'Error: {data.status_code}')
         raise Exception(f'API response: {data.status_code}')
+
+    # key = 'Note'
+    # keys = data.json()
+    # if key in keys.keys():
+    #     logging.warning('To many api calls, Waiting for 60 seconds')
+    #     time.sleep(60)
 
     return data.json()
 
@@ -43,12 +55,14 @@ def get_input_data(rootdir):
     """Get input from file"""
     input_data = read_jsonfile(f'{rootdir}\\.data\\input\\input.json')
     schema = read_jsonfile(f'{rootdir}\\.data\\input\\input_schema.json')
+    logging.info('Validating input data')
     validate(input_data, schema)
     return input_data
 
 
 def compute_transactions(transactions):
     """Compute transactions"""
+    logging.info('Computing transactions')
     transactions = sorted(
         transactions['transactions'], key=lambda k: k['transaction_date'])
     stocks_held = get_transactions_by_day(transactions)
@@ -59,6 +73,7 @@ def compute_transactions(transactions):
 
 def get_transactions_by_day(transactions):
     """Get transactions by day"""
+    logging.info('Getting transactions by day')
     # initialize variables
     stocks_held = {}
 
@@ -69,6 +84,7 @@ def get_transactions_by_day(transactions):
 
     # loop through dates
     for single_date in daterange:
+        logging.debug(f'Getting transactions for {single_date}')
         single_date = single_date.strftime("%Y-%m-%d")
         filterd_stocks_held = [
             d for d in transactions if d['transaction_date'] <= single_date]
@@ -94,12 +110,13 @@ def get_transactions_by_day(transactions):
 
 def calculate_sells_and_buys(stocks_held):
     """Merge sells and buys together"""
-
+    logging.info('Calculating sells and buys')
     # initialize variables
     computed_date_stocks_held = {}
 
     # Loop through dates
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
+        logging.debug(f'Calculating sells and buys for {single_date}')
         # initialize variables
         symbols_buys = []
         symbols_sells = []
@@ -165,11 +182,15 @@ def merge_sells_and_buys(stocks_held):
     """Loop through buys and sells and merge them together"""
     # pylint: disable=too-many-locals
 
+    logging.info('Merging sells and buys')
+
     # initialize variables
     merged_stocks_held = {}
     uid = 0
     # loop through dates
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
+        logging.debug(f'Merging sells and buys for {single_date}')
+
         # initialize variables
         symbols = []
         temp_list = []
@@ -217,11 +238,14 @@ def merge_sells_and_buys(stocks_held):
 
 def calculate_totals(stocks_held):
     """Calculate totals"""
+    logging.info('Calculating totals')
+
     # initialize variables
     perm_object = {}
     uid = 0
 
     for single_date, date_stocks_held in stocks_held['stocks_held'].items():
+        logging.debug(f'Calculating totals for {single_date}')
         temp_object = {
             'uid': uid,
             'total_cost': sum([d['total_cost'] for d in date_stocks_held]),
@@ -235,6 +259,8 @@ def calculate_totals(stocks_held):
 
 def get_stock_data(input_data):
     """get data for all stocks from api"""
+    logging.info('Getting stock data')
+
     # initialize variables
     symbols = []
     query = 'TIME_SERIES_DAILY'
@@ -257,6 +283,8 @@ def get_stock_data(input_data):
 
 def get_forex_data(input_data):
     """get data for all currencies from api"""
+    logging.info('Getting forex data')
+
     # initialize variables
     currencies = []
     query = 'FX_DAILY'
@@ -282,6 +310,8 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     """add data to stocks held"""
     #pylint: disable=too-many-locals
 
+    logging.info('Adding stock data to stocks held')
+
     # initialize variables
     data = {}
     updated_stocks_held = {}
@@ -291,6 +321,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
         stock_list = []
         for stock in date_stocks_held:
             days_to_substract = 0
+            logging.debug(f'Adding stock data to {stock["symbol"]}')
             while True:
                 try:
                     date_string = f"{single_date} 00:00:00"
@@ -323,6 +354,8 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                     break
                 except KeyError:
                     days_to_substract += 1
+                    logging.debug(
+                        f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)')
             stock_list.append(stock)
         updated_stocks_held.update({single_date: stock_list})
     data.update({'stocks_held': updated_stocks_held})
@@ -331,6 +364,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
 
 def get_cash_data(input_data):
     """Get the day by day cash data"""
+    logging.info('Getting cash data')
     cash = get_cash_day_by_day(input_data)
     cash = calculate_deposits_and_withdrawals(cash)
     cash = merge_deposits_and_withdrawals(cash)
@@ -339,6 +373,7 @@ def get_cash_data(input_data):
 
 def get_cash_day_by_day(input_data):
     """Get the day by day cash data"""
+    logging.info('Getting cash day by day')
     # initialize variables
     cash_held = {}
 
@@ -371,7 +406,7 @@ def get_cash_day_by_day(input_data):
 
 def calculate_deposits_and_withdrawals(cash):
     """calculate depoisits and withdrawals"""
-
+    logging.info('Calculating deposits and withdrawals')
     # initialize variables
     computed_date_cash_held = {}
 
@@ -410,6 +445,7 @@ def calculate_deposits_and_withdrawals(cash):
 
 def merge_deposits_and_withdrawals(cash):
     """merge deposits and withdrawals"""
+    logging.info('Merging deposits and withdrawals')
     # initialize variables
     merged_cash_held = {}
     uid = 0
@@ -438,6 +474,7 @@ def merge_deposits_and_withdrawals(cash):
 
 def output_to_sql(input_data, data):
     """Output the data to a sql server"""
+    logging.info('Outputting data to sql server')
     # initialize variables
     server = input_data['sql_server']['server']
     database = input_data['sql_server']['database']
@@ -455,11 +492,13 @@ def output_to_sql(input_data, data):
 
 def create_sql_table(input_data, conn):
     """create table"""
+    logging.info('Creating sql table')
     # initialize variables
     tables = input_data['sql_server']['tables']
     with conn:
         crs = conn.cursor()
         for table in tables:
+            logging.debug(f'Creating table {table}')
             crs.execute(f"""
             IF (NOT EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES 
@@ -472,6 +511,7 @@ def create_sql_table(input_data, conn):
             END
             """)
             for column_name, column_type in table['columns'].items():
+                logging.debug(f'Creating column {column_name}')
                 crs.execute(f"""
                 IF NOT EXISTS(SELECT 1 FROM sys.columns 
                         WHERE Name = N'{column_name}'
@@ -485,11 +525,13 @@ def create_sql_table(input_data, conn):
 
 def list_to_string(list_to_convert):
     """convert list to string"""
+    logging.debug(f'Converting list: {list_to_convert} to string')
     return ", ".join(str(e) for e in list_to_convert)
 
 
-def fill_sql_table(input_data, data, conn): # pylint: disable=R0914
+def fill_sql_table(input_data, data, conn):  # pylint: disable=R0914
     """fill table"""
+    logging.info('Filling sql table')
 
     cash_held = data['cash_held']
     stocks_held = data['stocks_held']
@@ -532,7 +574,8 @@ def fill_sql_table(input_data, data, conn): # pylint: disable=R0914
 
 def insert_sql_data(input_values, columns, table, conn, single_date=None):
     """insert data into sql"""
-
+    logging.debug(
+        f'Inserting data into sql table: {table} and date: {single_date}')
     values = list(input_values.values())
 
     temp_list = []
@@ -560,6 +603,8 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
 
 def delete_sql_tables(input_data):
     """delete table"""
+    logging.info('Deleting sql tables')
+
     # initialize variables
     server = input_data['sql_server']['server']
     database = input_data['sql_server']['database']
@@ -580,6 +625,8 @@ def delete_sql_tables(input_data):
 
 def truncate_sql_tables(input_data):
     """delete table"""
+    logging.info('Truncating sql tables')
+
     # initialize variables
     server = input_data['sql_server']['server']
     database = input_data['sql_server']['database']
@@ -607,6 +654,13 @@ def main():
     truncate_tables = True
     delete_tables = True
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # logger setup
+    logging.basicConfig(encoding='utf-8', level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(message)s')
+
+    logging.info(f'Starting Stock Tracker on {current_time} ')
 
     # get input data
     input_data = get_input_data(rootdir)
