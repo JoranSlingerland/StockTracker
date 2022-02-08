@@ -3,6 +3,7 @@
 # pylint: disable=logging-fstring-interpolation
 
 # Import modules
+import time
 import logging
 import json
 from datetime import date, datetime, timedelta
@@ -35,20 +36,33 @@ def write_jsonfile(data, filename):
 @limits(calls=500, period=86400)
 def call_api(url):
     """Get data from API"""
-    logging.info(f'Calling API: {url}')
-    data = requests.get(url)
+    errorcounter = 0
+    while True:
+        logging.info(f'Calling API: {url}')
+        data = requests.get(url)
 
-    if data.status_code != 200:
-        logging.error(f'Error: {data.status_code}')
-        raise Exception(f'API response: {data.status_code}')
+        if data.status_code != 200:
+            logging.error(f'Error: {data.status_code}')
+            logging.info('Retrying in 30 seconds')
+            errorcounter += 1
+            time.sleep(30)
+            if errorcounter > 3:
+                logging.error('Too many errors, exiting. Error: {data.status_code}')
+                raise Exception(f'Error: {data.status_code}')
+            continue
 
-    # key = 'Note'
-    # keys = data.json()
-    # if key in keys.keys():
-    #     logging.warning('To many api calls, Waiting for 60 seconds')
-    #     time.sleep(60)
+        key = 'Note'
+        keys = data.json()
+        if key in keys.keys():
+            logging.warning('To many api calls, Waiting for 60 seconds')
+            time.sleep(60)
+            errorcounter += 1
+            if errorcounter > 3:
+                logging.critical('To many api calls, Exiting.')
+                raise Exception('To many api calls, Exiting.')
+            continue
 
-    return data.json()
+        return data.json()
 
 
 def get_input_data(rootdir):
