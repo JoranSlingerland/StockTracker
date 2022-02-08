@@ -513,7 +513,7 @@ def create_sql_table(input_data, conn):
         crs = conn.cursor()
         for table in tables:
             logging.debug(f'Creating table {table}')
-            query = f'''
+            crs.execute(f"""
             IF (NOT EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES 
                  WHERE TABLE_SCHEMA = 'dbo' 
@@ -523,20 +523,18 @@ def create_sql_table(input_data, conn):
                     uid INT PRIMARY KEY,
                 )
             END
-            '''
-            crs.execute(query)
+            """)
             for column_name, column_type in table['columns'].items():
                 logging.debug(f'Creating column {column_name}')
-                query = f'''
+                crs.execute(f"""
                 IF NOT EXISTS(SELECT 1 FROM sys.columns 
                         WHERE Name = N'{column_name}'
                         AND Object_ID = Object_ID(N'dbo.{table["table_name"]}'))
                 BEGIN
                     ALTER TABLE {table["table_name"]}
                     ADD {column_name} {column_type};
-                END 
-                '''
-                crs.execute(query)
+                END
+                """)
 
 
 def list_to_string(list_to_convert):
@@ -634,8 +632,9 @@ def delete_sql_tables(input_data):
     with conn:
         crs = conn.cursor()
         for table in tables:
-            query = f'drop table {table["table_name"]}'
-            crs.execute(query)
+            crs.execute(f"""
+            drop table {table["table_name"]}
+            """)
 
 
 def truncate_sql_tables(input_data):
@@ -704,8 +703,6 @@ def main():
     if output_sql:
         output_to_sql(input_data, data)
 
-    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    logging.info (f'Finished Stock Tracker on {current_time} ')
 
 if __name__ == '__main__':
     main()
