@@ -47,7 +47,8 @@ def call_api(url):
             errorcounter += 1
             time.sleep(30)
             if errorcounter > 3:
-                logging.error('Too many errors, exiting. Error: {data.status_code}')
+                logging.error(
+                    'Too many errors, exiting. Error: {data.status_code}')
                 raise Exception(f'Error: {data.status_code}')
             continue
 
@@ -312,11 +313,36 @@ def get_forex_data(input_data):
 
     # get data for all currencies
     for currency in currencies:
-        url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full'
-        temp_data = call_api(url)
-        forex_data.update({currency: temp_data})
+        if currency == 'GBX':
+            currency = 'GBP'
+            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full&datatype=compact'
+            temp_data = call_api(url)
+            gbx_data = {"Meta Data":
+                          {
+                              "1. Information": "Forex Daily Prices (open, high, low, close)",
+                              "2. From Symbol": "EUR",
+                              "3. To Symbol": "GBX",
+                              "4. Output Size": "Full size",
+                              "5. Last Refreshed": "2022-02-09 19:05:00",
+                              "6. Time Zone": "UTC"
+                          },
+                          "Time Series FX (Daily)": {}
+                          }
+            for single_date, date_data in temp_data['Time Series FX (Daily)'].items():
+                gbx_data['Time Series FX (Daily)'].update({single_date: {
+                    "1. open": float(date_data['1. open']) / 100,
+                    "2. high": float(date_data['2. high']) / 100,
+                    "3. low": float(date_data['3. low']) / 100,
+                    "4. close": float(date_data['4. close']) / 100
+                }})
+            forex_data.update({'GBX': gbx_data})
+        else:
+            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full'
+            temp_data = call_api(url)
+            forex_data.update({currency: temp_data})
 
     # return dictionary
+    write_jsonfile(forex_data, 'forex_data.json')
     return forex_data
 
 
