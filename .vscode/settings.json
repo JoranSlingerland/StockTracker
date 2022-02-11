@@ -3,5 +3,6 @@
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=pyodbc"
-    ]
+    ],
+    "python.terminal.activateEnvironment": true,
 }
