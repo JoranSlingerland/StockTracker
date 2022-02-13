@@ -3,6 +3,7 @@
 # pylint: disable=logging-fstring-interpolation
 
 # Import modules
+import os
 import time
 import logging
 import json
@@ -10,8 +11,8 @@ from datetime import date, datetime, timedelta
 import pyodbc
 import requests
 import pandas
-from jsonschema import validate
 from ratelimit import limits, sleep_and_retry
+from dotenv import load_dotenv
 
 # modules
 
@@ -64,15 +65,6 @@ def call_api(url):
             continue
 
         return data.json()
-
-
-def get_input_data(rootdir):
-    """Get input from file"""
-    input_data = read_jsonfile(f'{rootdir}\\.data\\input\\input.json')
-    schema = read_jsonfile(f'{rootdir}\\.data\\input\\input_schema.json')
-    logging.info('Validating input data')
-    validate(input_data, schema)
-    return input_data
 
 
 def compute_transactions(transactions):
@@ -272,7 +264,7 @@ def calculate_totals(stocks_held):
     return stocks_held_and_totals
 
 
-def get_stock_data(input_data):
+def get_stock_data(transactions, api_key):
     """get data for all stocks from api"""
     logging.info('Getting stock data')
 
@@ -282,13 +274,13 @@ def get_stock_data(input_data):
     stock_data = {}
 
     # get unique symbols
-    for temp_loop in input_data['transactions']:
+    for temp_loop in transactions['transactions']:
         symbols.append(temp_loop['symbol'])
         symbols = list(dict.fromkeys(symbols))
 
     # get data for all symbols
     for symbol in symbols:
-        url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={input_data["api_key"]}&outputsize=full&datatype=compact'
+        url = f'https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact'
         temp_data = call_api(url)
         stock_data.update({symbol: temp_data})
 
@@ -296,7 +288,7 @@ def get_stock_data(input_data):
     return stock_data
 
 
-def get_forex_data(input_data):
+def get_forex_data(transactions, api_key):
     """get data for all currencies from api"""
     logging.info('Getting forex data')
 
@@ -307,7 +299,7 @@ def get_forex_data(input_data):
     base_currency = 'EUR'
 
     # get unique currencies
-    for temp_loop in input_data['transactions']:
+    for temp_loop in transactions['transactions']:
         currencies.append(temp_loop['currency'])
         currencies = list(dict.fromkeys(currencies))
 
@@ -315,19 +307,19 @@ def get_forex_data(input_data):
     for currency in currencies:
         if currency == 'GBX':
             currency = 'GBP'
-            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full&datatype=compact'
+            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full&datatype=compact'
             temp_data = call_api(url)
             gbx_data = {"Meta Data":
-                          {
-                              "1. Information": "Forex Daily Prices (open, high, low, close)",
-                              "2. From Symbol": "EUR",
-                              "3. To Symbol": "GBX",
-                              "4. Output Size": "Full size",
-                              "5. Last Refreshed": "2022-02-09 19:05:00",
-                              "6. Time Zone": "UTC"
-                          },
-                          "Time Series FX (Daily)": {}
-                          }
+                        {
+                            "1. Information": "Forex Daily Prices (open, high, low, close)",
+                            "2. From Symbol": "EUR",
+                            "3. To Symbol": "GBX",
+                            "4. Output Size": "Full size",
+                            "5. Last Refreshed": "2022-02-09 19:05:00",
+                            "6. Time Zone": "UTC"
+                        },
+                        "Time Series FX (Daily)": {}
+                        }
             for single_date, date_data in temp_data['Time Series FX (Daily)'].items():
                 gbx_data['Time Series FX (Daily)'].update({single_date: {
                     "1. open": float(date_data['1. open']) / 100,
@@ -337,12 +329,11 @@ def get_forex_data(input_data):
                 }})
             forex_data.update({'GBX': gbx_data})
         else:
-            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={input_data["api_key"]}&outputsize=full'
+            url = f'https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full'
             temp_data = call_api(url)
             forex_data.update({currency: temp_data})
 
     # return dictionary
-    write_jsonfile(forex_data, 'forex_data.json')
     return forex_data
 
 
@@ -402,30 +393,30 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     return data
 
 
-def get_cash_data(input_data):
+def get_cash_data(transactions):
     """Get the day by day cash data"""
     logging.info('Getting cash data')
-    cash = get_cash_day_by_day(input_data)
+    cash = get_cash_day_by_day(transactions)
     cash = calculate_deposits_and_withdrawals(cash)
     cash = merge_deposits_and_withdrawals(cash)
     return cash
 
 
-def get_cash_day_by_day(input_data):
+def get_cash_day_by_day(transactions):
     """Get the day by day cash data"""
     logging.info('Getting cash day by day')
     # initialize variables
     cash_held = {}
 
-    transactions = sorted(
-        input_data['transactions'], key=lambda k: k['transaction_date'])
+    transactions_dates = sorted(
+        transactions['transactions'], key=lambda k: k['transaction_date'])
     end_date = date.today()
-    start_date = transactions[0]['transaction_date']
+    start_date = transactions_dates[0]['transaction_date']
     daterange = pandas.date_range(start_date, end_date)
-
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
-        filterd_cash_held = [d for d in input_data['cash']
+
+        filterd_cash_held = [d for d in transactions['cash']
                              if d['transaction_date'] <= single_date]
 
         # create object
@@ -512,29 +503,29 @@ def merge_deposits_and_withdrawals(cash):
     return merged_cash_held
 
 
-def output_to_sql(input_data, data):
+def output_to_sql(sql_server, data, tables):
     """Output the data to a sql server"""
     logging.info('Outputting data to sql server')
     # initialize variables
-    server = input_data['sql_server']['server']
-    database = input_data['sql_server']['database']
-    username = input_data['sql_server']['user']
-    password = input_data['sql_server']['password']
+    server = sql_server['sql_server']['server']
+    database = sql_server['sql_server']['database']
+    username = sql_server['sql_server']['user']
+    password = sql_server['sql_server']['password']
 
     # connect to database
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
                           server+';DATABASE='+database+';UID='+username+';PWD=' + password)
 
     # create tables
-    create_sql_table(input_data, conn)
-    fill_sql_table(input_data, data, conn)
+    create_sql_table(tables, conn)
+    fill_sql_table(tables, data, conn)
 
 
-def create_sql_table(input_data, conn):
+def create_sql_table(tables, conn):
     """create table"""
     logging.info('Creating sql tables')
     # initialize variables
-    tables = input_data['sql_server']['tables']
+    tables = tables['tables']
     with conn:
         crs = conn.cursor()
         for table in tables:
@@ -569,7 +560,7 @@ def list_to_string(list_to_convert):
     return ", ".join(str(e) for e in list_to_convert)
 
 
-def fill_sql_table(input_data, data, conn):  # pylint: disable=R0914
+def fill_sql_table(tables, data, conn):  # pylint: disable=R0914
     """fill table"""
     logging.info('Filling sql tables')
 
@@ -579,13 +570,13 @@ def fill_sql_table(input_data, data, conn):  # pylint: disable=R0914
 
     # input lists
     cash_held_columns = 'uid, ' + \
-        list_to_string(input_data['sql_server']['tables'][0]['columns'].keys())
+        list_to_string(tables['tables'][0]['columns'].keys())
     stocks_held_columns = 'uid, ' + \
-        list_to_string(input_data['sql_server']['tables'][1]['columns'].keys())
+        list_to_string(tables['tables'][1]['columns'].keys())
     totals_columns = 'uid, ' + \
-        list_to_string(input_data['sql_server']['tables'][2]['columns'].keys())
+        list_to_string(tables['tables'][2]['columns'].keys())
     single_day_columns = 'uid, ' + \
-        list_to_string(input_data['sql_server']['tables'][3]['columns'].keys())
+        list_to_string(tables['tables'][3]['columns'].keys())
 
     for single_date, cash_held in cash_held.items():
         insert_sql_data(cash_held, cash_held_columns,
@@ -641,16 +632,16 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
         """)
 
 
-def delete_sql_tables(input_data):
+def delete_sql_tables(tables, sql_server):
     """delete table"""
     logging.info('Deleting sql tables')
 
     # initialize variables
-    server = input_data['sql_server']['server']
-    database = input_data['sql_server']['database']
-    username = input_data['sql_server']['user']
-    password = input_data['sql_server']['password']
-    tables = input_data['sql_server']['tables']
+    server = sql_server['sql_server']['server']
+    database = sql_server['sql_server']['database']
+    username = sql_server['sql_server']['user']
+    password = sql_server['sql_server']['password']
+    tables = tables['tables']
 
     # connect to database
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
@@ -663,16 +654,16 @@ def delete_sql_tables(input_data):
             """)
 
 
-def truncate_sql_tables(input_data):
+def truncate_sql_tables(tables, sql_server):
     """delete table"""
     logging.info('Truncating sql tables')
 
     # initialize variables
-    server = input_data['sql_server']['server']
-    database = input_data['sql_server']['database']
-    username = input_data['sql_server']['user']
-    password = input_data['sql_server']['password']
-    tables = input_data['sql_server']['tables']
+    server = sql_server['sql_server']['server']
+    database = sql_server['sql_server']['database']
+    username = sql_server['sql_server']['user']
+    password = sql_server['sql_server']['password']
+    tables = tables['tables']
 
     # connect to database
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
@@ -684,6 +675,60 @@ def truncate_sql_tables(input_data):
             crs.execute(f"""
             truncate table {table["table_name"]}
             """)
+
+
+def get_transactions(sql_server):
+    "Get Transactions data"
+    logging.info('Getting transactions data')
+
+    # initialize variables
+    server = sql_server['sql_server']['server']
+    database = sql_server['sql_server']['database']
+    username = sql_server['sql_server']['user']
+    password = sql_server['sql_server']['password']
+
+    # connect to database
+
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
+                          server+';DATABASE='+database+';UID='+username+';PWD=' + password)
+    transactions_list = []
+    with conn:
+        crs = conn.cursor()
+        crs.execute("""
+        SELECT * FROM input_transactions
+        """)
+        for row in crs:
+            temp_object = {
+                "symbol": row[1],
+                "transaction_date": (row[2].strftime("%Y-%m-%d")),
+                "cost": float(row[3]),
+                "quantity": float(row[4]),
+                "transaction_type": row[5],
+                "transaction_cost": float(row[6]),
+                "currency": row[7]
+            }
+            transactions_list.append(temp_object)
+
+    invested_list = []
+    with conn:
+        crs = conn.cursor()
+        crs.execute("""
+        select * from input_invested
+        """)
+        for row in crs:
+            temp_object = {
+                "transaction_date": (row[1].strftime("%Y-%m-%d")),
+                "transaction_type": row[2],
+                "amount": float(row[3]),
+            }
+            invested_list.append(temp_object)
+
+    invested = {
+        "transactions": transactions_list,
+        "cash": invested_list
+    }
+
+    return invested
 
 
 def main():
@@ -702,32 +747,45 @@ def main():
 
     logging.info(f'Starting Stock Tracker on {current_time} ')
 
+    # load .env file
+    load_dotenv()
+
     # get input data
-    input_data = get_input_data(rootdir)
+    tables = read_jsonfile(f'{rootdir}\\.data\\input\\tables.json')
+    sql_server = {
+        'sql_server': {
+            'server': os.environ['SERVER'],
+            'database': os.environ['DATABASE'],
+            'user': os.environ['USER'],
+            'password': os.environ['PASSWORD']
+        }
+    }
+    transactions = get_transactions(sql_server)
+    api_key = os.environ['API_KEY']
 
     # get stock data
-    stock_held = compute_transactions(input_data)
-    stock_data = get_stock_data(input_data)
-    forex_data = get_forex_data(input_data)
-    cash_data = get_cash_data(input_data)
+    stock_held = compute_transactions(transactions)
+    stock_data = get_stock_data(transactions, api_key)
+    forex_data = get_forex_data(transactions, api_key)
+    cash_data = get_cash_data(transactions)
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
     data.update(**cash_data)
 
     # clear old data
     if delete_tables:
-        delete_sql_tables(input_data)
+        delete_sql_tables(tables, sql_server)
 
     if truncate_tables:
         if not delete_tables:
-            truncate_sql_tables(input_data)
+            truncate_sql_tables(tables, sql_server)
 
     # write output
     if output_json:
         write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
     if output_sql:
-        output_to_sql(input_data, data)
+        output_to_sql(sql_server, data, tables)
 
 
 if __name__ == '__main__':

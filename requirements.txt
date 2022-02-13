@@ -3,3 +3,4 @@ pandas
 jsonschema
 ratelimit
 pyodbc
+python-dotenv

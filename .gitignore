@@ -135,3 +135,4 @@ dmypy.json
 /.data/input/*
 !.data/input/input_schema.json
 !.data/input/sample.json
+!.data/input/tables.json
