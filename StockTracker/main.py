@@ -375,6 +375,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                         forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
 
                     stock.update({
+                        'total_cost': stock['total_cost'] * forex_high,
                         'open_value': stock_open * forex_high,
                         'high_value': stock_high * forex_high,
                         'low_value': stock_low * forex_high,
@@ -730,6 +731,29 @@ def get_transactions(sql_server):
 
     return invested
 
+def rebuild_transactions(transactions, forex_data):
+    """Rebuild transactions data"""
+    logging.info('Rebuilding transactions data')
+    data = transactions['transactions']
+    transaction_list = []
+    for transaction in data:
+        temp_object = {
+            "symbol": transaction['symbol'],
+            "transaction_date": transaction['transaction_date'],
+            "cost": transaction['cost'] * float(forex_data[transaction['currency']]['Time Series FX (Daily)'][transaction['transaction_date']]['4. close']),
+            "quantity": transaction['quantity'],
+            "transaction_type": transaction['transaction_type'],
+            "transaction_cost": transaction['transaction_cost'],
+            "currency": transaction['currency']
+        }
+        transaction_list.append(temp_object)
+
+    new_object = {
+        'invested': transactions['invested'],
+        'transactions': transaction_list,
+        }
+    return new_object
+
 
 def main():
     """Main function"""
@@ -763,10 +787,15 @@ def main():
     transactions = get_transactions(sql_server)
     api_key = os.environ['API_KEY']
 
-    # get stock data
-    stock_held = compute_transactions(transactions)
+    # get API data
     stock_data = get_stock_data(transactions, api_key)
     forex_data = get_forex_data(transactions, api_key)
+
+    #rebuild transactions data
+    transactions = rebuild_transactions(transactions,forex_data)
+
+    #build data
+    stock_held = compute_transactions(transactions)
     invested = get_invested_data(transactions)
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
