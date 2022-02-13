@@ -11,7 +11,6 @@ from datetime import date, datetime, timedelta
 import pyodbc
 import requests
 import pandas
-from jsonschema import validate
 from ratelimit import limits, sleep_and_retry
 from dotenv import load_dotenv
 
@@ -66,15 +65,6 @@ def call_api(url):
             continue
 
         return data.json()
-
-
-def get_tables(rootdir):
-    """Get input from file"""
-    tables = read_jsonfile(f'{rootdir}\\.data\\input\\tables.json')
-    # schema = read_jsonfile(f'{rootdir}\\.data\\input\\input_schema.json')
-    # logging.info('Validating input data')
-    # validate(input_data, schema)
-    return tables
 
 
 def compute_transactions(transactions):

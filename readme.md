@@ -8,117 +8,50 @@ The target of this project is to get data of stocks and write this to a readable
 
 This project will be using the [Alpha vantage API](https://www.alphavantage.co/) to get stock data. You can get a free key on there site.
 
-## Input
+## Setup
 
-The script requires you to put a .json file of your transactions, cash deposits and api key in `.\\.data\input\input.json` using the structure below:
+Setup a MS SQL server or create one on Azure with the [IAC code](https://github.com/JoranSlingerland/StockTrackerInfrastructure)
 
-``` json
-{
-    "$schema": "https://raw.githubusercontent.com/JoranSlingerland/StockTracker/main/.data/input/input_schema.json",
-    "transactions": [
-        {
-            "symbol": "AAPL",
-            "transaction_date": "2019-01-21",
-            "cost": 100.00,
-            "quantity": 100,
-            "transaction_type": "Buy",
-            "transaction_cost": 0.50,
-            "currency": "USD"
-        },
-        {
-            "symbol": "AAPL",
-            "transaction_date": "2020-01-21",
-            "cost": 125.00,
-            "quantity": 100,
-            "transaction_type": "Buy",
-            "transaction_cost": 0.50,
-            "currency": "USD"
-        },
-        {
-            "symbol": "MSFT",
-            "transaction_date": "2021-10-24",
-            "cost": 100.00,
-            "quantity": 100,
-            "transaction_type": "Buy",
-            "transaction_cost": 0.50 ,
-            "currency": "USD"
-        }
-    ],
-    "cash": [
-        {
-            "transaction_date": "2019-01-21",
-            "transaction_type": "Deposit",
-            "amount": 125.00
-        },
-        {
-            "transaction_date": "2020-01-21",
-            "transaction_type": "Withdrawal",
-            "amount": 100.00
-        },
-        {
-            "transaction_date": "2021-10-24",
-            "transaction_type": "Deposit",
-            "amount": 100.00
-        }
-    ],
-    "api_key": "ABCD1234EFGH5678",
-    "sql_server": {
-        "server": "localhost",
-        "database": "StockTracker",
-        "user": "sa",
-        "password": "Password123",
-        "tables": [
-            {
-                "table_name": "cash_held",
-                "columns": {
-                    "date": "DATE",
-                    "amount": "MONEY"
-                }
-            },
-            {
-                "table_name": "stocks_held",
-                "columns": {
-                    "date": "DATE",
-                    "symbol": "TEXT",
-                    "average_cost": "MONEY",
-                    "total_cost": "MONEY",
-                    "quantity": "DECIMAL(38,2)",
-                    "transaction_cost": "MONEY",
-                    "currency": "TEXT",
-                    "close_value": "MONEY",
-                    "high_value": "MONEY",
-                    "low_value": "MONEY",
-                    "open_value": "MONEY",
-                    "volume": "DECIMAL(38,2)",
-                    "total_value": "MONEY"
-                }
-            },
-            {
-                "table_name": "totals",
-                "columns": {
-                    "date": "DATE",
-                    "total_cost": "MONEY",
-                    "total_value": "MONEY"
-                }
-            },
-            {
-                "table_name": "single_day",
-                "columns": {
-                    "symbol": "TEXT",
-                    "average_cost": "MONEY",
-                    "total_cost": "MONEY",
-                    "quantity": "DECIMAL(38,2)",
-                    "transaction_cost": "MONEY",
-                    "currency": "TEXT",
-                    "close_value": "MONEY",
-                    "high_value": "MONEY",
-                    "low_value": "MONEY",
-                    "open_value": "MONEY",
-                    "volume": "DECIMAL(38,2)",
-                    "total_value": "MONEY"
-                }
-            }
-        ]
-    }
-}
+Set the below environment variables:
+
+|Name|Value|
+|--|--|
+|Server|tcp:< Your server name >|
+|Database|< Your database name >|
+|User|< Your database user> |
+|Password|< Your sql password >|
+|Api_key|< Your api key >|
+
+Create the following tables and insert data into them:
+
+```sql
+create table input_transactions (
+uid INT PRIMARY KEY,
+symbol text,
+transaction_date date,
+cost money,
+quantity DECIMAL(38,2),
+transaction_type text,
+transaction_cost money,
+currency text,
+)
+
+INSERT INTO input_transactions
+VALUES (0, 'T', '2020-03-25', 280.80, 10, 'Buy', 0.54, 'USD');
+
+INSERT INTO input_transactions
+VALUES (1, 'AMD', '2020-03-25', 233.90, 5, 'Buy', 0.52, 'USD');
+
+create table input_invested (
+uid INT PRIMARY KEY,
+transaction_date date,
+transaction_type text,
+amount money,
+)
+
+INSERT INTO input_invested
+VALUES (0, '2019-01-21', 'Deposit', 100);
+
+INSERT INTO input_invested
+VALUES (1, '2020-01-21', 'Deposit', 200);
 ```
