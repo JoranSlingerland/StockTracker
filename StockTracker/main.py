@@ -77,32 +77,6 @@ def get_tables(rootdir):
     return tables
 
 
-def get_env_variables():
-    """Get environment variables"""
-    load_dotenv()
-
-    try:
-        api_key = os.environ['API_KEY']
-        server = os.environ['SERVER']
-        database = os.environ['DATABASE']
-        user = os.environ['USER']
-        password = os.environ['PASSWORD']
-    except:
-        logging.error('Environment variables not set')
-        raise Exception('Environment variables not set') from None
-
-    env_variables = {
-        'api_key': api_key,
-        'sql_server': {
-            'server': os.environ['API_KEY'],
-            'database': os.environ['SERVER'],
-            'user': os.environ['USER'],
-            'password': os.environ['PASSWORD']
-        }
-    }
-    return env_variables
-
-
 def compute_transactions(transactions):
     """Compute transactions"""
     logging.info('Computing transactions')
@@ -712,6 +686,7 @@ def truncate_sql_tables(tables, sql_server):
             truncate table {table["table_name"]}
             """)
 
+
 def get_transactions(sql_server):
     "Get Transactions data"
     logging.info('Getting transactions data')
@@ -723,19 +698,47 @@ def get_transactions(sql_server):
     password = sql_server['sql_server']['password']
 
     # connect to database
+
     conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' +
                           server+';DATABASE='+database+';UID='+username+';PWD=' + password)
-
+    transactions_list = []
     with conn:
         crs = conn.cursor()
         crs.execute("""
-        SELECT * FROM Transactions
+        SELECT * FROM input_transactions
         """)
-        transactions = crs.fetchall()
+        for row in crs:
+            temp_object = {
+                "symbol": row[1],
+                "transaction_date": (row[2].strftime("%Y-%m-%d")),
+                "cost": float(row[3]),
+                "quantity": float(row[4]),
+                "transaction_type": row[5],
+                "transaction_cost": float(row[6]),
+                "currency": row[7]
+            }
+            transactions_list.append(temp_object)
 
-    print (transactions)
+    invested_list = []
+    with conn:
+        crs = conn.cursor()
+        crs.execute("""
+        select * from input_invested
+        """)
+        for row in crs:
+            temp_object = {
+                "transaction_date": (row[1].strftime("%Y-%m-%d")),
+                "transaction_type": row[2],
+                "amount": float(row[3]),
+            }
+            invested_list.append(temp_object)
 
-    return transactions
+    invested = {
+        "transactions": transactions_list,
+        "cash": invested_list
+    }
+
+    return invested
 
 
 def main():
@@ -761,10 +764,10 @@ def main():
     tables = read_jsonfile(f'{rootdir}\\.data\\input\\tables.json')
     sql_server = {
         'sql_server': {
-        'server': os.environ['SERVER'],
-        'database': os.environ['DATABASE'],
-        'user': os.environ['USER'],
-        'password': os.environ['PASSWORD']
+            'server': os.environ['SERVER'],
+            'database': os.environ['DATABASE'],
+            'user': os.environ['USER'],
+            'password': os.environ['PASSWORD']
         }
     }
     transactions = get_transactions(sql_server)
