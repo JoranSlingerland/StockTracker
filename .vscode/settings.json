@@ -5,4 +5,9 @@
         "--extension-pkg-whitelist=pyodbc"
     ],
     "python.terminal.activateEnvironment": true,
+    "azureFunctions.deploySubpath": ".",
+    "azureFunctions.scmDoBuildDuringDeployment": true,
+    "azureFunctions.pythonVenv": ".venv",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~4",
 }
