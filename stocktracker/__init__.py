@@ -376,6 +376,7 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
                         forex_data[stock['currency']]['Time Series FX (Daily)'][date_object]['2. high'])
 
                     stock.update({
+                        'total_cost': stock['total_cost'] * forex_high,
                         'open_value': stock_open * forex_high,
                         'high_value': stock_high * forex_high,
                         'low_value': stock_low * forex_high,
@@ -394,20 +395,20 @@ def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
     return data
 
 
-def get_cash_data(transactions):
-    """Get the day by day cash data"""
-    logging.info('Getting cash data')
-    cash = get_cash_day_by_day(transactions)
-    cash = calculate_deposits_and_withdrawals(cash)
-    cash = merge_deposits_and_withdrawals(cash)
-    return cash
+def get_invested_data(transactions):
+    """Get the day by day invested data"""
+    logging.info('Getting invested data')
+    invested = get_invested_day_by_day(transactions)
+    invested = calculate_deposits_and_withdrawals(invested)
+    invested = merge_deposits_and_withdrawals(invested)
+    return invested
 
 
-def get_cash_day_by_day(transactions):
-    """Get the day by day cash data"""
-    logging.info('Getting cash day by day')
+def get_invested_day_by_day(transactions):
+    """Get the day by day invested data"""
+    logging.info('Getting invested day by day')
     # initialize variables
-    cash_held = {}
+    invested = {}
 
     transactions_dates = sorted(
         transactions['transactions'], key=lambda k: k['transaction_date'])
@@ -417,38 +418,38 @@ def get_cash_day_by_day(transactions):
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
 
-        filterd_cash_held = [d for d in transactions['cash']
-                             if d['transaction_date'] <= single_date]
+        filterd_invested = [d for d in transactions['invested']
+                            if d['transaction_date'] <= single_date]
 
         # create object
         temp_list = []
-        for filterd_c_held in filterd_cash_held:
+        for filterd_i_held in filterd_invested:
             temp_object = {
-                "transaction_date": filterd_c_held['transaction_date'],
-                "transaction_type": filterd_c_held['transaction_type'],
-                "amount": filterd_c_held['amount']
+                "transaction_date": filterd_i_held['transaction_date'],
+                "transaction_type": filterd_i_held['transaction_type'],
+                "amount": filterd_i_held['amount']
             }
             temp_list.append(temp_object)
-        cash_held.update({single_date: temp_list})
+        invested.update({single_date: temp_list})
     # return dictionary
-    cash_held = {"cash_held": cash_held}
+    invested = {"invested": invested}
 
-    return cash_held
+    return invested
 
 
-def calculate_deposits_and_withdrawals(cash):
+def calculate_deposits_and_withdrawals(invested):
     """calculate depoisits and withdrawals"""
     logging.info('Calculating deposits and withdrawals')
     # initialize variables
-    computed_date_cash_held = {}
+    computed_date_invested = {}
 
-    for single_date, date_cash_held in cash['cash_held'].items():
+    for single_date, date_invested in invested['invested'].items():
         # intialize variables
         temp_list = []
 
         # get deposits
         deposits = [
-            d for d in date_cash_held if d['transaction_type'] == 'Deposit']
+            d for d in date_invested if d['transaction_type'] == 'Deposit']
         if deposits:
             temp_object = {
                 "amount": sum([d['amount'] for d in deposits]),
@@ -458,7 +459,7 @@ def calculate_deposits_and_withdrawals(cash):
 
         # get withdrawals
         withdrawals = [
-            d for d in date_cash_held if d['transaction_type'] == 'Withdrawal']
+            d for d in date_invested if d['transaction_type'] == 'Withdrawal']
         if withdrawals:
             temp_object = {
                 "amount": sum([d['amount'] for d in withdrawals]),
@@ -470,38 +471,38 @@ def calculate_deposits_and_withdrawals(cash):
             continue
 
         # return dictionary
-        computed_date_cash_held.update({single_date: temp_list})
-    computed_date_cash_held = {"cash_held": computed_date_cash_held}
-    return computed_date_cash_held
+        computed_date_invested.update({single_date: temp_list})
+    computed_date_invested = {"invested": computed_date_invested}
+    return computed_date_invested
 
 
-def merge_deposits_and_withdrawals(cash):
+def merge_deposits_and_withdrawals(invested):
     """merge deposits and withdrawals"""
     logging.info('Merging deposits and withdrawals')
     # initialize variables
-    merged_cash_held = {}
+    merged_invested = {}
     uid = 0
-    for single_date, date_cash_held in cash['cash_held'].items():
+    for single_date, date_invested in invested['invested'].items():
         # intialize variables
         temp_list = []
 
-        if len(date_cash_held) == 1 and date_cash_held[0]['transaction_type'] == 'Deposit':
+        if len(date_invested) == 1 and date_invested[0]['transaction_type'] == 'Deposit':
             temp_object = {
                 'uid': uid,
-                'cash_held': date_cash_held[0]['amount']
+                'invested': date_invested[0]['amount']
             }
             temp_list.append(temp_object)
-        elif len(date_cash_held) == 2:
-            date_cash_held = sorted(
-                date_cash_held, key=lambda k: k['transaction_type'])
+        elif len(date_invested) == 2:
+            date_invested = sorted(
+                date_invested, key=lambda k: k['transaction_type'])
             temp_object = {
                 'uid': uid,
-                'cash_held': date_cash_held[0]['amount'] - date_cash_held[1]['amount']
+                'invested': date_invested[0]['amount'] - date_invested[1]['amount']
             }
-        merged_cash_held.update({single_date: temp_object})
+        merged_invested.update({single_date: temp_object})
         uid += 1
-    merged_cash_held = {"cash_held": merged_cash_held}
-    return merged_cash_held
+    merged_invested = {"invested": merged_invested}
+    return merged_invested
 
 
 def output_to_sql(sql_server, data, tables):
@@ -565,12 +566,12 @@ def fill_sql_table(tables, data, conn):  # pylint: disable=R0914
     """fill table"""
     logging.info('Filling sql tables')
 
-    cash_held = data['cash_held']
+    invested = data['invested']
     stocks_held = data['stocks_held']
     totals = data['totals']
 
     # input lists
-    cash_held_columns = 'uid, ' + \
+    invested_columns = 'uid, ' + \
         list_to_string(tables['tables'][0]['columns'].keys())
     stocks_held_columns = 'uid, ' + \
         list_to_string(tables['tables'][1]['columns'].keys())
@@ -579,9 +580,9 @@ def fill_sql_table(tables, data, conn):  # pylint: disable=R0914
     single_day_columns = 'uid, ' + \
         list_to_string(tables['tables'][3]['columns'].keys())
 
-    for single_date, cash_held in cash_held.items():
-        insert_sql_data(cash_held, cash_held_columns,
-                        'cash_held', conn, single_date)
+    for single_date, invested in invested.items():
+        insert_sql_data(invested, invested_columns,
+                        'invested', conn, single_date)
 
     for single_date, stock_held in stocks_held.items():
         for single_stock in stock_held:
@@ -726,10 +727,33 @@ def get_transactions(sql_server):
 
     invested = {
         "transactions": transactions_list,
-        "cash": invested_list
+        "invested": invested_list
     }
 
     return invested
+
+def rebuild_transactions(transactions, forex_data):
+    """Rebuild transactions data"""
+    logging.info('Rebuilding transactions data')
+    data = transactions['transactions']
+    transaction_list = []
+    for transaction in data:
+        temp_object = {
+            "symbol": transaction['symbol'],
+            "transaction_date": transaction['transaction_date'],
+            "cost": transaction['cost'] * float(forex_data[transaction['currency']]['Time Series FX (Daily)'][transaction['transaction_date']]['4. close']),
+            "quantity": transaction['quantity'],
+            "transaction_type": transaction['transaction_type'],
+            "transaction_cost": transaction['transaction_cost'],
+            "currency": transaction['currency']
+        }
+        transaction_list.append(temp_object)
+
+    new_object = {
+        'invested': transactions['invested'],
+        'transactions': transaction_list,
+        }
+    return new_object
 
 
 def main(name: str) -> str:
@@ -822,14 +846,19 @@ def main(name: str) -> str:
     transactions = get_transactions(sql_server)
     api_key = os.environ['API_KEY']
 
-    # get stock data
-    stock_held = compute_transactions(transactions)
+    # get API data
     stock_data = get_stock_data(transactions, api_key)
     forex_data = get_forex_data(transactions, api_key)
-    cash_data = get_cash_data(transactions)
+
+    #rebuild transactions data
+    transactions = rebuild_transactions(transactions,forex_data)
+
+    #build data
+    stock_held = compute_transactions(transactions)
+    invested = get_invested_data(transactions)
     data = add_stock_data_to_stocks_held(stock_held, stock_data, forex_data)
     data = calculate_totals(data)
-    data.update(**cash_data)
+    data.update(**invested)
 
     # clear old data
     if delete_tables:

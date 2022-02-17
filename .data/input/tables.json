@@ -1,7 +1,7 @@
 {
     "tables": [
         {
-            "table_name": "cash_held",
+            "table_name": "invested",
             "columns": {
                 "date": "DATE",
                 "amount": "MONEY"
