@@ -1,6 +1,7 @@
 """StockTracker Main.py"""
 # pylint: disable=line-too-long
 # pylint: disable=logging-fstring-interpolation
+# pylint: disable=too-many-locals
 
 # Import modules
 import os
