@@ -4,3 +4,6 @@ jsonschema
 ratelimit
 pyodbc
 python-dotenv
+azure-functions-durable
+azure-functions
+pylint
