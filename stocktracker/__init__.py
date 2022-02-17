@@ -1,6 +1,7 @@
 """StockTracker Main.py"""
 # pylint: disable=line-too-long
 # pylint: disable=logging-fstring-interpolation
+# pylint: disable=too-many-locals
 
 # Import modules
 import os
@@ -755,13 +756,15 @@ def rebuild_transactions(transactions, forex_data):
     return new_object
 
 
-def main():
+def main(name: str) -> str:
     """Main function"""
+    #pylint: disable=unused-argument
+
     # initialize variables
     output_json = False
     output_sql = True
-    truncate_tables = True
-    delete_tables = True
+    truncate_tables = False
+    delete_tables = False
     rootdir = __file__.replace('\\StockTracker\\main.py', '')
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -775,7 +778,60 @@ def main():
     load_dotenv()
 
     # get input data
-    tables = read_jsonfile(f'{rootdir}\\.data\\input\\tables.json')
+    tables = {
+        "tables": [
+            {
+                "table_name": "cash_held",
+                "columns": {
+                    "date": "DATE",
+                    "amount": "MONEY"
+                }
+            },
+            {
+                "table_name": "stocks_held",
+                "columns": {
+                    "date": "DATE",
+                    "symbol": "TEXT",
+                    "average_cost": "MONEY",
+                    "total_cost": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "transaction_cost": "MONEY",
+                    "currency": "TEXT",
+                    "close_value": "MONEY",
+                    "high_value": "MONEY",
+                    "low_value": "MONEY",
+                    "open_value": "MONEY",
+                    "volume": "DECIMAL(38,2)",
+                    "total_value": "MONEY"
+                }
+            },
+            {
+                "table_name": "totals",
+                "columns": {
+                    "date": "DATE",
+                    "total_cost": "MONEY",
+                    "total_value": "MONEY"
+                }
+            },
+            {
+                "table_name": "single_day",
+                "columns": {
+                    "symbol": "TEXT",
+                    "average_cost": "MONEY",
+                    "total_cost": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "transaction_cost": "MONEY",
+                    "currency": "TEXT",
+                    "close_value": "MONEY",
+                    "high_value": "MONEY",
+                    "low_value": "MONEY",
+                    "open_value": "MONEY",
+                    "volume": "DECIMAL(38,2)",
+                    "total_value": "MONEY"
+                }
+            }
+        ]
+    }
     sql_server = {
         'sql_server': {
             'server': os.environ['SERVER'],
@@ -784,6 +840,9 @@ def main():
             'password': os.environ['PASSWORD']
         }
     }
+
+    logging.info(sql_server)
+
     transactions = get_transactions(sql_server)
     api_key = os.environ['API_KEY']
 
@@ -816,6 +875,4 @@ def main():
     if output_sql:
         output_to_sql(sql_server, data, tables)
 
-
-if __name__ == '__main__':
-    main()
+    return 'Success'
