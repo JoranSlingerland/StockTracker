@@ -734,6 +734,7 @@ def get_transactions(sql_server):
 def main(name: str) -> str:
     """Main function"""
     #pylint: disable=unused-argument
+
     # initialize variables
     output_json = False
     output_sql = True
