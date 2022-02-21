@@ -33,9 +33,6 @@ def write_jsonfile(data, filename):
         json.dump(data, file, indent=4, sort_keys=True)
 
 
-@sleep_and_retry
-@limits(calls=5, period=60)
-@limits(calls=500, period=86400)
 def call_api(url):
     """Get data from API"""
     errorcounter = 0
@@ -761,11 +758,9 @@ def main(name: str) -> str:
     #pylint: disable=unused-argument
 
     # initialize variables
-    output_json = False
     output_sql = True
     truncate_tables = False
     delete_tables = False
-    rootdir = __file__.replace('\\StockTracker\\main.py', '')
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # logger setup
@@ -841,8 +836,6 @@ def main(name: str) -> str:
         }
     }
 
-    logging.info(sql_server)
-
     transactions = get_transactions(sql_server)
     api_key = os.environ['API_KEY']
 
@@ -867,10 +860,6 @@ def main(name: str) -> str:
     if truncate_tables:
         if not delete_tables:
             truncate_sql_tables(tables, sql_server)
-
-    # write output
-    if output_json:
-        write_jsonfile(data, f'{rootdir}\\.data\\output\\data.json')
 
     if output_sql:
         output_to_sql(sql_server, data, tables)
