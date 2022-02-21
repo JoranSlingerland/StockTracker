@@ -1,5 +1,6 @@
 {
     "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=pyodbc"

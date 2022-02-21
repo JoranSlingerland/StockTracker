@@ -9,7 +9,7 @@ import azure.durable_functions as df
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
-    result1 = yield context.call_activity('stocktracker', "Go")
+    result1 = yield context.call_activity("stocktracker", "Go")
     return [result1]
 
 
