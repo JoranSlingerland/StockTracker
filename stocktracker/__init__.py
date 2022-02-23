@@ -4,15 +4,13 @@
 # pylint: disable=too-many-locals
 
 # Import modules
-import os
 import time
 import logging
-import json
 from datetime import date, datetime, timedelta
 import pyodbc
 import requests
 import pandas
-from dotenv import load_dotenv
+from shared_code import get_config
 
 # modules
 def call_api(url):
@@ -842,69 +840,12 @@ def main(name: str) -> str:
 
     logging.info(f"Starting Stock Tracker on {current_time} ")
 
-    # load .env file
-    load_dotenv()
-
     # get input data
-    tables = {
-        "tables": [
-            {"table_name": "cash_held", "columns": {"date": "DATE", "amount": "MONEY"}},
-            {
-                "table_name": "stocks_held",
-                "columns": {
-                    "date": "DATE",
-                    "symbol": "TEXT",
-                    "average_cost": "MONEY",
-                    "total_cost": "MONEY",
-                    "quantity": "DECIMAL(38,2)",
-                    "transaction_cost": "MONEY",
-                    "currency": "TEXT",
-                    "close_value": "MONEY",
-                    "high_value": "MONEY",
-                    "low_value": "MONEY",
-                    "open_value": "MONEY",
-                    "volume": "DECIMAL(38,2)",
-                    "total_value": "MONEY",
-                },
-            },
-            {
-                "table_name": "totals",
-                "columns": {
-                    "date": "DATE",
-                    "total_cost": "MONEY",
-                    "total_value": "MONEY",
-                },
-            },
-            {
-                "table_name": "single_day",
-                "columns": {
-                    "symbol": "TEXT",
-                    "average_cost": "MONEY",
-                    "total_cost": "MONEY",
-                    "quantity": "DECIMAL(38,2)",
-                    "transaction_cost": "MONEY",
-                    "currency": "TEXT",
-                    "close_value": "MONEY",
-                    "high_value": "MONEY",
-                    "low_value": "MONEY",
-                    "open_value": "MONEY",
-                    "volume": "DECIMAL(38,2)",
-                    "total_value": "MONEY",
-                },
-            },
-        ]
-    }
-    sql_server = {
-        "sql_server": {
-            "server": os.environ["SERVER"],
-            "database": os.environ["DATABASE"],
-            "user": os.environ["USER"],
-            "password": os.environ["PASSWORD"],
-        }
-    }
+    tables = get_config.get_tables()
+    sql_server = get_config.get_sqlserver()
+    api_key = get_config.get_api_key()
 
     transactions = get_transactions(sql_server)
-    api_key = os.environ["API_KEY"]
 
     # get API data
     stock_data = get_stock_data(transactions, api_key)
