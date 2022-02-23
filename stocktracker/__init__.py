@@ -689,11 +689,12 @@ def delete_sql_tables(tables, sql_server):
     with conn:
         crs = conn.cursor()
         for table in tables:
-            crs.execute(
-                f"""
-            drop table {table["table_name"]}
-            """
-            )
+            if table["candelete"]:
+                crs.execute(
+                    f"""
+                drop table {table["table_name"]}
+                """
+                )
 
 
 def truncate_sql_tables(tables, sql_server):
@@ -722,11 +723,12 @@ def truncate_sql_tables(tables, sql_server):
     with conn:
         crs = conn.cursor()
         for table in tables:
-            crs.execute(
-                f"""
-            truncate table {table["table_name"]}
-            """
-            )
+            if table["cantruncate"]:
+                crs.execute(
+                    f"""
+                truncate table {table["table_name"]}
+                """
+                )
 
 
 def get_transactions(sql_server):
@@ -828,7 +830,7 @@ def main(name: str) -> str:
     # initialize variables
     output_sql = True
     truncate_tables = False
-    delete_tables = False
+    delete_tables = True
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # logger setup

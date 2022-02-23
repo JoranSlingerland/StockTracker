@@ -4,14 +4,21 @@
 import os
 from dotenv import load_dotenv
 
-#functions
+# functions
 def get_tables() -> dict:
     """Get tables"""
     tables = {
         "tables": [
-            {"table_name": "cash_held", "columns": {"date": "DATE", "amount": "MONEY"}},
+            {
+                "table_name": "cash_held",
+                "candelete": True,
+                "cantruncate": True,
+                "columns": {"date": "DATE", "amount": "MONEY"},
+            },
             {
                 "table_name": "stocks_held",
+                "candelete": True,
+                "cantruncate": True,
                 "columns": {
                     "date": "DATE",
                     "symbol": "TEXT",
@@ -30,6 +37,8 @@ def get_tables() -> dict:
             },
             {
                 "table_name": "totals",
+                "candelete": True,
+                "cantruncate": True,
                 "columns": {
                     "date": "DATE",
                     "total_cost": "MONEY",
@@ -38,6 +47,8 @@ def get_tables() -> dict:
             },
             {
                 "table_name": "single_day",
+                "candelete": True,
+                "cantruncate": True,
                 "columns": {
                     "symbol": "TEXT",
                     "average_cost": "MONEY",
@@ -53,10 +64,35 @@ def get_tables() -> dict:
                     "total_value": "MONEY",
                 },
             },
+            {
+                "table_name": "input_transactions",
+                "candelete": False,
+                "cantruncate": False,
+                "columns": {
+                    "symbol": "TEXT",
+                    "transaction_date": "DATE",
+                    "cost": "MONEY",
+                    "quantity": "DECIMAL(38,2)",
+                    "transaction_type": "TEXT",
+                    "transaction_cost": "MONEY",
+                    "currency": "TEXT",
+                },
+            },
+            {
+                "table_name": "input_invested",
+                "candelete": False,
+                "cantruncate": False,
+                "columns": {
+                    "transaction_date": "DATE",
+                    "transaction_type": "TEXT",
+                    "amount": "MONEY",
+                },
+            },
         ]
     }
 
     return tables
+
 
 def get_sqlserver() -> dict:
     """Get sqlserver"""
@@ -72,6 +108,7 @@ def get_sqlserver() -> dict:
         }
     }
     return sql_server
+
 
 def get_api_key() -> str:
     """Get api key"""
