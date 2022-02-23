@@ -596,7 +596,7 @@ def list_to_string(list_to_convert):
     return ", ".join(str(e) for e in list_to_convert)
 
 
-def fill_sql_table(tables, data, conn):  # pylint: disable=R0914
+def fill_sql_table(tables, data, conn):
     """fill table"""
     logging.info("Filling sql tables")
 
