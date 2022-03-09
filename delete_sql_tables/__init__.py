@@ -7,7 +7,7 @@ from shared_code import get_config
 
 def main(name: str) -> str:
     """delete table"""
-    #pylint disable=unused-argument
+    # pylint: disable=unused-argument
 
     logging.info("Deleting sql tables")
 
@@ -41,6 +41,5 @@ def main(name: str) -> str:
                 drop table {table["table_name"]}
                 """
                 )
-
 
     return "Success"

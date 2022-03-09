@@ -88,6 +88,12 @@ def get_tables() -> dict:
                     "amount": "MONEY",
                 },
             },
+            {
+                "table_name": "invested",
+                "candelete": True,
+                "cantruncate": True,
+                "columns": {"date": "DATE", "amount": "MONEY"},
+            },
         ]
     }
 

@@ -32,7 +32,7 @@ def main(name: str) -> str:
     logging.info("Creating sql tables")
     # initialize variables
     tables = tables["tables"]
-    #create tables
+    # create tables
     with conn:
         crs = conn.cursor()
         for table in tables:
