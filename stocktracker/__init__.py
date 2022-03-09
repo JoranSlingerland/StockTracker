@@ -545,47 +545,7 @@ def output_to_sql(sql_server, data, tables):
         + ";PWD="
         + password
     )
-
-    # create tables
-    create_sql_table(tables, conn)
     fill_sql_table(tables, data, conn)
-
-
-def create_sql_table(tables, conn):
-    """create table"""
-    logging.info("Creating sql tables")
-    # initialize variables
-    tables = tables["tables"]
-    with conn:
-        crs = conn.cursor()
-        for table in tables:
-            logging.debug(f"Creating table {table}")
-            crs.execute(
-                f"""
-            IF (NOT EXISTS (SELECT *
-                 FROM INFORMATION_SCHEMA.TABLES
-                 WHERE TABLE_SCHEMA = 'dbo'
-                 AND  TABLE_NAME = '{table["table_name"]}'))
-            BEGIN
-                create table {table["table_name"]} (
-                    uid INT PRIMARY KEY,
-                )
-            END
-            """
-            )
-            for column_name, column_type in table["columns"].items():
-                logging.debug(f"Creating column {column_name}")
-                crs.execute(
-                    f"""
-                IF NOT EXISTS(SELECT 1 FROM sys.columns
-                        WHERE Name = N'{column_name}'
-                        AND Object_ID = Object_ID(N'dbo.{table["table_name"]}'))
-                BEGIN
-                    ALTER TABLE {table["table_name"]}
-                    ADD {column_name} {column_type};
-                END
-                """
-                )
 
 
 def list_to_string(list_to_convert):
@@ -662,73 +622,6 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
         END
         """
         )
-
-
-def delete_sql_tables(tables, sql_server):
-    """delete table"""
-    logging.info("Deleting sql tables")
-
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-    tables = tables["tables"]
-
-    # connect to database
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
-    with conn:
-        crs = conn.cursor()
-        for table in tables:
-            if table["candelete"]:
-                crs.execute(
-                    f"""
-                drop table {table["table_name"]}
-                """
-                )
-
-
-def truncate_sql_tables(tables, sql_server):
-    """delete table"""
-    logging.info("Truncating sql tables")
-
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-    tables = tables["tables"]
-
-    # connect to database
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
-
-    with conn:
-        crs = conn.cursor()
-        for table in tables:
-            if table["cantruncate"]:
-                crs.execute(
-                    f"""
-                truncate table {table["table_name"]}
-                """
-                )
 
 
 def get_transactions(sql_server):
@@ -828,9 +721,6 @@ def main(name: str) -> str:
     # pylint: disable=unused-argument
 
     # initialize variables
-    output_sql = True
-    truncate_tables = False
-    delete_tables = True
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # logger setup
@@ -863,15 +753,6 @@ def main(name: str) -> str:
     data = calculate_totals(data)
     data.update(**invested)
 
-    # clear old data
-    if delete_tables:
-        delete_sql_tables(tables, sql_server)
-
-    if truncate_tables:
-        if not delete_tables:
-            truncate_sql_tables(tables, sql_server)
-
-    if output_sql:
-        output_to_sql(sql_server, data, tables)
+    output_to_sql(sql_server, data, tables)
 
     return "Success"
