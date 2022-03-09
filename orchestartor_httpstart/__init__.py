@@ -1,4 +1,5 @@
 """Http start function"""
+#pylint: disable=duplicate-code
 
 import logging
 
