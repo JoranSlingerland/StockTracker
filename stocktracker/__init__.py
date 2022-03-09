@@ -2,6 +2,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-locals
+# pylint: disable=duplicate-code
 
 # Import modules
 import time

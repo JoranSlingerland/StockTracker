@@ -1,4 +1,5 @@
 """Activity trigger"""
+#pylint: disable=duplicate-code
 
 import logging
 import pyodbc
