@@ -22,32 +22,17 @@ Set the below environment variables:
 |Password|< Your sql password >|
 |Api_key|< Your api key >|
 
-Create the following tables and insert data into them:
+Create the tables by running the create_sql_tables_orchestrator function.
+This can be done by browsing to `https://<Your function name>.azurewebsites.net/api/orchestrators/create_sql_tables_orchestrator?code=<Your apikey>`
+
+After that insert your data in the sql server with the below commands:
 
 ```sql
-create table input_transactions (
-uid INT PRIMARY KEY,
-symbol text,
-transaction_date date,
-cost money,
-quantity DECIMAL(38,2),
-transaction_type text,
-transaction_cost money,
-currency text,
-)
-
 INSERT INTO input_transactions
 VALUES (0, 'T', '2020-03-25', 280.80, 10, 'Buy', 0.54, 'USD');
 
 INSERT INTO input_transactions
 VALUES (1, 'AMD', '2020-03-25', 233.90, 5, 'Buy', 0.52, 'USD');
-
-create table input_invested (
-uid INT PRIMARY KEY,
-transaction_date date,
-transaction_type text,
-amount money,
-)
 
 INSERT INTO input_invested
 VALUES (0, '2019-01-21', 'Deposit', 100);
