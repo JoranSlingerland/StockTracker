@@ -40,3 +40,29 @@ VALUES (0, '2019-01-21', 'Deposit', 100);
 INSERT INTO input_invested
 VALUES (1, '2020-01-21', 'Deposit', 200);
 ```
+
+## Azure Functions
+
+### create_sql_tables
+
+Function will create sql tables for the project.
+
+![Azure Functions](./docs/images/create_sql_tables.drawio.svg)
+
+### delete_sql_tables
+
+Function will delete the sql tables marked as candelete in the get_config helper function.
+
+![Azure Functions](./docs/images/delete_sql_tables.drawio.svg)
+
+### truncate_sql_tables
+
+Function will truncate the sql tables marked as cantruncate in the get_config helper function.
+
+![Azure Functions](./docs/images/truncate_sql_tables.drawio.svg)
+
+### Stocktracker
+
+Function will get all the data from the input tables and use this to create the ouput data. This will then be outputted to the sql server.
+
+![Azure Functions](./docs/images/stocktracker.drawio.svg)
