@@ -10,6 +10,12 @@ def get_tables() -> dict:
     tables = {
         "tables": [
             {
+                "table_name": "invested",
+                "candelete": True,
+                "cantruncate": True,
+                "columns": {"date": "DATE", "amount": "MONEY"},
+            },
+            {
                 "table_name": "stocks_held",
                 "candelete": True,
                 "cantruncate": True,
@@ -81,12 +87,6 @@ def get_tables() -> dict:
                     "transaction_type": "TEXT",
                     "amount": "MONEY",
                 },
-            },
-            {
-                "table_name": "invested",
-                "candelete": True,
-                "cantruncate": True,
-                "columns": {"date": "DATE", "amount": "MONEY"},
             },
         ]
     }

@@ -262,30 +262,6 @@ def calculate_totals(stocks_held):
     return stocks_held_and_totals
 
 
-def get_stock_data(transactions, api_key):
-    """get data for all stocks from api"""
-    logging.info("Getting stock data")
-
-    # initialize variables
-    symbols = []
-    query = "TIME_SERIES_DAILY"
-    stock_data = {}
-
-    # get unique symbols
-    for temp_loop in transactions["transactions"]:
-        symbols.append(temp_loop["symbol"])
-        symbols = list(dict.fromkeys(symbols))
-
-    # get data for all symbols
-    for symbol in symbols:
-        url = f"https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact"
-        temp_data = call_api(url)
-        stock_data.update({symbol: temp_data})
-
-    # return dictionary
-    return stock_data
-
-
 def get_forex_data(transactions, api_key):
     """get data for all currencies from api"""
     logging.info("Getting forex data")
@@ -675,10 +651,10 @@ def main(name: str) -> str:
     sql_server = get_config.get_sqlserver()
     api_key = get_config.get_api_key()
 
-    transactions = json.loads(name)
+    transactions = json.loads(name[0])
 
     # get API data
-    stock_data = get_stock_data(transactions, api_key)
+    stock_data = json.loads(name[1])
     forex_data = get_forex_data(transactions, api_key)
 
     # rebuild transactions data
