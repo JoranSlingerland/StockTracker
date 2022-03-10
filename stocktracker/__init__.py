@@ -5,47 +5,14 @@
 # pylint: disable=duplicate-code
 
 # Import modules
-import time
 import logging
 import json
 from datetime import date, datetime, timedelta
 import pyodbc
-import requests
 import pandas
 from shared_code import get_config
 
 # modules
-def call_api(url):
-    """Get data from API"""
-    errorcounter = 0
-    while True:
-        logging.info(f"Calling API: {url}")
-        data = requests.get(url)
-
-        if data.status_code != 200:
-            logging.error(f"Error: {data.status_code}")
-            logging.info("Retrying in 30 seconds")
-            errorcounter += 1
-            time.sleep(30)
-            if errorcounter > 3:
-                logging.error("Too many errors, exiting. Error: {data.status_code}")
-                raise Exception(f"Error: {data.status_code}")
-            continue
-
-        key = "Note"
-        keys = data.json()
-        if key in keys.keys():
-            logging.warning("To many api calls, Waiting for 60 seconds")
-            time.sleep(60)
-            errorcounter += 1
-            if errorcounter > 3:
-                logging.critical("To many api calls, Exiting.")
-                raise Exception("To many api calls, Exiting.")
-            continue
-
-        return data.json()
-
-
 def compute_transactions(transactions):
     """Compute transactions"""
     logging.info("Computing transactions")
@@ -260,59 +227,6 @@ def calculate_totals(stocks_held):
         uid += 1
     stocks_held_and_totals = {**stocks_held, "totals": perm_object}
     return stocks_held_and_totals
-
-
-def get_forex_data(transactions, api_key):
-    """get data for all currencies from api"""
-    logging.info("Getting forex data")
-
-    # initialize variables
-    currencies = []
-    query = "FX_DAILY"
-    forex_data = {}
-    base_currency = "EUR"
-
-    # get unique currencies
-    for temp_loop in transactions["transactions"]:
-        currencies.append(temp_loop["currency"])
-        currencies = list(dict.fromkeys(currencies))
-
-    # get data for all currencies
-    for currency in currencies:
-        if currency == "GBX":
-            currency = "GBP"
-            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full&datatype=compact"
-            temp_data = call_api(url)
-            gbx_data = {
-                "Meta Data": {
-                    "1. Information": "Forex Daily Prices (open, high, low, close)",
-                    "2. From Symbol": "EUR",
-                    "3. To Symbol": "GBX",
-                    "4. Output Size": "Full size",
-                    "5. Last Refreshed": "2022-02-09 19:05:00",
-                    "6. Time Zone": "UTC",
-                },
-                "Time Series FX (Daily)": {},
-            }
-            for single_date, date_data in temp_data["Time Series FX (Daily)"].items():
-                gbx_data["Time Series FX (Daily)"].update(
-                    {
-                        single_date: {
-                            "1. open": float(date_data["1. open"]) / 100,
-                            "2. high": float(date_data["2. high"]) / 100,
-                            "3. low": float(date_data["3. low"]) / 100,
-                            "4. close": float(date_data["4. close"]) / 100,
-                        }
-                    }
-                )
-            forex_data.update({"GBX": gbx_data})
-        else:
-            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full"
-            temp_data = call_api(url)
-            forex_data.update({currency: temp_data})
-
-    # return dictionary
-    return forex_data
 
 
 def add_stock_data_to_stocks_held(stocks_held, stock_data, forex_data):
@@ -649,13 +563,12 @@ def main(name: str) -> str:
     # get input data
     tables = get_config.get_tables()
     sql_server = get_config.get_sqlserver()
-    api_key = get_config.get_api_key()
 
     transactions = json.loads(name[0])
 
     # get API data
     stock_data = json.loads(name[1])
-    forex_data = get_forex_data(transactions, api_key)
+    forex_data = json.loads(name[2])
 
     # rebuild transactions data
     transactions = rebuild_transactions(transactions, forex_data)
