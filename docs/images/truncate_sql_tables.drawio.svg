@@ -1,4 +1,4 @@
-<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="441px" height="96px" viewBox="-0.5 -0.5 441 96" content="&lt;mxfile&gt;&lt;diagram id=&quot;77Ltb5QDAAJxPXmxR5jD&quot; name=&quot;truncate_sql_tables&quot;&gt;7VZNb9swDP01BrpL4dix2x3jtF0PG1agBXYMFFu1tcmiK9H56K8fFcmxXbdDgKHbpZdEfiJp8j2KchAv690XzZrqGxRcBlFY7IL4KoiiWXgxpz+L7B2SpLEDSi0Kb9QD9+KZd54ebUXBzcgQASSKZgzmoBTPcYQxrWE7NnsEOX5rw0o+Ae5zJqfoD1Fg5dDLJOzxWy7KqnvzLPQ7NeuMPWAqVsB2AMXXQbzUAOhW9W7JpSWv48X53byxe0xMc4WnOETOYcNk62vzeeG+K5YXVLt/BI0VlKCYvO7RTEOrCm4jhvTU23wFaAicEfiTI+69kKxFIKjCWvpdydZcZiz/VR5CLUGCpi0FyoZ3Gdk03izSQwZanXsr31HIdMm91fxIMHUmh5qj3pOJ5pKh2IyjM98i5dGuZ5EWnsjXSY0npILOK25QMwS9qhAbQ3lhEKWSUsvWmlalXZ3dPjzckeu93eb600QMZhrX0I9iZxkfstiAUHhIO8mC5IoQJkWpCMiJKE6MZqI+dHb2CAq9GrOox69EXVJxUqzplz23mtuic6ibFjmtblqVowC1WjSNOTeb8kTtNpyq2f1Zvaku3iGKPjsXPyziC392tv3RSy8dVA1OXRr+vZLzV46H08w0TI2kSZ9ae2iz0eogKmqijSFfmSe5QraW3KyGDdGFpGRcVOc27I6T3nP2/RiUNLJzzcv10UZWym4G/4c2SiZttNgyQec/nE2k4apY2CvK8i2ZMSIfyzMetu8xOefTyZm+Tu2Auu7uG1LXYScPWP+GO9uBvXLp7PN5MtJufvlCFJe+9xtedy9CJckkVPgilCt7Euog8bH0k1RP32l4TK+NNybI2YKO2Ubg/mMAWO3TfzYA6LH/hHOd038Ix9e/AQ==&lt;/diagram&gt;&lt;/mxfile&gt;">
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="441px" height="96px" viewBox="-0.5 -0.5 441 96" content="&lt;mxfile&gt;&lt;diagram id=&quot;77Ltb5QDAAJxPXmxR5jD&quot; name=&quot;truncate_sql_tables&quot;&gt;7VZNb5wwEP01SOklYmEhyXE/ssmhVSMlUo8rLzjg1niIGfYjv75jbBYISbRSm/aSPbDmeWbseW88xgsXxf5GszL/BimXXuCney9cekEw8S+m9GeQg0WiOLRApkXqjDrgXjzz1tOhtUh5NTBEAImiHIIJKMUTHGBMa9gNzR5BDlctWcZHwH3C5Bj9IVLMLXoZ+R1+y0WWtytPfDdTsNbYAVXOUtj1oPDaCxcaAO2o2C+4NOS1vFi/1Ruzx41prvAUh8A6bJmsXW5uX3hok+Up5e5eQWMOGSgmrzt0rqFWKTcRfXrrbL4ClAROCPzJEQ9OSFYjEJRjId2sZBsu5yz5lTWhFiBB05QCZcI/gsIW8oJw1fwIH+fq0q+g1onbvSssZDrjzsoVn8mr5+b4ueFQcNQHMtBcMhTboebMlU52tOvYpYEj+HWywxHZoJOcV6gZgl7niGVFG0UviCXtdb7RNMrM6Oz24eGOXO/NNNdfRiKxqrSF/ij2Rok+uyUIhc22o7kXLQlhUmSKgISY40TrXBRNxTdUO5UmQYcvRZFRclJs6Mmea81N0gkUZY2cRqtaJShArWdlWZ1X2+zva7rllPj+Xb3cbBBcWRfXXMILd9Z23VGNLy2U905p7P+5wtNXjpPVsiqZGkgWP9XmkM8Ho0Zs1EQnQ76unuQa2Ubyat0vlDYkbcZGtW79qjlpnbPvx6CknemDTsbP8nqnvKZtL/8P5RWNymu2Y4L6hT8ZScZVOjNXndFBsqoSyVC2YdP+wA48HXfg+MQO3KO0vVv7lLbYyY3arXBnKrZTNJ5cnUcDTaeXL8Sy+Ti//nX6IlQUjUL5L0JZHkahGumPqZ9UDfEHNZvx9fNGxzmb0bHcCjx8Nox3GkYU/7OGQa/dp6OtqO4DPLz+DQ==&lt;/diagram&gt;&lt;/mxfile&gt;">
     <defs/>
     <g>
         <path d="M 91 30 L 187.63 30" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10" pointer-events="stroke"/>
@@ -8,8 +8,8 @@
             <switch>
                 <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 67px; margin-left: 57px;">
-                        <div data-drawio-colors="color: rgb(0, 0, 0); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
-                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                        <div data-drawio-colors="color: #FFFFFF; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: nowrap;">
                                 orchestrator_httpstart
                                 <br/>
                                 (HTTP Starter)
@@ -17,7 +17,7 @@
                         </div>
                     </div>
                 </foreignObject>
-                <text x="57" y="79" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                <text x="57" y="79" fill="#FFFFFF" font-family="Helvetica" font-size="12px" text-anchor="middle">
                     orchestrato...
                 </text>
             </switch>
@@ -27,8 +27,8 @@
             <switch>
                 <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 67px; margin-left: 228px;">
-                        <div data-drawio-colors="color: rgb(0, 0, 0); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
-                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                        <div data-drawio-colors="color: #FFFFFF; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: nowrap;">
                                 <span>
                                     truncate_sql_tables_orchestrator
                                 </span>
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </foreignObject>
-                <text x="228" y="79" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                <text x="228" y="79" fill="#FFFFFF" font-family="Helvetica" font-size="12px" text-anchor="middle">
                     truncate_sq...
                 </text>
             </switch>
@@ -49,14 +49,14 @@
             <switch>
                 <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 30px; margin-left: 308px;">
-                        <div data-drawio-colors="color: rgb(0, 0, 0); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
-                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                        <div data-drawio-colors="color: #FFFFFF; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 11px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: nowrap;">
                                 Await 1
                             </div>
                         </div>
                     </div>
                 </foreignObject>
-                <text x="308" y="33" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="11px" text-anchor="middle">
+                <text x="308" y="33" fill="#FFFFFF" font-family="Helvetica" font-size="11px" text-anchor="middle">
                     Await 1
                 </text>
             </switch>
@@ -66,8 +66,8 @@
             <switch>
                 <foreignObject pointer-events="none" width="100%" height="100%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" style="overflow: visible; text-align: left;">
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 1px; height: 1px; padding-top: 67px; margin-left: 388px;">
-                        <div data-drawio-colors="color: rgb(0, 0, 0); " style="box-sizing: border-box; font-size: 0px; text-align: center;">
-                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: nowrap;">
+                        <div data-drawio-colors="color: #FFFFFF; " style="box-sizing: border-box; font-size: 0px; text-align: center;">
+                            <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(255, 255, 255); line-height: 1.2; pointer-events: all; white-space: nowrap;">
                                 <span>
                                     truncate_sql_tables
                                     <br/>
@@ -77,7 +77,7 @@
                         </div>
                     </div>
                 </foreignObject>
-                <text x="388" y="79" fill="rgb(0, 0, 0)" font-family="Helvetica" font-size="12px" text-anchor="middle">
+                <text x="388" y="79" fill="#FFFFFF" font-family="Helvetica" font-size="12px" text-anchor="middle">
                     truncate_sq...
                 </text>
             </switch>
