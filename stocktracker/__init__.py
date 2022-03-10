@@ -7,6 +7,7 @@
 # Import modules
 import time
 import logging
+import json
 from datetime import date, datetime, timedelta
 import pyodbc
 import requests
@@ -625,69 +626,6 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
         )
 
 
-def get_transactions(sql_server):
-    "Get Transactions data"
-    logging.info("Getting transactions data")
-
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-
-    # connect to database
-
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
-    transactions_list = []
-    with conn:
-        crs = conn.cursor()
-        crs.execute(
-            """
-        SELECT * FROM input_transactions
-        """
-        )
-        for row in crs:
-            temp_object = {
-                "symbol": row[1],
-                "transaction_date": (row[2].strftime("%Y-%m-%d")),
-                "cost": float(row[3]),
-                "quantity": float(row[4]),
-                "transaction_type": row[5],
-                "transaction_cost": float(row[6]),
-                "currency": row[7],
-            }
-            transactions_list.append(temp_object)
-
-    invested_list = []
-    with conn:
-        crs = conn.cursor()
-        crs.execute(
-            """
-        select * from input_invested
-        """
-        )
-        for row in crs:
-            temp_object = {
-                "transaction_date": (row[1].strftime("%Y-%m-%d")),
-                "transaction_type": row[2],
-                "amount": float(row[3]),
-            }
-            invested_list.append(temp_object)
-
-    invested = {"transactions": transactions_list, "invested": invested_list}
-
-    return invested
-
-
 def rebuild_transactions(transactions, forex_data):
     """Rebuild transactions data"""
     logging.info("Rebuilding transactions data")
@@ -719,7 +657,6 @@ def rebuild_transactions(transactions, forex_data):
 
 def main(name: str) -> str:
     """Main function"""
-    # pylint: disable=unused-argument
 
     # initialize variables
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -738,7 +675,7 @@ def main(name: str) -> str:
     sql_server = get_config.get_sqlserver()
     api_key = get_config.get_api_key()
 
-    transactions = get_transactions(sql_server)
+    transactions = json.loads(name)
 
     # get API data
     stock_data = get_stock_data(transactions, api_key)
