@@ -10,12 +10,6 @@ def get_tables() -> dict:
     tables = {
         "tables": [
             {
-                "table_name": "cash_held",
-                "candelete": True,
-                "cantruncate": True,
-                "columns": {"date": "DATE", "amount": "MONEY"},
-            },
-            {
                 "table_name": "stocks_held",
                 "candelete": True,
                 "cantruncate": True,
