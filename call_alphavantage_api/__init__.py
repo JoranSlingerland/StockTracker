@@ -1,13 +1,17 @@
 """Call alphavantage API"""
 # pylint: disable=logging-fstring-interpolation
 
+import json
 import logging
 import time
 import requests
 
 
-def call_api(url):
+def main(name: str) -> str:
     """Get data from API"""
+
+    url = name
+
     errorcounter = 0
     while True:
         logging.info(f"Calling API: {url}")
@@ -34,4 +38,4 @@ def call_api(url):
                 raise Exception("To many api calls, Exiting.")
             continue
 
-        return data.json()
+        return json.dumps(data.json())
