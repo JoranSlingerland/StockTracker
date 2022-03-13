@@ -44,10 +44,22 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 5 - Get invested data
     invested = yield context.call_activity("get_invested_data", transactions)
 
-    # Step 5 - Run main function
-    result = yield context.call_activity(
-        "stocktracker", [stock_data, forex_data, stock_held, invested]
+    # step 6 - add stock_data to stock_held
+    data = yield context.call_activity(
+        "add_stock_data_to_stocks_held", [stock_held, stock_data, forex_data]
     )
+
+    # step 7 - Calulate totals
+    data = yield context.call_activity("calculate_totals", data)
+
+    # step 8 add invested to data
+    invested = json.loads(invested)
+    data = json.loads(data)
+    data.update(**invested)
+    data = json.dumps(data)
+
+    # Step 7 - Run main function
+    result = yield context.call_activity("stocktracker", data)
     return [result]
 
 
