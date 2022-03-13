@@ -38,9 +38,12 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         "rebuild_transactions", [transactions, forex_data]
     )
 
-    # Step 4 - Run main function
+    # step 4 - Compute transactions
+    stock_held = yield context.call_activity("compute_transactions", transactions)
+
+    # Step 5 - Run main function
     result = yield context.call_activity(
-        "stocktracker", [transactions, stock_data, forex_data]
+        "stocktracker", [transactions, stock_data, forex_data, stock_held]
     )
     return [result]
 
