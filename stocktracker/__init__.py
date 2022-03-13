@@ -516,35 +516,6 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
         )
 
 
-def rebuild_transactions(transactions, forex_data):
-    """Rebuild transactions data"""
-    logging.info("Rebuilding transactions data")
-    data = transactions["transactions"]
-    transaction_list = []
-    for transaction in data:
-        temp_object = {
-            "symbol": transaction["symbol"],
-            "transaction_date": transaction["transaction_date"],
-            "cost": transaction["cost"]
-            * float(
-                forex_data[transaction["currency"]]["Time Series FX (Daily)"][
-                    transaction["transaction_date"]
-                ]["4. close"]
-            ),
-            "quantity": transaction["quantity"],
-            "transaction_type": transaction["transaction_type"],
-            "transaction_cost": transaction["transaction_cost"],
-            "currency": transaction["currency"],
-        }
-        transaction_list.append(temp_object)
-
-    new_object = {
-        "invested": transactions["invested"],
-        "transactions": transaction_list,
-    }
-    return new_object
-
-
 def main(name: str) -> str:
     """Main function"""
 
@@ -565,13 +536,9 @@ def main(name: str) -> str:
     sql_server = get_config.get_sqlserver()
 
     transactions = json.loads(name[0])
-
-    # get API data
     stock_data = json.loads(name[1])
     forex_data = json.loads(name[2])
 
-    # rebuild transactions data
-    transactions = rebuild_transactions(transactions, forex_data)
 
     # build data
     stock_held = compute_transactions(transactions)

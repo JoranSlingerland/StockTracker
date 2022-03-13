@@ -1,6 +1,4 @@
 """main Orchestrator function"""
-#pylint: disable=duplicate-code
-#pylint: disable=line-too-long
 
 import logging
 import json
@@ -11,26 +9,40 @@ import azure.durable_functions as df
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
+
+    # step 1 - Get the input from the sql database
     transactions = yield context.call_activity("get_transactions", "Go")
 
-    # Get data from api via suborchestrator
+    # Step 2.1 - Get data for stocks via the API
     provisioning_tasks = []
     id_ = 0
     child_id = f"{context.instance_id}:{id_}"
-    provision_task = context.call_sub_orchestrator("get_stock_data_orchestrator", transactions, child_id)
+    provision_task = context.call_sub_orchestrator(
+        "get_stock_data_orchestrator", transactions, child_id
+    )
     provisioning_tasks.append(provision_task)
     stock_data = (yield context.task_all(provisioning_tasks))[0]
 
-    # get more data from api via suborchestrator
+    # Step 2.2 - Get forex data via the API
     provisioning_tasks = []
     id_ += 1
     child_id = f"{context.instance_id}:{id_}"
-    provision_task = context.call_sub_orchestrator("get_forex_data_orchestrator", transactions, child_id)
+    provision_task = context.call_sub_orchestrator(
+        "get_forex_data_orchestrator", transactions, child_id
+    )
     provisioning_tasks.append(provision_task)
     forex_data = (yield context.task_all(provisioning_tasks))[0]
 
-    result1 = yield context.call_activity("stocktracker", [transactions, stock_data, forex_data])
-    return [result1]
+    # Step 3 - Rebuild the transactions object
+    transactions = yield context.call_activity(
+        "rebuild_transactions", [transactions, forex_data]
+    )
+
+    # Step 4 - Run main function
+    result = yield context.call_activity(
+        "stocktracker", [transactions, stock_data, forex_data]
+    )
+    return [result]
 
 
 main = df.Orchestrator.create(orchestrator_function)
