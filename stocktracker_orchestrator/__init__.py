@@ -52,14 +52,21 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 7 - Calulate totals
     data = yield context.call_activity("calculate_totals", data)
 
-    # step 8 add invested to data
+    # step 8 - add invested to data
     invested = json.loads(invested)
     data = json.loads(data)
     data.update(**invested)
     data = json.dumps(data)
 
-    # Step 7 - Run main function
-    result = yield context.call_activity("stocktracker", data)
+    # step 9 - Output to sql
+    provisioning_tasks = []
+    id_ += 1
+    child_id = f"{context.instance_id}:{id_}"
+    provision_task = context.call_sub_orchestrator(
+        "output_to_sql_orchestrator", data, child_id
+    )
+    provisioning_tasks.append(provision_task)
+    result = (yield context.task_all(provisioning_tasks))[0]
     return [result]
 
 
