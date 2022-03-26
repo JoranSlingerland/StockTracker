@@ -1,5 +1,4 @@
 """main Orchestrator function"""
-#pylint: disable=duplicate-code
 
 import logging
 import json

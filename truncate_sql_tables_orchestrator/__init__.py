@@ -1,8 +1,6 @@
 """main Orchestrator function"""
-# pylint: disable=duplicate-code
 
 import logging
-import json
 
 import azure.functions as func
 import azure.durable_functions as df
