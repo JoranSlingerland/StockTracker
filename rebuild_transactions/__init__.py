@@ -9,8 +9,8 @@ def main(payload: str) -> str:
     logging.info("Rebuilding transactions data")
 
     # get input data
-    transactions = json.loads(payload[0])
-    forex_data = json.loads(payload[1])
+    transactions = payload[0]
+    forex_data = payload[1]
     data = transactions["transactions"]
 
     transaction_list = []
@@ -35,4 +35,4 @@ def main(payload: str) -> str:
         "invested": transactions["invested"],
         "transactions": transaction_list,
     }
-    return json.dumps(new_object)
+    return new_object

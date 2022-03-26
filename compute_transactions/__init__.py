@@ -10,7 +10,7 @@ import pandas
 def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
-    transactions = json.loads(payload)
+    transactions = payload
 
     transactions = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
@@ -18,7 +18,7 @@ def main(payload: str) -> str:
     stocks_held = get_transactions_by_day(transactions)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
-    return json.dumps(stocks_held)
+    return stocks_held
 
 
 def get_transactions_by_day(transactions):

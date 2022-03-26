@@ -38,4 +38,4 @@ def main(payload: str) -> str:
                 raise Exception("Too many api calls, Exiting.")
             continue
 
-        return json.dumps(data.json())
+        return data.json()

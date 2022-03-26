@@ -15,7 +15,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Getting forex data")
 
     api_key = get_config.get_api_key()
-    transactions = json.loads(context.get_input())
+    transactions = context.get_input()
 
     # initialize variables
     currencies = []
@@ -61,11 +61,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         else:
             url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full"
             temp_data = yield context.call_activity("call_alphavantage_api", url)
-            temp_data = json.loads(temp_data)
             forex_data.update({currency: temp_data})
 
     # return dictionary
-    return json.dumps(forex_data)
+    return forex_data
 
 
 main = df.Orchestrator.create(orchestrator_function)

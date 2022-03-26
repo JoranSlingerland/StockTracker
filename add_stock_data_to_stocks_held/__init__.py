@@ -12,9 +12,9 @@ def main(payload: str) -> str:
     logging.info("Adding stock data to stocks held")
 
     # get data
-    stocks_held = json.loads(payload[0])
-    stock_data = json.loads(payload[1])
-    forex_data = json.loads(payload[2])
+    stocks_held = payload[0]
+    stock_data = payload[1]
+    forex_data = payload[2]
 
     # initialize variables
     data = {}
@@ -84,4 +84,4 @@ def main(payload: str) -> str:
             stock_list.append(stock)
         updated_stocks_held.update({single_date: stock_list})
     data.update({"stocks_held": updated_stocks_held})
-    return json.dumps(data)
+    return data

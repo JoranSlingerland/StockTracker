@@ -70,4 +70,4 @@ def main(payload: str) -> str:
 
     invested = {"transactions": transactions_list, "invested": invested_list}
 
-    return json.dumps(invested)
+    return invested

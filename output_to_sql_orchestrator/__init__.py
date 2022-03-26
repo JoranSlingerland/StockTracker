@@ -89,7 +89,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     """Main function"""
     logging.info("Outputting data to sql server")
     # get data from durable function
-    data = json.loads(context.get_input())
+    data = context.get_input()
 
     # get config info
     tables = get_config.get_tables()

@@ -53,10 +53,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     data = yield context.call_activity("calculate_totals", data)
 
     # step 8 - add invested to data
-    invested = json.loads(invested)
-    data = json.loads(data)
     data.update(**invested)
-    data = json.dumps(data)
 
     # step 9 - Output to sql
     provisioning_tasks = []
