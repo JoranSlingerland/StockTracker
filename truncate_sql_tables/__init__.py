@@ -6,7 +6,7 @@ import pyodbc
 from shared_code import get_config
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """truncate tables"""
     # pylint: disable=unused-argument
 
@@ -44,4 +44,4 @@ def main(name: str) -> str:
                 """
                 )
 
-    return "Success"
+    return "Done"

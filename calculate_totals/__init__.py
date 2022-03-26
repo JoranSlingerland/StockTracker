@@ -4,11 +4,11 @@ import logging
 import json
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Calculate totals"""
     logging.info("Calculating totals")
 
-    stocks_held = json.loads(name)
+    stocks_held = json.loads(payload)
 
     # initialize variables
     perm_object = {}

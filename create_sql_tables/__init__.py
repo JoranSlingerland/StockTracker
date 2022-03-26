@@ -6,7 +6,7 @@ import pyodbc
 from shared_code import get_config
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Main function"""
     # pylint: disable=unused-argument
 

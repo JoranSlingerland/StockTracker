@@ -4,13 +4,13 @@ import logging
 import json
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Rebuild transactions data"""
     logging.info("Rebuilding transactions data")
 
     # get input data
-    transactions = json.loads(name[0])
-    forex_data = json.loads(name[1])
+    transactions = json.loads(payload[0])
+    forex_data = json.loads(payload[1])
     data = transactions["transactions"]
 
     transaction_list = []

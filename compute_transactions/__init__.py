@@ -7,10 +7,10 @@ import json
 import pandas
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
-    transactions = json.loads(name)
+    transactions = json.loads(payload)
 
     transactions = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]

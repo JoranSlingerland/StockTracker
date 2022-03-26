@@ -4,7 +4,8 @@ import logging
 import pyodbc
 from shared_code import get_config
 
-def main(name: str) -> str:
+
+def main(payload: str) -> str:
     "Get Transactions data"
 
     # pylint: disable=unused-argument
