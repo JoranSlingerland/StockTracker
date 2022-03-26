@@ -19,7 +19,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     symbols = []
     query = "TIME_SERIES_DAILY"
     stock_data = {}
-    transactions = json.loads(context.get_input())
+    transactions = context.get_input()
 
     # get unique symbols
     for temp_loop in transactions["transactions"]:
@@ -30,11 +30,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     for symbol in symbols:
         url = f"https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact"
         temp_data = yield context.call_activity("call_alphavantage_api", url)
-        temp_data = json.loads(temp_data)
         stock_data.update({symbol: temp_data})
 
     # return dictionary
-    return json.dumps(stock_data)
+    return stock_data
 
 
 main = df.Orchestrator.create(orchestrator_function)

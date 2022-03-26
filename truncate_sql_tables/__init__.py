@@ -1,38 +1,17 @@
 """Activity trigger"""
-# pylint: disable=duplicate-code
 
 import logging
-import pyodbc
-from shared_code import get_config
+from shared_code import get_config, sql_server_module
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """truncate tables"""
     # pylint: disable=unused-argument
 
     tables = get_config.get_tables()
-    sql_server = get_config.get_sqlserver()
+    conn = sql_server_module.create_conn_object()
 
     logging.info("Truncating sql tables")
-
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-    tables = tables["tables"]
-
-    # connect to database
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
 
     with conn:
         crs = conn.cursor()
@@ -44,4 +23,4 @@ def main(name: str) -> str:
                 """
                 )
 
-    return "Success"
+    return "Done"

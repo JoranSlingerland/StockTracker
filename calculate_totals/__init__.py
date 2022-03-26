@@ -4,11 +4,11 @@ import logging
 import json
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Calculate totals"""
     logging.info("Calculating totals")
 
-    stocks_held = json.loads(name)
+    stocks_held = payload
 
     # initialize variables
     perm_object = {}
@@ -24,4 +24,4 @@ def main(name: str) -> str:
         perm_object.update({single_date: temp_object})
         uid += 1
     stocks_held_and_totals = {**stocks_held, "totals": perm_object}
-    return json.dumps(stocks_held_and_totals)
+    return stocks_held_and_totals

@@ -12,8 +12,7 @@ import pyodbc
 import azure.functions as func
 import azure.durable_functions as df
 
-from shared_code import get_config
-from shared_code import list_to_string
+from shared_code import get_config, list_to_string, sql_server_module
 
 # Modules
 def insert_sql_data(input_values, columns, table, conn, single_date=None):
@@ -89,29 +88,11 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     """Main function"""
     logging.info("Outputting data to sql server")
     # get data from durable function
-    data = json.loads(context.get_input())
+    data = context.get_input()
 
     # get config info
     tables = get_config.get_tables()
-    sql_server = get_config.get_sqlserver()
-
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-
-    # connect to database
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
+    conn = sql_server_module.create_conn_object()
 
     fill_sql_table(tables, data, conn)
 

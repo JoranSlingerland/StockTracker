@@ -7,14 +7,14 @@ import logging
 from datetime import datetime, timedelta
 import json
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """add data to stocks held"""
     logging.info("Adding stock data to stocks held")
 
     # get data
-    stocks_held = json.loads(name[0])
-    stock_data = json.loads(name[1])
-    forex_data = json.loads(name[2])
+    stocks_held = payload[0]
+    stock_data = payload[1]
+    forex_data = payload[2]
 
     # initialize variables
     data = {}
@@ -84,4 +84,4 @@ def main(name: str) -> str:
             stock_list.append(stock)
         updated_stocks_held.update({single_date: stock_list})
     data.update({"stocks_held": updated_stocks_held})
-    return json.dumps(data)
+    return data

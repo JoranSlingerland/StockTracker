@@ -7,10 +7,10 @@ import time
 import requests
 
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Get data from API"""
 
-    url = name
+    url = payload
 
     errorcounter = 0
     while True:
@@ -38,4 +38,4 @@ def main(name: str) -> str:
                 raise Exception("Too many api calls, Exiting.")
             continue
 
-        return json.dumps(data.json())
+        return data.json()

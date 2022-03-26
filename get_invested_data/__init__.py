@@ -5,15 +5,15 @@ from datetime import date
 import json
 import pandas
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
-    transactions = json.loads(name)
+    transactions = payload
 
     invested = get_invested_day_by_day(transactions)
     invested = calculate_deposits_and_withdrawals(invested)
     invested = merge_deposits_and_withdrawals(invested)
-    return json.dumps(invested)
+    return invested
 
 def get_invested_day_by_day(transactions):
     """Get the day by day invested data"""

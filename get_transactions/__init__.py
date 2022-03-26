@@ -2,35 +2,18 @@
 import json
 import logging
 import pyodbc
-from shared_code import get_config
+from shared_code import get_config, sql_server_module
 
-def main(name: str) -> str:
+
+def main(payload: str) -> str:
     "Get Transactions data"
 
     # pylint: disable=unused-argument
 
     logging.info("Getting transactions data")
 
-    sql_server = get_config.get_sqlserver()
+    conn = sql_server_module.create_conn_object()
 
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-
-    # connect to database
-
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
     transactions_list = []
     with conn:
         crs = conn.cursor()
@@ -69,4 +52,4 @@ def main(name: str) -> str:
 
     invested = {"transactions": transactions_list, "invested": invested_list}
 
-    return json.dumps(invested)
+    return invested

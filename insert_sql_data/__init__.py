@@ -3,18 +3,17 @@
 
 
 import logging
-import json
 import pyodbc
 
 from shared_code import list_to_string
 
-def main(name: str) -> str:
+def main(payload: str) -> str:
     """insert data into sql"""
-    input_values = name[0]
-    columns = name[1]
-    table = name[2]
-    sql_server = name[3]
-    single_date = name[4]
+    input_values = payload[0]
+    columns = payload[1]
+    table = payload[2]
+    sql_server = payload[3]
+    single_date = payload[4]
 
     # initialize variables
     server = sql_server["sql_server"]["server"]
