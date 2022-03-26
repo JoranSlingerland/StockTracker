@@ -34,8 +34,8 @@ def main(name: str) -> str:
             time.sleep(60)
             errorcounter += 1
             if errorcounter > 3:
-                logging.critical("To many api calls, Exiting.")
-                raise Exception("To many api calls, Exiting.")
+                logging.critical("Too many api calls, Exiting.")
+                raise Exception("Too many api calls, Exiting.")
             continue
 
         return json.dumps(data.json())
