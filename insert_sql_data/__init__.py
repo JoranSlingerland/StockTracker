@@ -5,34 +5,17 @@
 import logging
 import pyodbc
 
-from shared_code import list_to_string
+from shared_code import list_to_string, sql_server_module
+
 
 def main(payload: str) -> str:
     """insert data into sql"""
     input_values = payload[0]
     columns = payload[1]
     table = payload[2]
-    sql_server = payload[3]
-    single_date = payload[4]
+    single_date = payload[3]
 
-    # initialize variables
-    server = sql_server["sql_server"]["server"]
-    database = sql_server["sql_server"]["database"]
-    username = sql_server["sql_server"]["user"]
-    password = sql_server["sql_server"]["password"]
-
-    # connect to database
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
-        + server
-        + ";DATABASE="
-        + database
-        + ";UID="
-        + username
-        + ";PWD="
-        + password
-    )
-
+    conn = sql_server_module.create_conn_object()
 
     logging.debug(f"Inserting data into sql table: {table} and date: {single_date}")
     values = list(input_values.values())
