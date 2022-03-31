@@ -8,11 +8,10 @@ def main(payload: str) -> str:
     """truncate tables"""
     # pylint: disable=unused-argument
 
-    tables = get_config.get_tables()
+    tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
 
     logging.info("Truncating sql tables")
-
     with conn:
         crs = conn.cursor()
         for table in tables:

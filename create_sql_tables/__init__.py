@@ -8,12 +8,11 @@ def main(payload: str) -> str:
     """Main function"""
     # pylint: disable=unused-argument
 
-    tables = get_config.get_tables()
+    tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
 
     logging.info("Creating sql tables")
-    # initialize variables
-    tables = tables["tables"]
+
     # create tables
     with conn:
         crs = conn.cursor()
