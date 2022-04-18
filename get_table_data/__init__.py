@@ -1,5 +1,6 @@
 """Function to query sql server for table data"""
 # pylint: disable=logging-fstring-interpolation
+# pylint: disable=too-many-return-statements
 
 import logging
 import json
