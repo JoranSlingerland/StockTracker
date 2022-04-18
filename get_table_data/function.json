@@ -7,7 +7,7 @@
       "direction": "in",
       "methods": [ "get" ],
       "route": "get_table_data/{tablename}",
-      "authLevel": "function"
+      "authLevel": "anonymous"
     },
     {
       "type": "http",
