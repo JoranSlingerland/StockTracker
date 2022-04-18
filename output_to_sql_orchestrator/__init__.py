@@ -44,6 +44,7 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
         """
         )
 
+
 def fill_sql_table(tables, data, conn):
     """fill table"""
     logging.info("Filling sql tables")
@@ -53,12 +54,10 @@ def fill_sql_table(tables, data, conn):
     totals = data["totals"]
 
     # input lists
-    invested_columns = "uid, " + list_to_string.main(tables["tables"][0]["columns"].keys())
-    stocks_held_columns = "uid, " + list_to_string.main(
-        tables["tables"][1]["columns"].keys()
-    )
-    totals_columns = "uid, " + list_to_string.main(tables["tables"][2]["columns"].keys())
-    single_day_columns = "uid, " + list_to_string.main(tables["tables"][3]["columns"].keys())
+    invested_columns = "uid, " + list_to_string.main(tables[0]["columns"].keys())
+    stocks_held_columns = "uid, " + list_to_string.main(tables[1]["columns"].keys())
+    totals_columns = "uid, " + list_to_string.main(tables[2]["columns"].keys())
+    single_day_columns = "uid, " + list_to_string.main(tables[3]["columns"].keys())
 
     for single_date, invested in invested.items():
         insert_sql_data(invested, invested_columns, "invested", conn, single_date)
@@ -91,7 +90,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     data = context.get_input()
 
     # get config info
-    tables = get_config.get_tables()
+    tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
 
     fill_sql_table(tables, data, conn)

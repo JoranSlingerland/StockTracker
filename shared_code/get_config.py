@@ -13,12 +13,16 @@ def get_tables() -> dict:
                 "table_name": "invested",
                 "candelete": True,
                 "cantruncate": True,
+                "input_table": False,
+                "output_table": True,
                 "columns": {"date": "DATE", "amount": "MONEY"},
             },
             {
                 "table_name": "stocks_held",
                 "candelete": True,
                 "cantruncate": True,
+                "input_table": False,
+                "output_table": True,
                 "columns": {
                     "date": "DATE",
                     "symbol": "TEXT",
@@ -39,6 +43,8 @@ def get_tables() -> dict:
                 "table_name": "totals",
                 "candelete": True,
                 "cantruncate": True,
+                "input_table": False,
+                "output_table": True,
                 "columns": {
                     "date": "DATE",
                     "total_cost": "MONEY",
@@ -49,6 +55,8 @@ def get_tables() -> dict:
                 "table_name": "single_day",
                 "candelete": True,
                 "cantruncate": True,
+                "input_table": False,
+                "output_table": True,
                 "columns": {
                     "symbol": "TEXT",
                     "average_cost": "MONEY",
@@ -68,6 +76,8 @@ def get_tables() -> dict:
                 "table_name": "input_transactions",
                 "candelete": False,
                 "cantruncate": False,
+                "input_table": True,
+                "output_table": False,
                 "columns": {
                     "symbol": "TEXT",
                     "transaction_date": "DATE",
@@ -82,6 +92,8 @@ def get_tables() -> dict:
                 "table_name": "input_invested",
                 "candelete": False,
                 "cantruncate": False,
+                "input_table": True,
+                "output_table": False,
                 "columns": {
                     "transaction_date": "DATE",
                     "transaction_type": "TEXT",

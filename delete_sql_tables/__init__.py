@@ -10,7 +10,7 @@ def main(payload: str) -> str:
 
     logging.info("Deleting sql tables")
 
-    tables = get_config.get_tables()
+    tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
 
     with conn:

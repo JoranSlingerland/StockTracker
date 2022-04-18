@@ -1,4 +1,5 @@
 """main Orchestrator function"""
+# pylint: disable=unused-variable
 
 import logging
 import json
@@ -10,8 +11,11 @@ import azure.durable_functions as df
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
 
-    # step 1 - Get the input from the sql database
+    # step 1.1 - Get the input from the sql database
     transactions = yield context.call_activity("get_transactions", "Go")
+
+    # step 1.2 - Get last uid from sql
+    highest_uids = yield context.call_activity("get_highest_uid", "Go")
 
     # Step 2.1 - Get data for stocks via the API
     provisioning_tasks = []
@@ -54,7 +58,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 8 - add invested to data
     data.update(**invested)
-
     # step 9 - Output to sql
     provisioning_tasks = []
     id_ += 1
