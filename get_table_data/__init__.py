@@ -1,10 +1,8 @@
 """Function to query sql server for table data"""
 # pylint: disable=logging-fstring-interpolation
 
-from cgitb import text
 import logging
 import json
-import re
 
 import azure.functions as func
 from shared_code import sql_server_module
