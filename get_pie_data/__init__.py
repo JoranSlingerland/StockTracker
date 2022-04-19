@@ -14,7 +14,7 @@ def inputoptions(datatype, row):
     if datatype == "stocks":
         return {
             "type": row[1],
-            "value": float(row[12]),
+            "value": float(f"{(row[12]):.2f}"),
         }
 
     # return nothing if no match
