@@ -17,10 +17,10 @@ def inputoptions(table_name, idx, row):
             "uid": row[0],
             "symbol": row[1],
             "transaction_date": (row[2].strftime("%Y-%m-%d")),
-            "cost": float(row[3]),
-            "quantity": float(row[4]),
+            "cost": float(f"{(row[3]):.2f}"),
+            "quantity": float(f"{(row[4]):.2f}"),
             "transaction_type": row[5],
-            "transaction_cost": float(row[6]),
+            "transaction_cost": float(f"{(row[6]):.2f}"),
             "currency": row[7],
         }
     if table_name == "input_invested":
@@ -29,31 +29,31 @@ def inputoptions(table_name, idx, row):
             "uid": row[0],
             "transaction_date": (row[1].strftime("%Y-%m-%d")),
             "transaction_type": row[2],
-            "amount": float(row[3]),
+            "amount": float(f"{(row[3]):.2f}"),
         }
     if table_name == "invested":
         return {
             "key": idx,
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
-            "amount": float(row[2]),
+            "amount": float(f"{(row[2]):.2f}"),
         }
     if table_name == "single_day":
         return {
             "key": idx,
             "uid": row[0],
             "symbol": row[1],
-            "average_cost": float(row[2]),
-            "total_cost": float(row[3]),
-            "quantity": float(row[4]),
-            "transaction_cost": float(row[5]),
+            "average_cost": float(f"{(row[2]):.2f}"),
+            "total_cost": float(f"{(row[3]):.2f}"),
+            "quantity": float(f"{(row[4]):.2f}"),
+            "transaction_cost": float(f"{(row[5]):.2f}"),
             "currency": row[6],
-            "close_value": float(row[7]),
-            "high_value": float(row[8]),
-            "low_value": float(row[9]),
-            "open_value": float(row[10]),
-            "volume": float(row[11]),
-            "total_value": float(row[12]),
+            "close_value": float(f"{(row[7]):.2f}"),
+            "high_value": float(f"{(row[8]):.2f}"),
+            "low_value": float(f"{(row[9]):.2f}"),
+            "open_value": float(f"{(row[10]):.2f}"),
+            "volume": float(f"{(row[11]):.2f}"),
+            "total_value": float(f"{(row[12]):.2f}"),
         }
     if table_name == "stocks_held":
         return {
@@ -61,25 +61,25 @@ def inputoptions(table_name, idx, row):
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
             "symbol": row[2],
-            "average_cost": float(row[3]),
-            "total_cost": float(row[4]),
-            "quantity": float(row[5]),
-            "transaction_cost": float(row[6]),
+            "average_cost": float(f"{(row[3]):.2f}"),
+            "total_cost": float(f"{(row[4]):.2f}"),
+            "quantity": float(f"{(row[5]):.2f}"),
+            "transaction_cost": float(f"{(row[6]):.2f}"),
             "currency": row[7],
-            "close_value": float(row[8]),
-            "high_value": float(row[9]),
-            "low_value": float(row[10]),
-            "open_value": float(row[11]),
-            "volume": float(row[12]),
-            "total_value": float(row[13]),
+            "close_value": float(f"{(row[8]):.2f}"),
+            "high_value": float(f"{(row[9]):.2f}"),
+            "low_value": float(f"{(row[10]):.2f}"),
+            "open_value": float(f"{(row[11]):.2f}"),
+            "volume": float(f"{(row[12]):.2f}"),
+            "total_value": float(f"{(row[13]):.2f}"),
         }
     if table_name == "totals":
         return {
             "key": idx,
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
-            "total_cost": float(row[2]),
-            "total_value": float(row[3]),
+            "total_cost": float(f"{(row[2]):.2f}"),
+            "total_value": float(f"{(row[3]):.2f}"),
         }
     # return nothing if no match
     return {}
