@@ -31,7 +31,6 @@ def main(payload: str) -> str:
     stock_meta_data = {}
     transactions = payload[0]
     clearbit_api_key = get_config.get_clearbit_api_key()
-    logging.info(f"Clearbit API Key: {clearbit_api_key}")
 
     # get unique symbols and domains
     for temp_loop in transactions["transactions"]:
@@ -48,11 +47,11 @@ def main(payload: str) -> str:
         temp_data = call_clearbit_api(url, clearbit_api_key)
 
         temp_object = {
-            "Name": temp_data["name"],
-            "Description": temp_data["description"],
-            "Country": temp_data["geo"]["country"],
-            "Sector": temp_data["category"]["sector"],
-            "Domain": domain,
+            "name": temp_data["name"],
+            "description": temp_data["description"],
+            "country": temp_data["geo"]["country"],
+            "sector": temp_data["category"]["sector"],
+            "domain": domain,
             "logo": temp_data["logo"],
         }
 

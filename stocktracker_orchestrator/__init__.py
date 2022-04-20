@@ -53,7 +53,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 6 - add stock_data to stock_held
     data = yield context.call_activity(
-        "add_stock_data_to_stocks_held", [stock_held, stock_data, forex_data]
+        "add_data_to_stocks_held", [stock_held, stock_data, forex_data, stock_meta_data]
     )
 
     # step 7 - Calulate totals
@@ -61,6 +61,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 8 - add invested to data
     data.update(**invested)
+
     # step 9 - Output to sql
     provisioning_tasks = []
     id_ += 1
