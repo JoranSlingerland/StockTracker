@@ -37,6 +37,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     provisioning_tasks.append(provision_task)
     forex_data = (yield context.task_all(provisioning_tasks))[0]
 
+    # Step 2.3 - Get stock meta data via the API
+    stock_meta_data = yield context.call_activity("get_stock_meta_data", [transactions])
+
     # Step 3 - Rebuild the transactions object
     transactions = yield context.call_activity(
         "rebuild_transactions", [transactions, forex_data]
@@ -50,7 +53,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 6 - add stock_data to stock_held
     data = yield context.call_activity(
-        "add_stock_data_to_stocks_held", [stock_held, stock_data, forex_data]
+        "add_data_to_stocks_held", [stock_held, stock_data, forex_data, stock_meta_data]
     )
 
     # step 7 - Calulate totals
@@ -58,6 +61,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 8 - add invested to data
     data.update(**invested)
+
     # step 9 - Output to sql
     provisioning_tasks = []
     id_ += 1

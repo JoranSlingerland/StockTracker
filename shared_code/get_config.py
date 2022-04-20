@@ -37,6 +37,12 @@ def get_tables() -> dict:
                     "open_value": "MONEY",
                     "volume": "DECIMAL(38,2)",
                     "total_value": "MONEY",
+                    "name": "TEXT",
+                    "description": "TEXT",
+                    "country": "TEXT",
+                    "sector": "TEXT",
+                    "domain": "TEXT",
+                    "logo": "TEXT",
                 },
             },
             {
@@ -70,6 +76,12 @@ def get_tables() -> dict:
                     "open_value": "MONEY",
                     "volume": "DECIMAL(38,2)",
                     "total_value": "MONEY",
+                    "name": "TEXT",
+                    "description": "TEXT",
+                    "country": "TEXT",
+                    "sector": "TEXT",
+                    "domain": "TEXT",
+                    "logo": "TEXT",
                 },
             },
             {
@@ -86,6 +98,7 @@ def get_tables() -> dict:
                     "transaction_type": "TEXT",
                     "transaction_cost": "MONEY",
                     "currency": "TEXT",
+                    "domain": "TEXT",
                 },
             },
             {
@@ -130,3 +143,13 @@ def get_api_key() -> str:
     api_key = os.environ["API_KEY"]
 
     return api_key
+
+
+def get_clearbit_api_key() -> str:
+    """Get clearbit api key"""
+
+    load_dotenv()
+
+    clearbit_api_key = os.environ["CLEARBIT_API_KEY"]
+
+    return clearbit_api_key

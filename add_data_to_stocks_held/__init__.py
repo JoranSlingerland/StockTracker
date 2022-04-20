@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timedelta
 import json
 
+
 def main(payload: str) -> str:
     """add data to stocks held"""
     logging.info("Adding stock data to stocks held")
@@ -15,6 +16,7 @@ def main(payload: str) -> str:
     stocks_held = payload[0]
     stock_data = payload[1]
     forex_data = payload[2]
+    stock_meta_data = payload[3]
 
     # initialize variables
     data = {}
@@ -73,6 +75,14 @@ def main(payload: str) -> str:
                             "close_value": stock_close * forex_high,
                             "volume": stock_volume,
                             "total_value": stock_close * forex_high * stock["quantity"],
+                            "name": stock_meta_data[f"{stock['symbol']}"]["name"],
+                            "description": stock_meta_data[f"{stock['symbol']}"][
+                                "description"
+                            ],
+                            "country": stock_meta_data[f"{stock['symbol']}"]["country"],
+                            "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
+                            "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
+                            "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
                         }
                     )
                     break
