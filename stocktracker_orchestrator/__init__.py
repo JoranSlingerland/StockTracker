@@ -37,6 +37,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     provisioning_tasks.append(provision_task)
     forex_data = (yield context.task_all(provisioning_tasks))[0]
 
+    # Step 2.3 - Get stock meta data via the API
+    stock_meta_data = yield context.call_activity("get_stock_meta_data", [transactions])
+
     # Step 3 - Rebuild the transactions object
     transactions = yield context.call_activity(
         "rebuild_transactions", [transactions, forex_data]
