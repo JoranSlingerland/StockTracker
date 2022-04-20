@@ -23,8 +23,20 @@ def inputoptions(datatype, row):
             "type": row[6],
             "value": float(f"{(row[12]):.2f}"),
         }
+    if datatype == "country":
+        return {
+            "type": row[15],
+            "value": float(f"{(row[12]):.2f}"),
+        }
+    if datatype == "sector":
+        return {
+            "type": row[16],
+            "value": float(f"{(row[12]):.2f}"),
+        }
+
     # return nothing if no match
     return {}
+
 
 def remove_duplicates(datatype, input_list):
     """Remove duplicates from list"""
@@ -34,22 +46,57 @@ def remove_duplicates(datatype, input_list):
         currencies = []
         output_list = []
 
-        #get unique currencies
+        # get unique currencies
         for temp_loop in input_list:
             currencies.append(temp_loop["type"])
             currencies = list(dict.fromkeys(currencies))
 
-        #loop through currencies and add to temp_list
+        # loop through currencies and add to temp_list
         for currency in currencies:
-            filterd_input_list = [
-                d for d in input_list if d["type"] == currency
-            ]
+            filterd_input_list = [d for d in input_list if d["type"] == currency]
             temp_object = {
                 "type": currency,
                 "value": sum([d["value"] for d in filterd_input_list]),
             }
             output_list.append(temp_object)
         return output_list
+    if datatype == "country":
+        countries = []
+        output_list = []
+
+        # get unique countries
+        for temp_loop in input_list:
+            countries.append(temp_loop["type"])
+            countries = list(dict.fromkeys(countries))
+
+        # loop through countries and add to temp_list
+        for country in countries:
+            filterd_input_list = [d for d in input_list if d["type"] == country]
+            temp_object = {
+                "type": country,
+                "value": sum([d["value"] for d in filterd_input_list]),
+            }
+            output_list.append(temp_object)
+        return output_list
+    if datatype == "sector":
+        sectors = []
+        output_list = []
+
+        # get unique sectors
+        for temp_loop in input_list:
+            sectors.append(temp_loop["type"])
+            sectors = list(dict.fromkeys(sectors))
+
+        # loop through sectors and add to temp_list
+        for sector in sectors:
+            filterd_input_list = [d for d in input_list if d["type"] == sector]
+            temp_object = {
+                "type": sector,
+                "value": sum([d["value"] for d in filterd_input_list]),
+            }
+            output_list.append(temp_object)
+        return output_list
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main function"""
