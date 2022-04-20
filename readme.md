@@ -61,6 +61,18 @@ Function will truncate the sql tables marked as cantruncate in the get_config he
 
 ![Azure Functions](./docs/images/truncate_sql_tables.drawio.svg)
 
+### Get table data
+
+Function will get data from the sql server and prep it for use in the static web app tables.
+
+![Azure Functions](./docs/images/get_table_data.drawio.svg)
+
+### Get pie data
+
+Function will get data from the sql server and prep it for use in the static web app pie graphs.
+
+![Azure Functions](./docs/images/get_pie_data.drawio.svg)
+
 ### Stocktracker
 
 Function will get all the data from the input tables and use this to create the ouput data. This will then be outputted to the sql server.
