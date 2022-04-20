@@ -31,6 +31,7 @@ def main(payload: str) -> str:
                 "transaction_type": row[5],
                 "transaction_cost": float(row[6]),
                 "currency": row[7],
+                "domain": row[8],
             }
             transactions_list.append(temp_object)
 
