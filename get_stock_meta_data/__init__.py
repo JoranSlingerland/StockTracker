@@ -18,8 +18,7 @@ def call_clearbit_api(url: str, clearbit_api_key: str) -> dict:
     response = requests.get(url, headers=requestheaders)
     if response.status_code == 200:
         return response.json()
-    else:
-        return None
+    return None
 
 
 def main(payload: str) -> str:
@@ -39,9 +38,9 @@ def main(payload: str) -> str:
         symbols_domains = list(dict.fromkeys(symbols_domains))
 
     # iterate over list in increments of 2
-    for i in range(0,len(symbols_domains),2):
+    for i in range(0, len(symbols_domains), 2):
         symbol = symbols_domains[i]
-        domain = symbols_domains[i+1]
+        domain = symbols_domains[i + 1]
 
         url = f"https://company.clearbit.com/v2/companies/find?domain={domain}"
         temp_data = call_clearbit_api(url, clearbit_api_key)
