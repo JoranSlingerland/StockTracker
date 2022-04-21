@@ -54,6 +54,11 @@ def inputoptions(table_name, idx, row):
             "open_value": float(f"{(row[10]):.2f}"),
             "volume": float(f"{(row[11]):.2f}"),
             "total_value": float(f"{(row[12]):.2f}"),
+            "name": row[13],
+            "description": row[14],
+            "sector": row[15],
+            "domain": row[16],
+            "logo": row[17],
         }
     if table_name == "stocks_held":
         return {
@@ -72,6 +77,11 @@ def inputoptions(table_name, idx, row):
             "open_value": float(f"{(row[11]):.2f}"),
             "volume": float(f"{(row[12]):.2f}"),
             "total_value": float(f"{(row[13]):.2f}"),
+            "name": row[13],
+            "description": row[14],
+            "sector": row[15],
+            "domain": row[16],
+            "logo": row[17],
         }
     if table_name == "totals":
         return {
