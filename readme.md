@@ -1,31 +1,78 @@
-# StockTracker
+# StockTracker Project - API
 
-![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pylint.yml/badge.svg) ![CodeQL](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg)  [![CodeFactor](https://www.codefactor.io/repository/github/joranslingerland/stocktracker/badge)](https://www.codefactor.io/repository/github/joranslingerland/stocktracker) ![Maintained](https://img.shields.io/badge/Maintained-Yes-%2331c553) ![License](https://img.shields.io/github/license/joranslingerland/stocktracker?color=%2331c553) ![Issues](https://img.shields.io/github/issues/JoranSlingerland/StockTracker)
+![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pylint.yml/badge.svg) ![CodeQL](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg) [![CodeFactor](https://www.codefactor.io/repository/github/joranslingerland/stocktracker/badge)](https://www.codefactor.io/repository/github/joranslingerland/stocktracker) ![Maintained](https://img.shields.io/badge/Maintained-Yes-%2331c553) ![License](https://img.shields.io/github/license/joranslingerland/stocktracker?color=%2331c553) ![Issues](https://img.shields.io/github/issues/JoranSlingerland/StockTracker)
 
-The target of this project is to get data of stocks and write this to a readable format for a BI tool to analyze.
+The target of this project is to get data about your stock portfolio and make this viewable in a web application.
+
+## Related repos
+
+The project consists of three repositories:
+
+| Name                                                                             | Notes                                       | Language |
+| -------------------------------------------------------------------------------- | ------------------------------------------- | -------- |
+| [API](https://github.com/JoranSlingerland/StockTracker)                          | This repo which will be used to gather data | Python   |
+| [Frontend](https://github.com/JoranSlingerland/StockTracker-frontend)            | Frontend repo which will create the website | React    |
+| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resouces to Azure        | Bicep    |
 
 ## API
 
-This project will be using the [Alpha vantage API](https://www.alphavantage.co/) to get stock data. You can get a free key on there site.
+This project will be using the [Alpha vantage API](https://www.alphavantage.co/) and [clearbit API](https://clearbit.com/).
 
 ## Setup
 
-Setup a MS SQL server or create one on Azure with the [IAC code](https://github.com/JoranSlingerland/StockTrackerInfrastructure)
+### Basic environment setup
 
-Set the below environment variables:
+- Fork this repo and the [stocktracker-FrontEnd](https://github.com/JoranSlingerland/Stocktracker-FrontEnd) Repo.
+- Get your api keys from [Alpha vantage API](https://www.alphavantage.co/) and [clearbit API](https://clearbit.com/)
 
-|Name|Value|
-|--|--|
-|Server|tcp:< Your server name >|
-|Database|< Your database name >|
-|User|< Your database user> |
-|Password|< Your sql password >|
-|Api_key|< Your api key >|
+### Azure environment
 
-Create the tables by running the create_sql_tables_orchestrator function.
-This can be done by browsing to `https://<Your function name>.azurewebsites.net/api/orchestrators/create_sql_tables_orchestrator?code=<Your apikey>`
+- Generate a Github PAT with Repo and workflow permissions.
 
-After that insert your data in the sql server with the below commands:
+#### One time deployment
+
+- Run the deployment by [clicking Here](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fgist.githubusercontent.com%2FJoranSlingerland%2Fa9087b977db092d71212e442dd5c5975%2Fraw%2FStocktrackerBuild).
+- I'd recommend not chaning any of the default values. But you can if you want to.
+
+#### Pipeline deployment
+
+- Fork the [Stocktracker Repo](https://github.com/JoranSlingerland/StockTrackerInfrastructure)
+- You can remove the `bicep-build.yml` file as this is only used to create a gist for the one time deployment.
+- Setup the workflow secrets as defined below:
+
+| Name               | Value                                                                              |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| Api_key            | < Your Alpha vantage API key >                                                     |
+| AZURE_CREDENTIALS  | I'm not sure anymore but it has something to do with the azure/login@v1 action : ) |
+| AZURE_SUBSCRIPTION | Your Azure subscription ID                                                         |
+| clearbit_Api_key   | < Your clearbit API key >                                                          |
+| Database           | < Your database name >                                                             |
+| Server             | tcp:< Your server address >                                                        |
+| SQLPassword        | < Your sql password >                                                              |
+| SWA_REPO_TOKEN     | The PAT token you generated                                                        |
+
+### local development environment
+
+- Setup a sql server locally or use the one deployed to Azure.
+- Setup a .env file in the stocktracker root with the values below
+
+| Name             | Value                          |
+| ---------------- | ------------------------------ |
+| Server           | tcp:< Your server address >    |
+| Database         | < Your database name >         |
+| User             | < Your database user>          |
+| Password         | < Your sql password >          |
+| Api_key          | < Your Alpha vantage API key > |
+| clearbit_Api_key | < Your clearbit API key >      |
+
+- Startup the server by pressing `f5` in vscode and running the command `swa start http://localhost:8080 --run "npm run dev" --api-location http://localhost:7071`
+- Login to the website by going to [http://localhost:4280/](http://localhost:4280/) and make sure you give yourself the admin role
+
+## Usage
+
+- Create the tables by running the create_sql_tables_orchestrator function.
+  This can be done by browsing to [http://localhost:7071/api/orchestrators/create_sql_tables_orchestrator](http://localhost:7071/api/orchestrators/create_sql_tables_orchestrator)
+- insert your data in the sql server with the below commands:
 
 ```sql
 INSERT INTO input_transactions
@@ -40,6 +87,9 @@ VALUES (0, '2019-01-21', 'Deposit', 100);
 INSERT INTO input_invested
 VALUES (1, '2020-01-21', 'Deposit', 200);
 ```
+
+- Run the main function by browsing to [http://localhost:7071/api/orchestrators/stocktracker_orchestrator](http://localhost:7071/api/orchestrators/stocktracker_orchestrator)
+- After it has finished running check the data by going to [http://localhost:4280/](http://localhost:4280/)
 
 ## Azure Functions
 
