@@ -9,11 +9,10 @@ import azure.functions as func
 from shared_code import sql_server_module
 
 
-def inputoptions(table_name, idx, row):
+def inputoptions(table_name, row):
     """Home made match function"""
     if table_name == "input_transactions":
         return {
-            "key": idx,
             "uid": row[0],
             "symbol": row[1],
             "transaction_date": (row[2].strftime("%Y-%m-%d")),
@@ -25,7 +24,6 @@ def inputoptions(table_name, idx, row):
         }
     if table_name == "input_invested":
         return {
-            "key": idx,
             "uid": row[0],
             "transaction_date": (row[1].strftime("%Y-%m-%d")),
             "transaction_type": row[2],
@@ -33,14 +31,12 @@ def inputoptions(table_name, idx, row):
         }
     if table_name == "invested":
         return {
-            "key": idx,
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
             "amount": float(f"{(row[2]):.2f}"),
         }
     if table_name == "single_day":
         return {
-            "key": idx,
             "uid": row[0],
             "symbol": row[1],
             "average_cost": float(f"{(row[2]):.2f}"),
@@ -56,13 +52,13 @@ def inputoptions(table_name, idx, row):
             "total_value": float(f"{(row[12]):.2f}"),
             "name": row[13],
             "description": row[14],
-            "sector": row[15],
-            "domain": row[16],
-            "logo": row[17],
+            "country": row[15],
+            "sector": row[16],
+            "domain": row[17],
+            "logo": row[18],
         }
     if table_name == "stocks_held":
         return {
-            "key": idx,
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
             "symbol": row[2],
@@ -85,7 +81,6 @@ def inputoptions(table_name, idx, row):
         }
     if table_name == "totals":
         return {
-            "key": idx,
             "uid": row[0],
             "date": (row[1].strftime("%Y-%m-%d")),
             "total_cost": float(f"{(row[2]):.2f}"),
@@ -119,8 +114,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             select * from [dbo].[{tablename}]
             """
         )
-        for idx, row in enumerate(crs):
-            tempobject = inputoptions(tablename, idx, row)
+        for row in crs:
+            tempobject = inputoptions(tablename, row)
             result.append(tempobject)
 
     return func.HttpResponse(
