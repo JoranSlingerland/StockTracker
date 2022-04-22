@@ -1,5 +1,6 @@
 """main Orchestrator function"""
 # pylint: disable=unused-variable
+# pylint: disable=logging-fstring-interpolation
 
 import logging
 import json
@@ -10,6 +11,12 @@ import azure.durable_functions as df
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
+    # step 0: get the input
+    days_to_change = 0  # remove one because it will always take the current day
+    if days_to_change in (0, "all"):
+        days_to_change = 0
+    else:
+        days_to_change = days_to_change - 1
 
     # step 1.1 - Get the input from the sql database
     transactions = yield context.call_activity("get_transactions", "Go")
@@ -46,10 +53,14 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     )
 
     # step 4 - Compute transactions
-    stock_held = yield context.call_activity("compute_transactions", transactions)
+    stock_held = yield context.call_activity(
+        "compute_transactions", [transactions, days_to_change]
+    )
 
     # step 5 - Get invested data
-    invested = yield context.call_activity("get_invested_data", transactions)
+    invested = yield context.call_activity(
+        "get_invested_data", [transactions, days_to_change]
+    )
 
     # step 6 - add stock_data to stock_held
     data = yield context.call_activity(

@@ -2,7 +2,7 @@
 # pylint: disable=logging-fstring-interpolation
 
 import logging
-from datetime import date
+from datetime import date, timedelta
 import json
 import pandas
 from shared_code import add_uid
@@ -11,18 +11,19 @@ from shared_code import add_uid
 def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
-    transactions = payload
+    transactions = payload[0]
+    days_to_change = payload[1]
 
     transactions = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
-    stocks_held = get_transactions_by_day(transactions)
+    stocks_held = get_transactions_by_day(transactions, days_to_change)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     return stocks_held
 
 
-def get_transactions_by_day(transactions):
+def get_transactions_by_day(transactions, days_to_change):
     """Get transactions by day"""
     logging.info("Getting transactions by day")
     # initialize variables
@@ -30,7 +31,10 @@ def get_transactions_by_day(transactions):
 
     # grab dates
     end_date = date.today()
-    start_date = transactions[0]["transaction_date"]
+    if days_to_change == 0:
+        start_date = transactions[0]["transaction_date"]
+    else:
+        start_date = end_date - timedelta(days=days_to_change)
     daterange = pandas.date_range(start_date, end_date)
 
     # loop through dates

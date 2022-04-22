@@ -1,7 +1,7 @@
 """Calculate invested data"""
 
 import logging
-from datetime import date
+from datetime import date, timedelta
 import json
 import pandas
 from shared_code import add_uid
@@ -10,15 +10,16 @@ from shared_code import add_uid
 def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
-    transactions = payload
+    transactions = payload[0]
+    days_to_change = payload[1]
 
-    invested = get_invested_day_by_day(transactions)
+    invested = get_invested_day_by_day(transactions, days_to_change)
     invested = calculate_deposits_and_withdrawals(invested)
     invested = merge_deposits_and_withdrawals(invested)
     return invested
 
 
-def get_invested_day_by_day(transactions):
+def get_invested_day_by_day(transactions, days_to_change):
     """Get the day by day invested data"""
     logging.info("Getting invested day by day")
     # initialize variables
@@ -27,9 +28,15 @@ def get_invested_day_by_day(transactions):
     transactions_dates = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
+
+    #grab dates
     end_date = date.today()
-    start_date = transactions_dates[0]["transaction_date"]
+    if days_to_change == 0:
+        start_date = transactions_dates[0]["transaction_date"]
+    else:
+        start_date = end_date - timedelta(days=days_to_change)
     daterange = pandas.date_range(start_date, end_date)
+
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
 
