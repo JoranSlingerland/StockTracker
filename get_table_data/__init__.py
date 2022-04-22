@@ -109,14 +109,35 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     with conn:
         crs = conn.cursor()
-        crs.execute(
-            f"""
-            select * from [dbo].[{tablename}]
-            """
-        )
-        for row in crs:
-            tempobject = inputoptions(tablename, row)
-            result.append(tempobject)
+        if tablename in ("input_invested", "input_transactions"):
+            crs.execute(
+                f"""
+                select * from [dbo].[{tablename}]
+                 ORDER BY transaction_date desc
+                """
+            )
+            for row in crs:
+                tempobject = inputoptions(tablename, row)
+                result.append(tempobject)
+        if tablename in ("invested", "stocks_held", "totals"):
+            crs.execute(
+                f"""
+                select * from [dbo].[{tablename}]
+                 ORDER BY date desc
+                """
+            )
+            for row in crs:
+                tempobject = inputoptions(tablename, row)
+                result.append(tempobject)
+        if tablename == "single_day":
+            crs.execute(
+                f"""
+                select * from [dbo].[{tablename}]
+                """
+            )
+            for row in crs:
+                tempobject = inputoptions(tablename, row)
+                result.append(tempobject)
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
