@@ -15,7 +15,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     transactions = yield context.call_activity("get_transactions", "Go")
 
     # step 1.2 - Get last uid from sql
-    highest_uids = yield context.call_activity("get_highest_uid", "Go")
+    # highest_uids = yield context.call_activity("get_highest_uid", "Go")
 
     # Step 2.1 - Get data for stocks via the API
     provisioning_tasks = []
