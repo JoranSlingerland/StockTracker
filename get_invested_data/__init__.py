@@ -4,6 +4,8 @@ import logging
 from datetime import date
 import json
 import pandas
+from shared_code import add_uid
+
 
 def main(payload: str) -> str:
     """Get the day by day invested data"""
@@ -14,6 +16,7 @@ def main(payload: str) -> str:
     invested = calculate_deposits_and_withdrawals(invested)
     invested = merge_deposits_and_withdrawals(invested)
     return invested
+
 
 def get_invested_day_by_day(transactions):
     """Get the day by day invested data"""
@@ -48,6 +51,7 @@ def get_invested_day_by_day(transactions):
     invested = {"invested": invested}
 
     return invested
+
 
 def calculate_deposits_and_withdrawals(invested):
     """calculate depoisits and withdrawals"""
@@ -87,6 +91,7 @@ def calculate_deposits_and_withdrawals(invested):
     computed_date_invested = {"invested": computed_date_invested}
     return computed_date_invested
 
+
 def merge_deposits_and_withdrawals(invested):
     """merge deposits and withdrawals"""
     logging.info("Merging deposits and withdrawals")
@@ -101,14 +106,15 @@ def merge_deposits_and_withdrawals(invested):
             len(date_invested) == 1
             and date_invested[0]["transaction_type"] == "Deposit"
         ):
-            temp_object = {"uid": uid, "invested": date_invested[0]["amount"]}
+            temp_object = {"invested": date_invested[0]["amount"]}
+            temp_object = add_uid.main(temp_object, single_date)
             temp_list.append(temp_object)
         elif len(date_invested) == 2:
             date_invested = sorted(date_invested, key=lambda k: k["transaction_type"])
             temp_object = {
-                "uid": uid,
                 "invested": date_invested[0]["amount"] - date_invested[1]["amount"],
             }
+            temp_object = add_uid.main(temp_object, single_date)
         merged_invested.update({single_date: temp_object})
         uid += 1
     merged_invested = {"invested": merged_invested}

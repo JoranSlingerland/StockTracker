@@ -5,6 +5,7 @@ import logging
 from datetime import date
 import json
 import pandas
+from shared_code import add_uid
 
 
 def main(payload: str) -> str:
@@ -170,7 +171,6 @@ def merge_sells_and_buys(stocks_held):
                 and single_stock_list[0]["transaction_type"] == "Buy"
             ):
                 temp_object = {
-                    "uid": uid,
                     "symbol": symbol,
                     "average_cost": single_stock_list[0]["average_cost"],
                     "total_cost": single_stock_list[0]["average_cost"]
@@ -179,13 +179,13 @@ def merge_sells_and_buys(stocks_held):
                     "transaction_cost": single_stock_list[0]["transaction_cost"],
                     "currency": single_stock_list[0]["currency"],
                 }
+                temp_object = add_uid.main(temp_object, single_date)
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
                 single_stock_list = sorted(
                     single_stock_list, key=lambda k: k["transaction_type"]
                 )
                 temp_object = {
-                    "uid": uid,
                     "symbol": symbol,
                     "average_cost": single_stock_list[0]["average_cost"],
                     "total_cost": single_stock_list[0]["average_cost"]
@@ -196,6 +196,7 @@ def merge_sells_and_buys(stocks_held):
                     + single_stock_list[1]["transaction_cost"],
                     "currency": single_stock_list[0]["currency"],
                 }
+                temp_object = add_uid.main(temp_object, single_date)
                 if temp_object["quantity"] > 0:
                     temp_list.append(temp_object)
             uid += 1

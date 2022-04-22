@@ -26,7 +26,7 @@ def main(payload: str) -> str:
                  AND  TABLE_NAME = '{table["table_name"]}'))
             BEGIN
                 create table {table["table_name"]} (
-                    uid INT PRIMARY KEY,
+                    uid BIGINT PRIMARY KEY,
                 )
             END
             """
