@@ -1,8 +1,6 @@
 """"Function to calulate totals"""
 # pylint: disable=logging-fstring-interpolation
 import logging
-import json
-from shared_code import add_uid
 
 
 def main(payload: str) -> str:
@@ -20,7 +18,6 @@ def main(payload: str) -> str:
             "total_cost": sum([d["total_cost"] for d in date_stocks_held]),
             "total_value": sum([d["total_value"] for d in date_stocks_held]),
         }
-        temp_object = add_uid.main(temp_object, single_date)
         perm_object.update({single_date: temp_object})
     stocks_held_and_totals = {**stocks_held, "totals": perm_object}
     return stocks_held_and_totals

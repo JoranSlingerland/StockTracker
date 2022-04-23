@@ -1,8 +1,6 @@
 "Get Transactions data"
-import json
 import logging
-import pyodbc
-from shared_code import get_config, sql_server_module
+from shared_code import sql_server_module
 
 
 def main(payload: str) -> str:
@@ -24,14 +22,14 @@ def main(payload: str) -> str:
         )
         for row in crs:
             temp_object = {
-                "symbol": row[1],
-                "transaction_date": (row[2].strftime("%Y-%m-%d")),
-                "cost": float(row[3]),
-                "quantity": float(row[4]),
-                "transaction_type": row[5],
-                "transaction_cost": float(row[6]),
-                "currency": row[7],
-                "domain": row[8],
+                "symbol": row[0],
+                "transaction_date": (row[1].strftime("%Y-%m-%d")),
+                "cost": float(row[2]),
+                "quantity": float(row[3]),
+                "transaction_type": row[4],
+                "transaction_cost": float(row[5]),
+                "currency": row[6],
+                "domain": row[7],
             }
             transactions_list.append(temp_object)
 
@@ -45,9 +43,9 @@ def main(payload: str) -> str:
         )
         for row in crs:
             temp_object = {
-                "transaction_date": (row[1].strftime("%Y-%m-%d")),
-                "transaction_type": row[2],
-                "amount": float(row[3]),
+                "transaction_date": (row[0].strftime("%Y-%m-%d")),
+                "transaction_type": row[1],
+                "amount": float(row[2]),
             }
             invested_list.append(temp_object)
 

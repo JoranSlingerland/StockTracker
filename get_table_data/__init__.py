@@ -13,31 +13,49 @@ def inputoptions(table_name, row):
     """Home made match function"""
     if table_name == "input_transactions":
         return {
-            "uid": row[0],
-            "symbol": row[1],
-            "transaction_date": (row[2].strftime("%Y-%m-%d")),
-            "cost": float(f"{(row[3]):.2f}"),
-            "quantity": float(f"{(row[4]):.2f}"),
-            "transaction_type": row[5],
-            "transaction_cost": float(f"{(row[6]):.2f}"),
-            "currency": row[7],
+            "symbol": row[0],
+            "transaction_date": (row[1].strftime("%Y-%m-%d")),
+            "cost": float(f"{(row[2]):.2f}"),
+            "quantity": float(f"{(row[3]):.2f}"),
+            "transaction_type": row[4],
+            "transaction_cost": float(f"{(row[5]):.2f}"),
+            "currency": row[6],
         }
     if table_name == "input_invested":
         return {
-            "uid": row[0],
-            "transaction_date": (row[1].strftime("%Y-%m-%d")),
-            "transaction_type": row[2],
-            "amount": float(f"{(row[3]):.2f}"),
+            "transaction_date": (row[0].strftime("%Y-%m-%d")),
+            "transaction_type": row[1],
+            "amount": float(f"{(row[2]):.2f}"),
         }
     if table_name == "invested":
         return {
-            "uid": row[0],
-            "date": (row[1].strftime("%Y-%m-%d")),
-            "amount": float(f"{(row[2]):.2f}"),
+            "date": (row[0].strftime("%Y-%m-%d")),
+            "amount": float(f"{(row[1]):.2f}"),
         }
     if table_name == "single_day":
         return {
-            "uid": row[0],
+            "symbol": row[0],
+            "average_cost": float(f"{(row[1]):.2f}"),
+            "total_cost": float(f"{(row[2]):.2f}"),
+            "quantity": float(f"{(row[3]):.2f}"),
+            "transaction_cost": float(f"{(row[4]):.2f}"),
+            "currency": row[5],
+            "close_value": float(f"{(row[6]):.2f}"),
+            "high_value": float(f"{(row[7]):.2f}"),
+            "low_value": float(f"{(row[8]):.2f}"),
+            "open_value": float(f"{(row[9]):.2f}"),
+            "volume": float(f"{(row[10]):.2f}"),
+            "total_value": float(f"{(row[11]):.2f}"),
+            "name": row[12],
+            "description": row[13],
+            "country": row[14],
+            "sector": row[15],
+            "domain": row[16],
+            "logo": row[17],
+        }
+    if table_name == "stocks_held":
+        return {
+            "date": (row[0].strftime("%Y-%m-%d")),
             "symbol": row[1],
             "average_cost": float(f"{(row[2]):.2f}"),
             "total_cost": float(f"{(row[3]):.2f}"),
@@ -52,39 +70,15 @@ def inputoptions(table_name, row):
             "total_value": float(f"{(row[12]):.2f}"),
             "name": row[13],
             "description": row[14],
-            "country": row[15],
-            "sector": row[16],
-            "domain": row[17],
-            "logo": row[18],
-        }
-    if table_name == "stocks_held":
-        return {
-            "uid": row[0],
-            "date": (row[1].strftime("%Y-%m-%d")),
-            "symbol": row[2],
-            "average_cost": float(f"{(row[3]):.2f}"),
-            "total_cost": float(f"{(row[4]):.2f}"),
-            "quantity": float(f"{(row[5]):.2f}"),
-            "transaction_cost": float(f"{(row[6]):.2f}"),
-            "currency": row[7],
-            "close_value": float(f"{(row[8]):.2f}"),
-            "high_value": float(f"{(row[9]):.2f}"),
-            "low_value": float(f"{(row[10]):.2f}"),
-            "open_value": float(f"{(row[11]):.2f}"),
-            "volume": float(f"{(row[12]):.2f}"),
-            "total_value": float(f"{(row[13]):.2f}"),
-            "name": row[13],
-            "description": row[14],
             "sector": row[15],
             "domain": row[16],
             "logo": row[17],
         }
     if table_name == "totals":
         return {
-            "uid": row[0],
-            "date": (row[1].strftime("%Y-%m-%d")),
-            "total_cost": float(f"{(row[2]):.2f}"),
-            "total_value": float(f"{(row[3]):.2f}"),
+            "date": (row[0].strftime("%Y-%m-%d")),
+            "total_cost": float(f"{(row[1]):.2f}"),
+            "total_value": float(f"{(row[2]):.2f}"),
         }
     # return nothing if no match
     return {}

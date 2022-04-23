@@ -15,23 +15,23 @@ def inputoptions(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
         return {
-            "type": row[13],
-            "value": float(f"{(row[12]):.2f}"),
+            "type": row[12],
+            "value": float(f"{(row[11]):.2f}"),
         }
     if datatype == "currency":
         return {
-            "type": row[6],
-            "value": float(f"{(row[12]):.2f}"),
+            "type": row[5],
+            "value": float(f"{(row[11]):.2f}"),
         }
     if datatype == "country":
         return {
-            "type": row[15],
-            "value": float(f"{(row[12]):.2f}"),
+            "type": row[14],
+            "value": float(f"{(row[11]):.2f}"),
         }
     if datatype == "sector":
         return {
-            "type": row[16],
-            "value": float(f"{(row[12]):.2f}"),
+            "type": row[15],
+            "value": float(f"{(row[11]):.2f}"),
         }
 
     # return nothing if no match
