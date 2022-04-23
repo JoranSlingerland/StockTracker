@@ -12,18 +12,18 @@ def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
     transactions = payload[0]
-    days_to_change = payload[1]
+    days_to_update = payload[1]
 
     transactions = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
-    stocks_held = get_transactions_by_day(transactions, days_to_change)
+    stocks_held = get_transactions_by_day(transactions, days_to_update)
     stocks_held = calculate_sells_and_buys(stocks_held)
     stocks_held = merge_sells_and_buys(stocks_held)
     return stocks_held
 
 
-def get_transactions_by_day(transactions, days_to_change):
+def get_transactions_by_day(transactions, days_to_update):
     """Get transactions by day"""
     logging.info("Getting transactions by day")
     # initialize variables
@@ -31,10 +31,10 @@ def get_transactions_by_day(transactions, days_to_change):
 
     # grab dates
     end_date = date.today()
-    if days_to_change == 0:
+    if days_to_update == "all":
         start_date = transactions[0]["transaction_date"]
     else:
-        start_date = end_date - timedelta(days=days_to_change)
+        start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
 
     # loop through dates

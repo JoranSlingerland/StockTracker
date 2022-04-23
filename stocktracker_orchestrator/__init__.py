@@ -9,11 +9,19 @@ import azure.durable_functions as df
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
     # step 0: get the input
-    days_to_change = 0  # remove one because it will always take the current day
-    if days_to_change in (0, "all"):
-        days_to_change = 0
-    else:
-        days_to_change = days_to_change - 1
+    days_to_update = 7  # remove one because it will always take the current day
+    if days_to_update != "all":
+        if isinstance(days_to_update, str):
+            try:
+                days_to_update = int(days_to_update)
+            except ValueError:
+                return "days_to_update must be an integer or the value of 'all'"
+        if days_to_update <= 0:
+            return (
+                "days_to_update must have a value greater than 0 or the value of 'all'"
+            )
+
+        days_to_update = days_to_update - 1
 
     # step 1.1 - Get the input from the sql database
     transactions = yield context.call_activity("get_transactions", "Go")
@@ -51,12 +59,12 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 4 - Compute transactions
     stock_held = yield context.call_activity(
-        "compute_transactions", [transactions, days_to_change]
+        "compute_transactions", [transactions, days_to_update]
     )
 
     # step 5 - Get invested data
     invested = yield context.call_activity(
-        "get_invested_data", [transactions, days_to_change]
+        "get_invested_data", [transactions, days_to_update]
     )
 
     # step 6 - add stock_data to stock_held
@@ -75,7 +83,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     id_ += 1
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
-        "output_to_sql_orchestrator", [data, days_to_change], child_id
+        "output_to_sql_orchestrator", [data, days_to_update], child_id
     )
     provisioning_tasks.append(provision_task)
     result = (yield context.task_all(provisioning_tasks))[0]

@@ -11,15 +11,15 @@ def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
     transactions = payload[0]
-    days_to_change = payload[1]
+    days_to_update = payload[1]
 
-    invested = get_invested_day_by_day(transactions, days_to_change)
+    invested = get_invested_day_by_day(transactions, days_to_update)
     invested = calculate_deposits_and_withdrawals(invested)
     invested = merge_deposits_and_withdrawals(invested)
     return invested
 
 
-def get_invested_day_by_day(transactions, days_to_change):
+def get_invested_day_by_day(transactions, days_to_update):
     """Get the day by day invested data"""
     logging.info("Getting invested day by day")
     # initialize variables
@@ -31,10 +31,10 @@ def get_invested_day_by_day(transactions, days_to_change):
 
     #grab dates
     end_date = date.today()
-    if days_to_change == 0:
+    if days_to_update == "all":
         start_date = transactions_dates[0]["transaction_date"]
     else:
-        start_date = end_date - timedelta(days=days_to_change)
+        start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
 
     for single_date in daterange:

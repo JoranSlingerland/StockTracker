@@ -89,22 +89,24 @@ def fill_sql_table(tables, data, conn):
     uid = 0
 
     logging.info("Filling single day table")
-    for single_stock in stock_held:  # pylint: disable=undefined-loop-variable
-        single_stock.update({"uid": uid})
-        insert_sql_data(single_stock, single_day_columns, "single_day", conn)
-        uid += 1
+    today = date.today().strftime("%Y-%m-%d")
+    single_day_stocks = {k:v for k,v in stocks_held.items() if k == today}
+    for single_data, single_data_stocks in single_day_stocks.items():
+        for single_stock in single_data_stocks:
+            single_stock.update({"uid": uid})
+            insert_sql_data(single_stock, single_day_columns, "single_day", conn)
+            uid += 1
 
 
-def drop_selected_dates(tables, conn, days_to_change):
+def drop_selected_dates(tables, conn, days_to_update):
     """Fill selected days of sql table"""
-    logging.info("dropping selected days of sql tables")
+    logging.info("drop certain sql rows")
 
     # setup dates
     today = date.today()
     end_date = today.strftime("%Y-%m-%d")
-    start_date = (today - timedelta(days=days_to_change)).strftime("%Y-%m-%d")
+    start_date = (today - timedelta(days=days_to_update)).strftime("%Y-%m-%d")
 
-    logging.info("drop certain sql rows")
     with conn:
         crs = conn.cursor()
         for table in tables:
@@ -131,15 +133,15 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Outputting data to sql server")
     # get data from durable function
     data = context.get_input()[0]
-    days_to_change = context.get_input()[1]
+    days_to_update = context.get_input()[1]
 
     # get config info
     tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
-    if days_to_change == 0:
+    if days_to_update == "all":
         truncate_sql_tables(tables, conn)
     else:
-        drop_selected_dates(tables, conn, days_to_change)
+        drop_selected_dates(tables, conn, days_to_update)
 
     fill_sql_table(tables, data, conn)
 
