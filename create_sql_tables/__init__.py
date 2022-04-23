@@ -27,7 +27,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                  AND  TABLE_NAME = '{table["table_name"]}'))
             BEGIN
                 create table {table["table_name"]} (
-                    uid BIGINT PRIMARY KEY,
+                    temp INT,
                 )
             END
             """
@@ -45,5 +45,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 END
                 """
                 )
+            crs.execute(
+                f"""
+                IF EXISTS (SELECT 1
+                            FROM   INFORMATION_SCHEMA.COLUMNS
+                            WHERE  TABLE_NAME = '{table["table_name"]}'
+                                    AND COLUMN_NAME = 'temp'
+                                    AND TABLE_SCHEMA='DBO')
+                BEGIN
+                    ALTER TABLE {table["table_name"]}
+                        DROP COLUMN temp
+                END
+                """
+            )
 
     return "Done"

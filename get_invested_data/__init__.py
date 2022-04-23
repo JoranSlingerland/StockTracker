@@ -4,7 +4,6 @@ import logging
 from datetime import date, timedelta
 import json
 import pandas
-from shared_code import add_uid
 
 
 def main(payload: str) -> str:
@@ -29,7 +28,7 @@ def get_invested_day_by_day(transactions, days_to_update):
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
 
-    #grab dates
+    # grab dates
     end_date = date.today()
     if days_to_update == "all":
         start_date = transactions_dates[0]["transaction_date"]
@@ -104,7 +103,6 @@ def merge_deposits_and_withdrawals(invested):
     logging.info("Merging deposits and withdrawals")
     # initialize variables
     merged_invested = {}
-    uid = 0
     for single_date, date_invested in invested["invested"].items():
         # intialize variables
         temp_list = []
@@ -114,15 +112,12 @@ def merge_deposits_and_withdrawals(invested):
             and date_invested[0]["transaction_type"] == "Deposit"
         ):
             temp_object = {"invested": date_invested[0]["amount"]}
-            temp_object = add_uid.main(temp_object, single_date)
             temp_list.append(temp_object)
         elif len(date_invested) == 2:
             date_invested = sorted(date_invested, key=lambda k: k["transaction_type"])
             temp_object = {
                 "invested": date_invested[0]["amount"] - date_invested[1]["amount"],
             }
-            temp_object = add_uid.main(temp_object, single_date)
         merged_invested.update({single_date: temp_object})
-        uid += 1
     merged_invested = {"invested": merged_invested}
     return merged_invested

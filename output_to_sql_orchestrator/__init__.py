@@ -29,7 +29,7 @@ def insert_sql_data(input_values, columns, table, conn, single_date=None):
 
     if single_date is not None:
         single_date = f"'{single_date}'"
-        temp_list.insert(1, single_date)
+        temp_list.insert(0, single_date)
     values = list_to_string.main(temp_list)
 
     with conn:
@@ -65,10 +65,10 @@ def fill_sql_table(tables, data, conn):
     totals = data["totals"]
 
     # input lists
-    invested_columns = "uid, " + list_to_string.main(tables[0]["columns"].keys())
-    stocks_held_columns = "uid, " + list_to_string.main(tables[1]["columns"].keys())
-    totals_columns = "uid, " + list_to_string.main(tables[2]["columns"].keys())
-    single_day_columns = "uid, " + list_to_string.main(tables[3]["columns"].keys())
+    invested_columns = list_to_string.main(tables[0]["columns"].keys())
+    stocks_held_columns = list_to_string.main(tables[1]["columns"].keys())
+    totals_columns = list_to_string.main(tables[2]["columns"].keys())
+    single_day_columns = list_to_string.main(tables[3]["columns"].keys())
 
     # insert data into tables
     logging.info("Filling invested table")
@@ -86,16 +86,13 @@ def fill_sql_table(tables, data, conn):
     for single_date, total in totals.items():
         insert_sql_data(total, totals_columns, "totals", conn, single_date)
 
-    uid = 0
 
     logging.info("Filling single day table")
     today = date.today().strftime("%Y-%m-%d")
     single_day_stocks = {k:v for k,v in stocks_held.items() if k == today}
     for single_data, single_data_stocks in single_day_stocks.items():
         for single_stock in single_data_stocks:
-            single_stock.update({"uid": uid})
             insert_sql_data(single_stock, single_day_columns, "single_day", conn)
-            uid += 1
 
 
 def drop_selected_dates(tables, conn, days_to_update):
