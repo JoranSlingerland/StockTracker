@@ -2,9 +2,6 @@
 # pylint: disable=unused-variable
 # pylint: disable=logging-fstring-interpolation
 
-import logging
-import json
-
 import azure.functions as func
 import azure.durable_functions as df
 
@@ -78,11 +75,11 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     id_ += 1
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
-        "output_to_sql_orchestrator", data, child_id
+        "output_to_sql_orchestrator", [data, days_to_change], child_id
     )
     provisioning_tasks.append(provision_task)
     result = (yield context.task_all(provisioning_tasks))[0]
-    return [result]
+    return '{"status": "Done"}'
 
 
 main = df.Orchestrator.create(orchestrator_function)
