@@ -1,10 +1,11 @@
 """Activity trigger"""
 
 import logging
+import azure.functions as func
 from shared_code import get_config, sql_server_module
 
 
-def main(payload: str) -> str:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     # pylint: disable=unused-argument
 
@@ -26,7 +27,7 @@ def main(payload: str) -> str:
                  AND  TABLE_NAME = '{table["table_name"]}'))
             BEGIN
                 create table {table["table_name"]} (
-                    uid INT PRIMARY KEY,
+                    uid BIGINT PRIMARY KEY,
                 )
             END
             """
@@ -45,4 +46,4 @@ def main(payload: str) -> str:
                 """
                 )
 
-    return "Success"
+    return "Done"

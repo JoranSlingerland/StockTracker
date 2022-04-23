@@ -2,9 +2,16 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "name": "payload",
-      "type": "activityTrigger",
-      "direction": "in"
+      "type": "httpTrigger",
+      "name": "req",
+      "direction": "in",
+      "methods": [ "get" ],
+      "authLevel": "anonymous"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
     }
   ]
 }

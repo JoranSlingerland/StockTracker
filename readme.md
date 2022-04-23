@@ -71,7 +71,7 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 ## Usage
 
 - Create the tables by running the create_sql_tables_orchestrator function.
-  This can be done by browsing to [http://localhost:7071/api/orchestrators/create_sql_tables_orchestrator](http://localhost:7071/api/orchestrators/create_sql_tables_orchestrator)
+  This can be done by browsing to [http://localhost:7071/api/create_sql_tables](http://localhost:7071/api/create_sql_tables)
 - insert your data in the sql server with the below commands:
 
 ```sql
@@ -88,7 +88,7 @@ INSERT INTO input_invested
 VALUES (1, '2020-01-21', 'Deposit', 200);
 ```
 
-- Run the main function by browsing to [http://localhost:7071/api/orchestrators/stocktracker_orchestrator](http://localhost:7071/api/orchestrators/stocktracker_orchestrator)
+- Run the main function by browsing to [http://localhost:7071/api/orchestrators/stocktracker_orchestrator/all](http://localhost:7071/api/orchestrators/stocktracker_orchestrator/all)
 - After it has finished running check the data by going to [http://localhost:4280/](http://localhost:4280/)
 
 ## Azure Functions

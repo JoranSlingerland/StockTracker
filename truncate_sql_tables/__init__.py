@@ -1,10 +1,11 @@
 """Activity trigger"""
 
 import logging
+import azure.functions as func
 from shared_code import get_config, sql_server_module
 
 
-def main(payload: str) -> str:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     """truncate tables"""
     # pylint: disable=unused-argument
 

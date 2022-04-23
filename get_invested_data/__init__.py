@@ -1,21 +1,25 @@
 """Calculate invested data"""
 
 import logging
-from datetime import date
+from datetime import date, timedelta
 import json
 import pandas
+from shared_code import add_uid
+
 
 def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
-    transactions = payload
+    transactions = payload[0]
+    days_to_update = payload[1]
 
-    invested = get_invested_day_by_day(transactions)
+    invested = get_invested_day_by_day(transactions, days_to_update)
     invested = calculate_deposits_and_withdrawals(invested)
     invested = merge_deposits_and_withdrawals(invested)
     return invested
 
-def get_invested_day_by_day(transactions):
+
+def get_invested_day_by_day(transactions, days_to_update):
     """Get the day by day invested data"""
     logging.info("Getting invested day by day")
     # initialize variables
@@ -24,9 +28,15 @@ def get_invested_day_by_day(transactions):
     transactions_dates = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
+
+    #grab dates
     end_date = date.today()
-    start_date = transactions_dates[0]["transaction_date"]
+    if days_to_update == "all":
+        start_date = transactions_dates[0]["transaction_date"]
+    else:
+        start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
+
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")
 
@@ -48,6 +58,7 @@ def get_invested_day_by_day(transactions):
     invested = {"invested": invested}
 
     return invested
+
 
 def calculate_deposits_and_withdrawals(invested):
     """calculate depoisits and withdrawals"""
@@ -87,6 +98,7 @@ def calculate_deposits_and_withdrawals(invested):
     computed_date_invested = {"invested": computed_date_invested}
     return computed_date_invested
 
+
 def merge_deposits_and_withdrawals(invested):
     """merge deposits and withdrawals"""
     logging.info("Merging deposits and withdrawals")
@@ -101,14 +113,15 @@ def merge_deposits_and_withdrawals(invested):
             len(date_invested) == 1
             and date_invested[0]["transaction_type"] == "Deposit"
         ):
-            temp_object = {"uid": uid, "invested": date_invested[0]["amount"]}
+            temp_object = {"invested": date_invested[0]["amount"]}
+            temp_object = add_uid.main(temp_object, single_date)
             temp_list.append(temp_object)
         elif len(date_invested) == 2:
             date_invested = sorted(date_invested, key=lambda k: k["transaction_type"])
             temp_object = {
-                "uid": uid,
                 "invested": date_invested[0]["amount"] - date_invested[1]["amount"],
             }
+            temp_object = add_uid.main(temp_object, single_date)
         merged_invested.update({single_date: temp_object})
         uid += 1
     merged_invested = {"invested": merged_invested}
