@@ -4,12 +4,13 @@
 
 import azure.functions as func
 import azure.durable_functions as df
+import logging
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """Orchestrator function"""
     # step 0: get the input
-    days_to_update = 7  # remove one because it will always take the current day
+    days_to_update = context.get_input()[0]
     if days_to_update != "all":
         if isinstance(days_to_update, str):
             try:
