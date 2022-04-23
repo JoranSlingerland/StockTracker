@@ -4,7 +4,6 @@
 
 import azure.functions as func
 import azure.durable_functions as df
-import logging
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
