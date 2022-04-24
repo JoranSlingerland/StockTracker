@@ -29,7 +29,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             for table in tables:
                 crs.execute(
                     f"""
-                drop table {table["table_name"]}
+                IF (EXISTS (SELECT *
+	                FROM INFORMATION_SCHEMA.TABLES
+	                WHERE TABLE_SCHEMA = 'dbo'
+	                AND  TABLE_NAME = '{table["table_name"]}'))
+                BEGIN
+                    drop table {table["table_name"]}
+                END
                 """
                 )
     elif tables_to_delete == "output_only":
@@ -39,7 +45,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 if table["candelete"]:
                     crs.execute(
                         f"""
-                    drop table {table["table_name"]}
+                    IF (EXISTS (SELECT *
+	                    FROM INFORMATION_SCHEMA.TABLES
+	                    WHERE TABLE_SCHEMA = 'dbo'
+	                    AND  TABLE_NAME = '{table["table_name"]}'))
+                    BEGIN
+                        drop table {table["table_name"]}
+                    END
                     """
                     )
     else:

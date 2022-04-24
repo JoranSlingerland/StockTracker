@@ -28,7 +28,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             for table in tables:
                 crs.execute(
                     f"""
-                truncate table {table["table_name"]}
+                IF (EXISTS (SELECT *
+	                FROM INFORMATION_SCHEMA.TABLES
+	                WHERE TABLE_SCHEMA = 'dbo'
+	                AND  TABLE_NAME = '{table["table_name"]}'))
+                BEGIN
+                    truncate table {table["table_name"]}
+                END
                 """
                 )
     elif tables_to_truncate == "output_only":
@@ -38,7 +44,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 if table["cantruncate"]:
                     crs.execute(
                         f"""
-                    truncate table {table["table_name"]}
+                    IF (EXISTS (SELECT *
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE TABLE_SCHEMA = 'dbo'
+                        AND  TABLE_NAME = '{table["table_name"]}'))
+                    BEGIN
+                        truncate table {table["table_name"]}
+                    END
                     """
                     )
     else:
