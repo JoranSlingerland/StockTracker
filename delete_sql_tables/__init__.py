@@ -1,4 +1,5 @@
-"""Activity trigger"""
+"""Delete sql Tables"""
+# pylint: disable=line-too-long
 
 import logging
 import azure.functions as func
@@ -17,11 +18,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not tables_to_delete:
         logging.error("No tables_to_delete provided")
         return func.HttpResponse(
-            "Please pass a name on the query string or in the request body",
+            body='{"result": "Please pass a name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
 
-    if tables_to_delete == 'all':
+    if tables_to_delete == "all":
         with conn:
             crs = conn.cursor()
             for table in tables:
@@ -30,7 +32,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 drop table {table["table_name"]}
                 """
                 )
-    elif tables_to_delete == 'output_only':
+    elif tables_to_delete == "output_only":
         with conn:
             crs = conn.cursor()
             for table in tables:
@@ -43,10 +45,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     else:
         logging.error("No valid tables_to_delete provided")
         return func.HttpResponse(
-            "Please pass a valid name on the query string or in the request body",
+            body='{"result": "Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
     return func.HttpResponse(
-        "done",
+        body='{"result": "done"}',
+        mimetype="application/json",
         status_code=200,
     )

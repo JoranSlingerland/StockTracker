@@ -1,4 +1,5 @@
-"""Activity trigger"""
+"""Truncate SQL Tables"""
+# pylint: disable=line-too-long
 
 import logging
 import azure.functions as func
@@ -15,7 +16,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not tables_to_truncate:
         logging.error("No tables_to_truncate provided")
         return func.HttpResponse(
-            "Please pass a name on the query string or in the request body",
+            body='{"status": "Please pass a name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
 
@@ -42,10 +44,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     else:
         logging.error("No valid tables_to_truncate provided")
         return func.HttpResponse(
-            "Please pass a valid name on the query string or in the request body",
+            body='{"status": "Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
     return func.HttpResponse(
-        "done",
+        body='{"status": "done"}',
+        mimetype="application/json",
         status_code=200,
     )

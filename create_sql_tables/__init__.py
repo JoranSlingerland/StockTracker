@@ -1,4 +1,4 @@
-"""Activity trigger"""
+"""Create sql tables"""
 
 import logging
 import azure.functions as func
@@ -59,4 +59,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 """
             )
 
-    return "Done"
+    return func.HttpResponse(
+        body='{"result": "done"}',
+        mimetype="application/json",
+        status_code=200,
+    )

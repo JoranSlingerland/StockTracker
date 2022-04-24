@@ -1,4 +1,4 @@
-"""Function to query sql server for table data"""
+"""Function to query sql server for pie data"""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-return-statements
 # pylint: disable=inconsistent-return-statements
@@ -35,7 +35,7 @@ def inputoptions(datatype, row):
         }
 
     # return nothing if no match
-    return {}
+    return None
 
 
 def remove_duplicates(datatype, input_list):
@@ -96,6 +96,8 @@ def remove_duplicates(datatype, input_list):
             }
             output_list.append(temp_object)
         return output_list
+    # return nothing if no match
+    return None
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -107,7 +109,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not datatype:
         logging.error("No datatype provided")
         return func.HttpResponse(
-            "Please pass a name on the query string or in the request body",
+            body='{"status": "Please pass a name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
@@ -127,7 +130,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             result.append(tempobject)
 
     result = remove_duplicates(datatype, result)
-
+    if not result:
+        return func.HttpResponse(
+            body='{"status": Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
+            status_code=400,
+        )
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )

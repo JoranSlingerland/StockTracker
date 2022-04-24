@@ -1,6 +1,7 @@
 """Function to query sql server for table data"""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-return-statements
+# pylint: disable=line-too-long
 
 import logging
 import json
@@ -83,7 +84,7 @@ def inputoptions(table_name, row):
             "total_value": float(f"{(row[2]):.2f}"),
         }
     # return nothing if no match
-    return {}
+    return None
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -95,7 +96,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not tablename:
         logging.error("No table name provided")
         return func.HttpResponse(
-            "Please pass a name on the query string or in the request body",
+            body='{"status": "Please pass a name on the query string or in the request body"}',
+            mimetype="application/json",
             status_code=400,
         )
     logging.info(f"Getting data for table {tablename}")
@@ -135,6 +137,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 tempobject = inputoptions(tablename, row)
                 result.append(tempobject)
 
+    if not result:
+        return func.HttpResponse(
+            body='{"status": "Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
+            status_code=400,
+        )
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
