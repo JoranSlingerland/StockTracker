@@ -20,6 +20,8 @@ def inputoptions(table_name, row):
             "transaction_type": row[4],
             "transaction_cost": float(f"{(row[5]):.2f}"),
             "currency": row[6],
+            "domain": row[7],
+            "logo": f"https://logo.clearbit.com/{row[7]}",
         }
     if table_name == "input_invested":
         return {

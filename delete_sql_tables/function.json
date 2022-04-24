@@ -6,7 +6,8 @@
       "name": "req",
       "direction": "in",
       "methods": [ "get" ],
-      "authLevel": "anonymous"
+      "authLevel": "anonymous",
+      "route": "delete_sql_tables/{tables_to_delete}"
     },
     {
       "type": "http",

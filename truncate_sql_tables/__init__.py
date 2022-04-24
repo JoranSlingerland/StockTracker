@@ -7,20 +7,45 @@ from shared_code import get_config, sql_server_module
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """truncate tables"""
-    # pylint: disable=unused-argument
 
     tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
+    tables_to_truncate = req.route_params.get("tables_to_truncate")
+
+    if not tables_to_truncate:
+        logging.error("No tables_to_truncate provided")
+        return func.HttpResponse(
+            "Please pass a name on the query string or in the request body",
+            status_code=400,
+        )
 
     logging.info("Truncating sql tables")
-    with conn:
-        crs = conn.cursor()
-        for table in tables:
-            if table["cantruncate"]:
+    if tables_to_truncate == "all":
+        with conn:
+            crs = conn.cursor()
+            for table in tables:
                 crs.execute(
                     f"""
                 truncate table {table["table_name"]}
                 """
                 )
-
-    return "Done"
+    elif tables_to_truncate == "output_only":
+        with conn:
+            crs = conn.cursor()
+            for table in tables:
+                if table["cantruncate"]:
+                    crs.execute(
+                        f"""
+                    truncate table {table["table_name"]}
+                    """
+                    )
+    else:
+        logging.error("No valid tables_to_truncate provided")
+        return func.HttpResponse(
+            "Please pass a valid name on the query string or in the request body",
+            status_code=400,
+        )
+    return func.HttpResponse(
+        "done",
+        status_code=200,
+    )
