@@ -5,16 +5,18 @@ import json
 import logging
 import time
 import requests
-
+from shared_code import get_config
 
 def main(payload: str) -> str:
     """Get data from API"""
 
     url = payload
+    api_key = get_config.get_api_key()
 
     errorcounter = 0
     while True:
         logging.info(f"Calling API: {url}")
+        url = f"{url}&apikey={api_key}"
         data = requests.get(url)
 
         if data.status_code != 200:
