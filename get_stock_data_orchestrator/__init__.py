@@ -6,14 +6,11 @@ import logging
 import json
 import azure.functions as func
 import azure.durable_functions as df
-from shared_code import get_config
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """get data for all stocks from api"""
     logging.info("Getting stock data")
-
-    api_key = get_config.get_api_key()
 
     # initialize variables
     symbols = []
@@ -28,7 +25,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # get data for all symbols
     for symbol in symbols:
-        url = f"https://www.alphavantage.co/query?function={query}&symbol={symbol}&apikey={api_key}&outputsize=full&datatype=compact"
+        url = f"https://www.alphavantage.co/query?function={query}&symbol={symbol}&outputsize=full&datatype=compact"
         temp_data = yield context.call_activity("call_alphavantage_api", url)
         stock_data.update({symbol: temp_data})
 

@@ -1,5 +1,5 @@
 """get data for all currencies from api"""
-#pylint: disable=line-too-long
+# pylint: disable=line-too-long
 
 import logging
 import json
@@ -7,14 +7,11 @@ import json
 import azure.functions as func
 import azure.durable_functions as df
 
-from shared_code import get_config
-
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
     """get data for all currencies from api"""
     logging.info("Getting forex data")
 
-    api_key = get_config.get_api_key()
     transactions = context.get_input()
 
     # initialize variables
@@ -32,7 +29,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     for currency in currencies:
         if currency == "GBX":
             currency = "GBP"
-            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full&datatype=compact"
+            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&outputsize=full&datatype=compact"
             temp_data = yield context.call_activity("call_alphavantage_api", url)
             temp_data = json.loads(temp_data)
             gbx_data = {
@@ -59,7 +56,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
                 )
             forex_data.update({"GBX": gbx_data})
         else:
-            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&apikey={api_key}&outputsize=full"
+            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&outputsize=full"
             temp_data = yield context.call_activity("call_alphavantage_api", url)
             forex_data.update({currency: temp_data})
 
