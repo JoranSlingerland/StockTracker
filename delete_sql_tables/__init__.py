@@ -7,21 +7,46 @@ from shared_code import get_config, sql_server_module
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """delete table"""
-    # pylint: disable=unused-argument
 
     logging.info("Deleting sql tables")
 
     tables = (get_config.get_tables())["tables"]
     conn = sql_server_module.create_conn_object()
+    tables_to_delete = req.route_params.get("tables_to_delete")
 
-    with conn:
-        crs = conn.cursor()
-        for table in tables:
-            if table["candelete"]:
+    if not tables_to_delete:
+        logging.error("No tables_to_delete provided")
+        return func.HttpResponse(
+            "Please pass a name on the query string or in the request body",
+            status_code=400,
+        )
+
+    if tables_to_delete == 'all':
+        with conn:
+            crs = conn.cursor()
+            for table in tables:
                 crs.execute(
                     f"""
                 drop table {table["table_name"]}
                 """
                 )
-
-    return "Done"
+    elif tables_to_delete == 'output_only':
+        with conn:
+            crs = conn.cursor()
+            for table in tables:
+                if table["candelete"]:
+                    crs.execute(
+                        f"""
+                    drop table {table["table_name"]}
+                    """
+                    )
+    else:
+        logging.error("No valid tables_to_delete provided")
+        return func.HttpResponse(
+            "Please pass a valid name on the query string or in the request body",
+            status_code=400,
+        )
+    return func.HttpResponse(
+        "done",
+        status_code=200,
+    )

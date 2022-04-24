@@ -6,7 +6,8 @@
       "name": "req",
       "direction": "in",
       "methods": [ "get" ],
-      "authLevel": "anonymous"
+      "authLevel": "anonymous",
+      "route": "truncate_sql_tables/{tables_to_truncate}"
     },
     {
       "type": "http",
