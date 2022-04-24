@@ -76,16 +76,16 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 
 ```sql
 INSERT INTO input_transactions
-VALUES (0, 'T', '2020-03-25', 280.80, 10, 'Buy', 0.54, 'USD');
+VALUES ('T', '2020-03-25', 280.80, 10, 'Buy', 0.54, 'USD', 'att.com');
 
 INSERT INTO input_transactions
-VALUES (1, 'AMD', '2020-03-25', 233.90, 5, 'Buy', 0.52, 'USD');
+VALUES ('AMD', '2020-03-25', 233.90, 5, 'Buy', 0.52, 'USD', 'amd.com');
 
 INSERT INTO input_invested
-VALUES (0, '2019-01-21', 'Deposit', 100);
+VALUES ('2019-01-21', 'Deposit', 100);
 
 INSERT INTO input_invested
-VALUES (1, '2020-01-21', 'Deposit', 200);
+VALUES ('2020-01-21', 'Deposit', 200);
 ```
 
 - Run the main function by browsing to [http://localhost:7071/api/orchestrators/stocktracker_orchestrator/all](http://localhost:7071/api/orchestrators/stocktracker_orchestrator/all)
