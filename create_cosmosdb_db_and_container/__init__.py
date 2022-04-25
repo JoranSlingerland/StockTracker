@@ -1,5 +1,6 @@
 """Create sql tables"""
 # pylint: disable=unused-argument
+# pylint: disable=consider-using-from-import
 
 import logging
 import azure.functions as func

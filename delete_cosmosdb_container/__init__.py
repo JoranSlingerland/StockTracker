@@ -2,13 +2,12 @@
 # pylint: disable=unused-argument
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-from-import
 
 import logging
 import azure.functions as func
-import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
-from azure.cosmos.partition_key import PartitionKey
-from shared_code import get_config
+from shared_code import get_config, cosmosdb_module
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -18,10 +17,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     # get config
     containers_to_delete = req.route_params.get("containers_to_delete")
     containers = (get_config.get_containers())["containers"]
-    cosmosdb_config = get_config.get_cosmosdb()
-    client = cosmos_client.CosmosClient(
-        cosmosdb_config["endpoint"], cosmosdb_config["key"]
-    )
 
     if not containers_to_delete:
         logging.error("No containers_to_delete provided")
@@ -32,7 +27,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     # get database
-    database = client.get_database_client(cosmosdb_config["database"])
+    database = cosmosdb_module.cosmosdb_database()
 
     # delete containers
     if containers_to_delete == "all":
