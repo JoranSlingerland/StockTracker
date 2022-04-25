@@ -58,6 +58,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     stock_held = yield context.call_activity(
         "compute_transactions", [transactions, days_to_update]
     )
+    return stock_held
 
     # step 5 - Get invested data
     invested = yield context.call_activity(
