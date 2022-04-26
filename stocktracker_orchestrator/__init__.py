@@ -1,6 +1,4 @@
 """main Orchestrator function"""
-# pylint: disable=unused-variable
-# pylint: disable=logging-fstring-interpolation
 
 import azure.functions as func
 import azure.durable_functions as df
@@ -74,16 +72,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         "calculate_totals", [data, invested, transactions, days_to_update]
     )
 
-    # step 8 - Output to sql
-    provisioning_tasks = []
-    id_ += 1
-    child_id = f"{context.instance_id}:{id_}"
-    provision_task = context.call_sub_orchestrator(
-        "output_to_sql_orchestrator", [data, days_to_update], child_id
-    )
-    provisioning_tasks.append(provision_task)
-    result = (yield context.task_all(provisioning_tasks))[0]
-    return '{"status": "Done"}'
+    # step 8 - Output to cosmos db
+    result = yield context.call_activity("output_to_cosmosdb", [data, days_to_update])
+
+    return result
 
 
 main = df.Orchestrator.create(orchestrator_function)
