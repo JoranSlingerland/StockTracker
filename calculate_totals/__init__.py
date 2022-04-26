@@ -1,23 +1,48 @@
 """"Function to calulate totals"""
 # pylint: disable=logging-fstring-interpolation
 import logging
+from datetime import timedelta, date
+import uuid
+import pandas
 
 
 def main(payload: str) -> str:
     """Calculate totals"""
     logging.info("Calculating totals")
 
-    stocks_held = payload
+    stocks_held = payload[0]
+    invested = payload[1]
+    transactions = payload[2]
+    days_to_update = payload[3]
 
-    # initialize variables
-    perm_object = {}
+    # get dates
+    end_date = date.today()
+    if days_to_update == "all":
+        start_date = transactions["transactions"][0]["transaction_date"]
+    else:
+        start_date = end_date - timedelta(days=days_to_update)
+    daterange = pandas.date_range(start_date, end_date)
 
-    for single_date, date_stocks_held in stocks_held["stocks_held"].items():
-        logging.debug(f"Calculating totals for {single_date}")
+    temp_list = []
+    # loop through dates
+    for single_date in daterange:
+        single_date = single_date.strftime("%Y-%m-%d")
+
+        stocks_single_date = [
+            d for d in stocks_held["stocks_held"] if d["date"] == single_date
+        ]
+        invested_single_date = [
+            d for d in invested["invested"] if d["date"] == single_date
+        ]
+
         temp_object = {
-            "total_cost": sum([d["total_cost"] for d in date_stocks_held]),
-            "total_value": sum([d["total_value"] for d in date_stocks_held]),
+            "id": str(uuid.uuid4()),
+            "date": single_date,
+            "total_cost": sum([d["total_cost"] for d in stocks_single_date]),
+            "total_value": sum([d["total_value"] for d in stocks_single_date]),
+            "total_invested": invested_single_date[0]["invested"],
         }
-        perm_object.update({single_date: temp_object})
-    stocks_held_and_totals = {**stocks_held, "totals": perm_object}
-    return stocks_held_and_totals
+
+        temp_list.append(temp_object)
+
+    return {**stocks_held, "totals": temp_list, **invested}

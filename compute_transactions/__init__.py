@@ -1,9 +1,10 @@
 """Compute transactions object"""
 # pylint: disable=logging-fstring-interpolation
+# pylint: disable=expression-not-assigned
 
 import logging
 from datetime import date, timedelta
-import json
+import uuid
 import pandas
 
 
@@ -13,22 +14,11 @@ def main(payload: str) -> str:
     transactions = payload[0]
     days_to_update = payload[1]
 
+    # setup dates
     transactions = sorted(
         transactions["transactions"], key=lambda k: k["transaction_date"]
     )
-    stocks_held = get_transactions_by_day(transactions, days_to_update)
-    stocks_held = calculate_sells_and_buys(stocks_held)
-    stocks_held = merge_sells_and_buys(stocks_held)
-    return stocks_held
 
-
-def get_transactions_by_day(transactions, days_to_update):
-    """Get transactions by day"""
-    logging.info("Getting transactions by day")
-    # initialize variables
-    stocks_held = {}
-
-    # grab dates
     end_date = date.today()
     if days_to_update == "all":
         start_date = transactions[0]["transaction_date"]
@@ -36,6 +26,18 @@ def get_transactions_by_day(transactions, days_to_update):
         start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
 
+    stocks_held = get_transactions_by_day(transactions, daterange)
+    stocks_held = calculate_sells_and_buys(stocks_held, daterange)
+    stocks_held = merge_sells_and_buys_new(stocks_held, daterange)
+    # stocks_held = merge_sells_and_buys(stocks_held)
+    return stocks_held
+
+
+def get_transactions_by_day(transactions, daterange):
+    """Get transactions by day"""
+    logging.info("Getting transactions by day")
+
+    temp_list = []
     # loop through dates
     for single_date in daterange:
         logging.debug(f"Getting transactions for {single_date}")
@@ -43,11 +45,11 @@ def get_transactions_by_day(transactions, days_to_update):
         filterd_stocks_held = [
             d for d in transactions if d["transaction_date"] <= single_date
         ]
-
         # create object
-        temp_list = []
+
         for filterd_stock_held in filterd_stocks_held:
             temp_object = {
+                "date": single_date,
                 "symbol": filterd_stock_held["symbol"],
                 "cost": filterd_stock_held["cost"],
                 "quantity": filterd_stock_held["quantity"],
@@ -57,37 +59,43 @@ def get_transactions_by_day(transactions, days_to_update):
             }
             temp_list.append(temp_object)
 
-        stocks_held.update({single_date: temp_list})
     # return dictionary
-    stocks_held = {"stocks_held": stocks_held}
+    [d.pop("transaction_date", None) for d in temp_list]
+    stocks_held = {"stocks_held": temp_list}
     return stocks_held
 
 
-def calculate_sells_and_buys(stocks_held):
+def calculate_sells_and_buys(stocks_held, daterange):
     """Merge sells and buys together"""
     logging.info("Calculating sells and buys")
-    # initialize variables
-    computed_date_stocks_held = {}
 
-    # Loop through dates
-    for single_date, date_stocks_held in stocks_held["stocks_held"].items():
+    output_list = []
+
+    # loop through dates
+    for single_date in daterange:
         logging.debug(f"Calculating sells and buys for {single_date}")
         # initialize variables
         symbols_buys = []
         symbols_sells = []
-        temp_list = []
 
-        # get buys
+        single_date = single_date.strftime("%Y-%m-%d")
+        date_stocks_held = [
+            d for d in stocks_held["stocks_held"] if d["date"] == single_date
+        ]
         date_stocks_held_buys = [
             d for d in date_stocks_held if d["transaction_type"] == "Buy"
         ]
+        date_stocks_held_sells = [
+            d for d in date_stocks_held if d["transaction_type"] == "Sell"
+        ]
 
-        # get symbols
         for temp_loop in date_stocks_held_buys:
             symbols_buys.append(temp_loop["symbol"])
             symbols_buys = list(dict.fromkeys(symbols_buys))
+        for temp_loop in date_stocks_held_sells:
+            symbols_sells.append(temp_loop["symbol"])
+            symbols_sells = list(dict.fromkeys(symbols_sells))
 
-        # create computed object
         for symbol_buys in symbols_buys:
             date_stock_held_buys = [
                 d for d in date_stocks_held_buys if d["symbol"] == symbol_buys
@@ -95,6 +103,7 @@ def calculate_sells_and_buys(stocks_held):
             if not date_stock_held_buys:
                 continue
             temp_object = {
+                "date": single_date,
                 "symbol": symbol_buys,
                 "average_cost": sum([d["cost"] for d in date_stock_held_buys])
                 / sum([d["quantity"] for d in date_stock_held_buys]),
@@ -105,19 +114,8 @@ def calculate_sells_and_buys(stocks_held):
                 ),
                 "currency": date_stock_held_buys[0]["currency"],
             }
-            temp_list.append(temp_object)
+            output_list.append(temp_object)
 
-        # Get sells
-        date_stocks_held_sells = [
-            d for d in date_stocks_held if d["transaction_type"] == "Sell"
-        ]
-
-        # get symbols
-        for temp_loop in date_stocks_held_sells:
-            symbols_sells.append(temp_loop["symbol"])
-            symbols_sells = list(dict.fromkeys(symbols_sells))
-
-        # create computed object
         for symbol_sells in symbols_sells:
             date_stock_held_sells = [
                 d for d in date_stocks_held_sells if d["symbol"] == symbol_sells
@@ -125,6 +123,7 @@ def calculate_sells_and_buys(stocks_held):
             if not date_stock_held_sells:
                 continue
             temp_object = {
+                "date": single_date,
                 "symbol": symbol_sells,
                 "average_cost": sum([d["cost"] for d in date_stock_held_sells])
                 / sum([d["quantity"] for d in date_stock_held_sells]),
@@ -135,29 +134,24 @@ def calculate_sells_and_buys(stocks_held):
                 ),
                 "currency": date_stock_held_sells[0]["currency"],
             }
-            temp_list.append(temp_object)
-        computed_date_stocks_held.update({single_date: temp_list})
+            output_list.append(temp_object)
 
-    # return dictionary
-    computed_date_stocks_held = {"stocks_held": computed_date_stocks_held}
-    return computed_date_stocks_held
+    return output_list
 
 
-def merge_sells_and_buys(stocks_held):
+def merge_sells_and_buys_new(stocks_held, daterange):
     """Loop through buys and sells and merge them together"""
-    # pylint: disable=too-many-locals
-
     logging.info("Merging sells and buys")
 
-    # initialize variables
-    merged_stocks_held = {}
-    # loop through dates
-    for single_date, date_stocks_held in stocks_held["stocks_held"].items():
+    temp_list = []
+    for single_date in daterange:
         logging.debug(f"Merging sells and buys for {single_date}")
 
         # initialize variables
         symbols = []
-        temp_list = []
+
+        single_date = single_date.strftime("%Y-%m-%d")
+        date_stocks_held = [d for d in stocks_held if d["date"] == single_date]
 
         # get symbols
         for temp_loop in date_stocks_held:
@@ -173,6 +167,8 @@ def merge_sells_and_buys(stocks_held):
                 and single_stock_list[0]["transaction_type"] == "Buy"
             ):
                 temp_object = {
+                    "id": str(uuid.uuid4()),
+                    "date": single_date,
                     "symbol": symbol,
                     "average_cost": single_stock_list[0]["average_cost"],
                     "total_cost": single_stock_list[0]["average_cost"]
@@ -187,6 +183,8 @@ def merge_sells_and_buys(stocks_held):
                     single_stock_list, key=lambda k: k["transaction_type"]
                 )
                 temp_object = {
+                    "id": str(uuid.uuid4()),
+                    "date": single_date,
                     "symbol": symbol,
                     "average_cost": single_stock_list[0]["average_cost"],
                     "total_cost": single_stock_list[0]["average_cost"]
@@ -199,6 +197,4 @@ def merge_sells_and_buys(stocks_held):
                 }
                 if temp_object["quantity"] > 0:
                     temp_list.append(temp_object)
-        merged_stocks_held.update({single_date: temp_list})
-    merged_stocks_held = {"stocks_held": merged_stocks_held}
-    return merged_stocks_held
+    return {"stocks_held": temp_list}

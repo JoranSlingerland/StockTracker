@@ -5,33 +5,32 @@
 
 import logging
 import json
-import types
 
 import azure.functions as func
-from shared_code import sql_server_module
+from shared_code import cosmosdb_module
 
 
 def inputoptions(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
         return {
-            "type": row[12],
-            "value": float(f"{(row[11]):.2f}"),
+            "type": row["name"],
+            "value": row['total_value'],
         }
     if datatype == "currency":
         return {
-            "type": row[5],
-            "value": float(f"{(row[11]):.2f}"),
+            "type": row["currency"],
+            "value": row['total_value'],
         }
     if datatype == "country":
         return {
-            "type": row[14],
-            "value": float(f"{(row[11]):.2f}"),
+            "type": row["country"],
+            "value": row['total_value'],
         }
     if datatype == "sector":
         return {
-            "type": row[15],
-            "value": float(f"{(row[11]):.2f}"),
+            "type": row["sector"],
+            "value": row['total_value'],
         }
 
     # return nothing if no match
@@ -114,22 +113,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
+    container = cosmosdb_module.cosmosdb_container("single_day")
+    results = list(container.read_all_items())
+    result_list = []
+    for result in results:
+        temp_object = inputoptions(datatype, result)
+        result_list.append(temp_object)
 
-    result = []
-    conn = sql_server_module.create_conn_object()
-
-    with conn:
-        crs = conn.cursor()
-        crs.execute(
-            """
-            select * from [dbo].[single_day]
-            """
-        )
-        for row in crs:
-            tempobject = inputoptions(datatype, row)
-            result.append(tempobject)
-
-    result = remove_duplicates(datatype, result)
+    result = remove_duplicates(datatype, result_list)
     if not result:
         return func.HttpResponse(
             body='{"status": Please pass a valid name on the query string or in the request body"}',
