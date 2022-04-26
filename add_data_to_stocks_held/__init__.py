@@ -4,8 +4,9 @@
 # pylint: disable=too-many-locals
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
+import pandas
 
 
 def main(payload: str) -> str:
@@ -18,80 +19,73 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     stock_meta_data = payload[3]
 
+    output_list = []
     # initialize variables
-    data = {}
-    updated_stocks_held = {}
 
-    for single_date, date_stocks_held in stocks_held["stocks_held"].items():
-        # initialize variables
-        stock_list = []
-        for stock in date_stocks_held:
-            days_to_substract = 0
-            logging.debug(f'Adding stock data to {stock["symbol"]}')
-            while True:
-                try:
-                    date_string = f"{single_date} 00:00:00"
-                    date_object = datetime.fromisoformat(date_string)
-                    date_object = date_object - timedelta(days=days_to_substract)
-                    date_object = date_object.strftime("%Y-%m-%d")
+    for stock in stocks_held["stocks_held"]:
+        days_to_substract = 0
+        while True:
+            try:
+                date_string = f"{stock['date']} 00:00:00"
+                date_object = datetime.fromisoformat(date_string)
+                date_object = date_object - timedelta(days=days_to_substract)
+                date_object = date_object.strftime("%Y-%m-%d")
 
-                    stock_open = float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                            "1. open"
-                        ]
-                    )
-                    stock_high = float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                            "2. high"
-                        ]
-                    )
-                    stock_low = float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                            "3. low"
-                        ]
-                    )
-                    stock_close = float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                            "4. close"
-                        ]
-                    )
-                    stock_volume = float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                            "5. volume"
-                        ]
-                    )
-                    forex_high = float(
-                        forex_data[stock["currency"]]["Time Series FX (Daily)"][
-                            date_object
-                        ]["2. high"]
-                    )
+                stock_open = float(
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
+                        "1. open"
+                    ]
+                )
+                stock_high = float(
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
+                        "2. high"
+                    ]
+                )
+                stock_low = float(
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
+                        "3. low"
+                    ]
+                )
+                stock_close = float(
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
+                        "4. close"
+                    ]
+                )
+                stock_volume = float(
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
+                        "5. volume"
+                    ]
+                )
+                forex_high = float(
+                    forex_data[stock["currency"]]["Time Series FX (Daily)"][
+                        date_object
+                    ]["2. high"]
+                )
 
-                    stock.update(
-                        {
-                            "total_cost": stock["total_cost"] * forex_high,
-                            "open_value": stock_open * forex_high,
-                            "high_value": stock_high * forex_high,
-                            "low_value": stock_low * forex_high,
-                            "close_value": stock_close * forex_high,
-                            "volume": stock_volume,
-                            "total_value": stock_close * forex_high * stock["quantity"],
-                            "name": stock_meta_data[f"{stock['symbol']}"]["name"],
-                            "description": stock_meta_data[f"{stock['symbol']}"][
-                                "description"
-                            ],
-                            "country": stock_meta_data[f"{stock['symbol']}"]["country"],
-                            "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
-                            "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
-                            "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
-                        }
-                    )
-                    break
-                except KeyError:
-                    days_to_substract += 1
-                    logging.debug(
-                        f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
-                    )
-            stock_list.append(stock)
-        updated_stocks_held.update({single_date: stock_list})
-    data.update({"stocks_held": updated_stocks_held})
-    return data
+                stock.update(
+                    {
+                        "total_cost": stock["total_cost"] * forex_high,
+                        "open_value": stock_open * forex_high,
+                        "high_value": stock_high * forex_high,
+                        "low_value": stock_low * forex_high,
+                        "close_value": stock_close * forex_high,
+                        "volume": stock_volume,
+                        "total_value": stock_close * forex_high * stock["quantity"],
+                        "name": stock_meta_data[f"{stock['symbol']}"]["name"],
+                        "description": stock_meta_data[f"{stock['symbol']}"][
+                            "description"
+                        ],
+                        "country": stock_meta_data[f"{stock['symbol']}"]["country"],
+                        "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
+                        "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
+                        "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
+                    }
+                )
+                break
+            except KeyError:
+                days_to_substract += 1
+                logging.debug(
+                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
+                )
+        output_list.append(stock)
+    return {"stocks_held": output_list}
