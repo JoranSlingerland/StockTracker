@@ -6,7 +6,7 @@
       "name": "req",
       "direction": "in",
       "methods": [ "get" ],
-      "route": "get_table_data/{tablename}",
+      "route": "get_table_data/{containername}",
       "authLevel": "anonymous"
     },
     {

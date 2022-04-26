@@ -8,3 +8,4 @@ azure-functions-durable
 azure-functions
 pylint
 black
+azure-cosmos

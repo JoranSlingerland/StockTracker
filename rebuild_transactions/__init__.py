@@ -12,24 +12,18 @@ def main(payload: str) -> str:
     transactions = payload[0]
     forex_data = payload[1]
     data = transactions["transactions"]
-
     transaction_list = []
     for transaction in data:
-        temp_object = {
-            "symbol": transaction["symbol"],
-            "transaction_date": transaction["transaction_date"],
+        adjusted_cost = {
             "cost": transaction["cost"]
             * float(
                 forex_data[transaction["currency"]]["Time Series FX (Daily)"][
                     transaction["transaction_date"]
                 ]["4. close"]
             ),
-            "quantity": transaction["quantity"],
-            "transaction_type": transaction["transaction_type"],
-            "transaction_cost": transaction["transaction_cost"],
-            "currency": transaction["currency"],
         }
-        transaction_list.append(temp_object)
+        transaction.update(adjusted_cost)
+        transaction_list.append(transaction)
 
     new_object = {
         "invested": transactions["invested"],
