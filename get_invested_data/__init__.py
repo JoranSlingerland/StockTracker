@@ -3,6 +3,7 @@
 import logging
 from datetime import date, timedelta
 import json
+import uuid
 import pandas
 
 
@@ -107,6 +108,7 @@ def merge_deposits_and_withdrawals(invested, daterange):
             and invested_single_date[0]["transaction_type"] == "Deposit"
         ):
             temp_object = {
+                "id": str(uuid.uuid4()),
                 "date": single_date,
                 "invested": invested_single_date[0]["amount"],
             }
@@ -116,6 +118,7 @@ def merge_deposits_and_withdrawals(invested, daterange):
                 invested_single_date, key=lambda k: k["transaction_type"]
             )
             temp_object = {
+                "id": str(uuid.uuid4()),
                 "date": single_date,
                 "invested": invested_single_date[0]["amount"]
                 - invested_single_date[1]["amount"],

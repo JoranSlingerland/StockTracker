@@ -70,12 +70,11 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     )
 
     # step 7 - Calulate totals
-    data = yield context.call_activity("calculate_totals", data)
+    data = yield context.call_activity(
+        "calculate_totals", [data, invested, transactions, days_to_update]
+    )
 
-    # step 8 - add invested to data
-    data.update(**invested)
-
-    # step 9 - Output to sql
+    # step 8 - Output to sql
     provisioning_tasks = []
     id_ += 1
     child_id = f"{context.instance_id}:{id_}"
