@@ -1,4 +1,4 @@
-"""Function to query sql server for table data"""
+"""Function to query sql server for container data"""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-return-statements
 # pylint: disable=line-too-long
@@ -12,7 +12,7 @@ from shared_code import cosmosdb_module
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main fucntion"""
     logging.info("Getting container data")
-    containername = req.route_params.get("tablename")
+    containername = req.route_params.get("containername")
 
     if not containername:
         logging.error("No container name provided")
