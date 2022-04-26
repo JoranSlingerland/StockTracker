@@ -56,7 +56,6 @@ def get_transactions_by_day(transactions, daterange):
                 "transaction_type": filterd_stock_held["transaction_type"],
                 "transaction_cost": filterd_stock_held["transaction_cost"],
                 "currency": filterd_stock_held["currency"],
-                "domain": filterd_stock_held["domain"],
             }
             temp_list.append(temp_object)
 
@@ -114,7 +113,6 @@ def calculate_sells_and_buys(stocks_held, daterange):
                     [d["transaction_cost"] for d in date_stock_held_buys]
                 ),
                 "currency": date_stock_held_buys[0]["currency"],
-                "domain": date_stock_held_buys[0]["domain"],
             }
             output_list.append(temp_object)
 
@@ -135,7 +133,6 @@ def calculate_sells_and_buys(stocks_held, daterange):
                     [d["transaction_cost"] for d in date_stock_held_sells]
                 ),
                 "currency": date_stock_held_sells[0]["currency"],
-                "domain": date_stock_held_buys[0]["domain"],
             }
             output_list.append(temp_object)
 
@@ -179,7 +176,6 @@ def merge_sells_and_buys_new(stocks_held, daterange):
                     "quantity": single_stock_list[0]["quantity"],
                     "transaction_cost": single_stock_list[0]["transaction_cost"],
                     "currency": single_stock_list[0]["currency"],
-                    "domain": single_stock_list[0]["domain"],
                 }
                 temp_list.append(temp_object)
             elif len(single_stock_list) == 2:
@@ -198,7 +194,6 @@ def merge_sells_and_buys_new(stocks_held, daterange):
                     "transaction_cost": single_stock_list[0]["transaction_cost"]
                     + single_stock_list[1]["transaction_cost"],
                     "currency": single_stock_list[0]["currency"],
-                    "domain": single_stock_list[0]["domain"],
                 }
                 if temp_object["quantity"] > 0:
                     temp_list.append(temp_object)
