@@ -1,4 +1,5 @@
 """main Orchestrator function"""
+#pylint: disable=too-many-locals
 
 import azure.functions as func
 import azure.durable_functions as df
