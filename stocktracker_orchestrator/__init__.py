@@ -1,5 +1,5 @@
 """main Orchestrator function"""
-#pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
 
 import azure.functions as func
 import azure.durable_functions as df
@@ -80,14 +80,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     result = yield context.call_activity("output_singleday_to_cosmosdb", data)
 
     # step 9.2 - output everything else to cosmosdb
-    provisioning_tasks = []
-    id_ = 0
     for container_name, items in data.items():
-        child_id = f"{context.instance_id}:{id_}"
-        provision_task = context.call_sub_orchestrator(
-            "output_to_cosmosdb", [container_name, items], child_id
+        result = yield context.call_activity(
+            "output_to_cosmosdb", [container_name, items]
         )
-        provisioning_tasks.append(provision_task)
     result = yield context.task_all(provisioning_tasks)
 
     return result
