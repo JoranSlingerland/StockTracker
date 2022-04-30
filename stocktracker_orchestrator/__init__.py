@@ -84,7 +84,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         result = yield context.call_activity(
             "output_to_cosmosdb", [container_name, items]
         )
-    result = yield context.task_all(provisioning_tasks)
 
     return result
 
