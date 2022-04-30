@@ -1,30 +1,61 @@
 """Function to output data to CosmosDB"""
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=consider-using-from-import
+# pylint: disable=broad-except
+# pylint: disable=raise-missing-from
 
 import logging
+import asyncio
+from azure.cosmos.aio import CosmosClient
+from shared_code import get_config
 
-import azure.functions as func
-import azure.durable_functions as df
-from shared_code import cosmosdb_module
+# global variable
 
 
-def orchestrator_function(context: df.DurableOrchestrationContext):
+async def main(payload: str) -> str:
     """Function to output data to CosmosDB"""
-    logging.info("Outputting data to CosmosDB")
 
     # suppress logger output
     logger = logging.getLogger("azure")
     logger.setLevel(logging.CRITICAL)
 
-    container_name = context.get_input()[0]
-    items = context.get_input()[1]
+    # get config
+    container_name = payload[0]
+    items = payload[1]
 
-    container = cosmosdb_module.cosmosdb_container(container_name)
+    logging.info(f"Outputting to container {container_name}")
+
+    # get cosmosdb config
+    cosmosdb_config = get_config.get_cosmosdb()
+    url = cosmosdb_config["endpoint"]
+    key = cosmosdb_config["key"]
+    comosdb = cosmosdb_config["database"]
+    client = CosmosClient(url, credential=key)
+    database = client.get_database_client(comosdb)
+
+    tasks = []
+    container = database.get_container_client(container_name)
     for item in items:
-        container.upsert_item(item)
-
+        # fill event loop list
+        tasks.append(insert_item(container, item))
+    # wait for all tasks to complete
+    await gather_with_concurrency(15, *tasks)
+    await client.close()
     return '{"status": "Done"}'
 
 
-main = df.Orchestrator.create(orchestrator_function)
+async def insert_item(container, item):
+    """async fill"""
+
+    await container.create_item(item)
+
+
+async def gather_with_concurrency(concurrency, *tasks):
+    """async gather with max concurrency"""
+    semaphore = asyncio.Semaphore(concurrency)
+
+    async def sem_task(task):
+        async with semaphore:
+            return await task
+
+    return await asyncio.gather(*(sem_task(task) for task in tasks))
