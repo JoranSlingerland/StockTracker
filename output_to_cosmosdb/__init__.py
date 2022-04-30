@@ -7,7 +7,7 @@
 import logging
 import asyncio
 from azure.cosmos.aio import CosmosClient
-from shared_code import get_config
+from shared_code import get_config, aio_helper
 
 # global variable
 
@@ -39,7 +39,7 @@ async def main(payload: str) -> str:
         # fill event loop list
         tasks.append(insert_item(container, item))
     # wait for all tasks to complete
-    await gather_with_concurrency(15, *tasks)
+    await aio_helper.gather_with_concurrency(15, *tasks)
     await client.close()
     return '{"status": "Done"}'
 
@@ -48,14 +48,3 @@ async def insert_item(container, item):
     """async fill"""
 
     await container.create_item(item)
-
-
-async def gather_with_concurrency(concurrency, *tasks):
-    """async gather with max concurrency"""
-    semaphore = asyncio.Semaphore(concurrency)
-
-    async def sem_task(task):
-        async with semaphore:
-            return await task
-
-    return await asyncio.gather(*(sem_task(task) for task in tasks))
