@@ -10,7 +10,7 @@
         "get",
         "post"
       ],
-      "route": "get_linechart_data/{data}"
+      "route": "get_linechart_data/{datatype}"
     },
     {
       "type": "http",

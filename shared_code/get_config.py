@@ -79,6 +79,14 @@ def get_containers() -> dict:
                 "output_container": True,
             },
             {
+                "container_name": "single_day_totals",
+                "partition_key": "/id",
+                "candelete": True,
+                "cantruncate": True,
+                "input_container": False,
+                "output_container": True,
+            },
+            {
                 "container_name": "input_transactions",
                 "partition_key": "/id",
                 "candelete": False,

@@ -26,8 +26,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     items = list(container.read_all_items())
     result = []
     for item in items:
-        temp_object = inputoptions(datatype, item)
-        result.append(temp_object)
+        temp_list = inputoptions(datatype, item)
+        for temp_item in temp_list:
+            result.append(temp_item)
+
+    result = sorted(result, key=lambda k: k["date"])
 
     if not result:
         return func.HttpResponse(
@@ -53,7 +56,7 @@ def inputoptions(datatype, item):
                 "date": item["date"],
                 "value": item["total_invested"],
                 "category": "Invested",
-            }
+            },
         ]
 
     # return nothing if no match
