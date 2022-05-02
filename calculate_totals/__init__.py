@@ -47,8 +47,7 @@ def main(payload: str) -> str:
                 sum([d["total_value"] for d in stocks_single_date])
                 - invested_single_date[0]["invested"]
             )
-            / invested_single_date[0]["invested"]
-            * 100,
+            / invested_single_date[0]["invested"],
         }
 
         temp_list.append(temp_object)
