@@ -52,4 +52,4 @@ def main(payload: str) -> str:
 
         temp_list.append(temp_object)
 
-    return {**stocks_held, "totals": temp_list, **invested}
+    return {**stocks_held, "totals": temp_list}

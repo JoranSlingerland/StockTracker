@@ -47,14 +47,6 @@ def get_containers() -> dict:
     containers = {
         "containers": [
             {
-                "container_name": "invested",
-                "partition_key": "/id",
-                "candelete": True,
-                "cantruncate": True,
-                "input_container": False,
-                "output_container": True,
-            },
-            {
                 "container_name": "stocks_held",
                 "partition_key": "/id",
                 "candelete": True,
