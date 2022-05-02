@@ -71,6 +71,13 @@ def main(payload: str) -> str:
                         "close_value": stock_close * forex_high,
                         "volume": stock_volume,
                         "total_value": stock_close * forex_high * stock["quantity"],
+                        "total_pl": (stock_close * forex_high * stock["quantity"])
+                        - (stock["total_cost"] * forex_high),
+                        "total_pl_percentage": (
+                            (stock_close * forex_high * stock["quantity"])
+                            - (stock["total_cost"] * forex_high)
+                        )
+                        / (stock_close * forex_high * stock["quantity"]),
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
                         "description": stock_meta_data[f"{stock['symbol']}"][
                             "description"
