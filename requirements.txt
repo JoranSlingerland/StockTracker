@@ -8,4 +8,4 @@ azure-functions-durable
 azure-functions
 pylint
 black
-azure-cosmos == 4.3.0b1
+azure-cosmos == 4.3.0b4
