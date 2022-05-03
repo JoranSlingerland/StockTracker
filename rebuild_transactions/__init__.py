@@ -9,24 +9,16 @@ def main(payload: str) -> str:
     logging.info("Rebuilding transactions data")
 
     # get input data
-    transactions = payload[0]
-    forex_data = payload[1]
-    data = transactions["transactions"]
-    transaction_list = []
-    for transaction in data:
-        adjusted_cost = {
-            "cost": transaction["cost"]
-            * float(
-                forex_data[transaction["currency"]]["Time Series FX (Daily)"][
-                    transaction["transaction_date"]
-                ]["4. close"]
-            ),
-        }
-        transaction.update(adjusted_cost)
-        transaction_list.append(transaction)
+    data = payload[0]
+    transactions = data["transactions"]
+    invested = data["invested"]
+    #sort transactions
+    transactions.sort(key=lambda x: x["transaction_date"])
+    #sort invested
+    invested.sort(key=lambda x: x["transaction_date"])
 
     new_object = {
-        "invested": transactions["invested"],
-        "transactions": transaction_list,
+        "invested": invested,
+        "transactions": transactions,
     }
     return new_object
