@@ -29,9 +29,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     for currency in currencies:
         if currency == "GBX":
             currency = "GBP"
-            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&outputsize=full&datatype=compact"
+            url = f"https://www.alphavantage.co/query?function={query}&from_symbol={currency}&to_symbol={base_currency}&outputsize=full"
             temp_data = yield context.call_activity("call_alphavantage_api", url)
-            temp_data = json.loads(temp_data)
             gbx_data = {
                 "Meta Data": {
                     "1. Information": "Forex Daily Prices (open, high, low, close)",
