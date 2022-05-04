@@ -6,11 +6,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "get",
-        "post"
-      ],
-      "route": "get_linechart_data/{datatype}"
+      "methods": ["get", "post"],
+      "route": "get_linechart_data/{datatype}/{datatoget}"
     },
     {
       "type": "http",
