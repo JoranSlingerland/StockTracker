@@ -3,6 +3,7 @@
 
 import logging
 import json
+from datetime import date, timedelta
 import azure.functions as func
 
 from shared_code import cosmosdb_module
@@ -13,8 +14,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Getting linechart data")
 
     datatype = req.route_params.get("datatype")
+    datatoget = req.route_params.get("datatoget")
 
-    if not datatype:
+    if not datatype or not datatoget:
         logging.error("No datatype provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -22,8 +24,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
+
     container = cosmosdb_module.cosmosdb_container("totals")
-    items = list(container.read_all_items())
+    if datatoget == "max":
+        items = list(container.read_all_items())
+    else:
+        start_date, end_date = datatogetswitch(datatoget)
+        items = list(
+            container.query_items(
+                query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
+                parameters=[
+                    {"name": "@start_date", "value": start_date},
+                    {"name": "@end_date", "value": end_date},
+                ],
+                enable_cross_partition_query=True,
+            )
+        )
     result = []
     for item in items:
         temp_list = inputoptions(datatype, item)
@@ -61,3 +77,22 @@ def inputoptions(datatype, item):
 
     # return nothing if no match
     return None
+
+
+def datatogetswitch(datatoget):
+    """Home made match function"""
+    end_date = date.today()
+    if datatoget == "year":
+        start_date = end_date - timedelta(days=365)
+    if datatoget == "month":
+        start_date = end_date - timedelta(days=30)
+    if datatoget == "week":
+        start_date = end_date - timedelta(days=7)
+    if datatoget == "ytd":
+        start_date = date(end_date.year, 1, 1)
+
+    start_date = start_date.strftime("%Y-%m-%d")
+    end_date = end_date.strftime("%Y-%m-%d")
+
+    # return nothing if no match
+    return start_date, end_date
