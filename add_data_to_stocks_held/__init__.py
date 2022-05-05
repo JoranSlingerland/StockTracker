@@ -4,9 +4,7 @@
 # pylint: disable=too-many-locals
 
 import logging
-from datetime import datetime, timedelta, date
-import json
-import pandas
+from datetime import datetime, timedelta
 
 
 def main(payload: str) -> str:
@@ -64,7 +62,6 @@ def main(payload: str) -> str:
 
                 stock.update(
                     {
-                        "total_cost": stock["total_cost"] * forex_high,
                         "open_value": stock_open * forex_high,
                         "high_value": stock_high * forex_high,
                         "low_value": stock_low * forex_high,
@@ -72,10 +69,10 @@ def main(payload: str) -> str:
                         "volume": stock_volume,
                         "total_value": stock_close * forex_high * stock["quantity"],
                         "total_pl": (stock_close * forex_high * stock["quantity"])
-                        - (stock["total_cost"] * forex_high),
+                        - (stock["average_cost"] * stock["quantity"]),
                         "total_pl_percentage": (
                             (stock_close * forex_high * stock["quantity"])
-                            - (stock["total_cost"] * forex_high)
+                            - (stock["average_cost"] * stock["quantity"])
                         )
                         / (stock_close * forex_high * stock["quantity"]),
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
