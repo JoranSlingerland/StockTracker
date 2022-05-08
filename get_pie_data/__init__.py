@@ -14,7 +14,7 @@ def inputoptions(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
         return {
-            "type": row["name"],
+            "type": row["symbol"],
             "value": row['total_value'],
         }
     if datatype == "currency":
