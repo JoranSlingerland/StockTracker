@@ -2,10 +2,7 @@
 # pylint: disable=logging-fstring-interpolation
 # pylint: disable=line-too-long
 
-from cmath import log
 import logging
-import time
-from wsgiref import headers
 import requests
 from shared_code import get_config
 
@@ -26,21 +23,21 @@ def main(payload: str) -> str:
     logging.info("Getting stock meta data")
 
     # initialize variables
-    symbols_domains = []
+    symbols = []
     stock_meta_data = {}
     transactions = payload[0]
     clearbit_api_key = get_config.get_clearbit_api_key()
 
     # get unique symbols and domains
     for temp_loop in transactions["transactions"]:
-        symbols_domains.append(temp_loop["symbol"])
-        symbols_domains.append(temp_loop["domain"])
-        symbols_domains = list(dict.fromkeys(symbols_domains))
+        symbols.append(temp_loop["symbol"])
+        symbols = list(dict.fromkeys(symbols))
 
     # iterate over list in increments of 2
-    for i in range(0, len(symbols_domains), 2):
-        symbol = symbols_domains[i]
-        domain = symbols_domains[i + 1]
+    for symbol in symbols:
+        # list comprehension to get the domain
+        domain = [x for x in transactions["transactions"] if x["symbol"] == symbol]
+        domain = domain[0]["domain"]
 
         url = f"https://company.clearbit.com/v2/companies/find?domain={domain}"
         temp_data = call_clearbit_api(url, clearbit_api_key)
