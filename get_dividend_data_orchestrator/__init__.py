@@ -21,9 +21,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     transactions = context.get_input()
 
     end_date = date.today()
-    # Timedelta is to make sure the keyerror try catch works in add_data_to_stocks_held
-    # TODO Make this cleaner so we cant in theory get a error if someone buys on ipo
-    start_date = transactions["transactions"][0]["transaction_date"] - timedelta(days=7)
+    start_date = transactions["transactions"][0]["transaction_date"]
     daterange = pandas.date_range(start_date, end_date)
 
     # get unique symbols
@@ -36,7 +34,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         url = f"https://www.alphavantage.co/query?function={query}&symbol={symbol}&outputsize=full&datatype=compact"
         temp_data = yield context.call_activity("call_alphavantage_api", url)
         output_data = {}
-
         for single_date in daterange:
             single_date = single_date.strftime("%Y-%m-%d")
             try:
