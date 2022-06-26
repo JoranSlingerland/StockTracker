@@ -4,6 +4,7 @@
 import logging
 import json
 from datetime import date, timedelta
+from time import strftime
 import azure.functions as func
 import pandas
 
@@ -46,110 +47,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # get data by quarter
         start_date = items[0]["date"]
         end_date = date.today()
-
-        quarters = get_quarters(start_date, end_date)
-
-        for quarter in quarters:
-            quarter_start_date, quarter_end_date = get_quarter_first_and_last_date(
-                quarter
-            )
-            daterange = pandas.date_range(
-                quarter_start_date,
-                quarter_end_date,
-            )
-            quarter_stocks_held = []
-            for single_date in daterange:
-                single_date = single_date.strftime("%Y-%m-%d")
-                date_stocks_held = [d for d in items if d["date"] == single_date]
-                for single_date_object in date_stocks_held:
-                    quarter_stocks_held.append(single_date_object)
-
-            # get unique stocks
-            symbols = []
-            for temp_loop in quarter_stocks_held:
-                symbols.append(temp_loop["symbol"])
-                symbols = list(dict.fromkeys(symbols))
-
-            for symbol in symbols:
-                single_stock_data = [
-                    d for d in quarter_stocks_held if d["symbol"] == symbol
-                ]
-                temp_object = {
-                    "date": quarter,
-                    "value": sum(d["dividend"] for d in single_stock_data),
-                    "category": symbol,
-                }
-                result.append(temp_object)
-
+        result = get_max_data(items, start_date, end_date)
     if datatoget in ["year", "ytd"]:
-        # get data by month
-        months = get_months(start_date, end_date)
-        for month in months:
-            month_start_date = month.replace(day=1)
-            month_start_date = month_start_date.strftime("%Y-%m-%d")
-            month_end_date = month.strftime("%Y-%m-%d")
-            daterange = pandas.date_range(
-                month_start_date,
-                month_end_date,
-            )
-            month_stocks_held = []
-            for single_date in daterange:
-                single_date = single_date.strftime("%Y-%m-%d")
-                date_stocks_held = [d for d in items if d["date"] == single_date]
-                for single_date_object in date_stocks_held:
-                    month_stocks_held.append(single_date_object)
-
-            # get unique stocks
-            symbols = []
-            for temp_loop in month_stocks_held:
-                symbols.append(temp_loop["symbol"])
-                symbols = list(dict.fromkeys(symbols))
-
-            for symbol in symbols:
-                single_stock_data = [
-                    d for d in month_stocks_held if d["symbol"] == symbol
-                ]
-                temp_object = {
-                    "date": month.strftime("%Y %B"),
-                    "value": sum(d["dividend"] for d in single_stock_data),
-                    "category": symbol,
-                }
-                result.append(temp_object)
+        result = get_year_ytd_data(items, start_date, end_date)
 
     if datatoget in ["month", "week"]:
-        # get data by week
-        weeks = get_weeks(start_date, end_date)
-        for week in weeks:
-            week_start_date = week - timedelta(days=week.weekday())
-            week_start_date = week_start_date.strftime("%Y-%m-%d")
-            week_end_date = week.strftime("%Y-%m-%d")
-            daterange = pandas.date_range(
-                week_start_date,
-                week_end_date,
-            )
-            week_stocks_held = []
-            for single_date in daterange:
-                single_date = single_date.strftime("%Y-%m-%d")
-                date_stocks_held = [d for d in items if d["date"] == single_date]
-                for single_date_object in date_stocks_held:
-                    week_stocks_held.append(single_date_object)
-
-            # get unique stocks
-            symbols = []
-            for temp_loop in week_stocks_held:
-                symbols.append(temp_loop["symbol"])
-                symbols = list(dict.fromkeys(symbols))
-
-            for symbol in symbols:
-                single_stock_data = [
-                    d for d in week_stocks_held if d["symbol"] == symbol
-                ]
-                temp_object = {
-                    "date": week.strftime("%Y %U"),
-                    "value": sum(d["dividend"] for d in single_stock_data),
-                    "category": symbol,
-                }
-                result.append(temp_object)
+        result = get_month_week_data(items, start_date, end_date)
 
     if not result:
         return func.HttpResponse(
@@ -160,6 +63,115 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
+
+
+def get_max_data(items, start_date, end_date):
+    """Get max data"""
+    quarters = get_quarters(start_date, end_date)
+    result = []
+    for quarter in quarters:
+        quarter_start_date, quarter_end_date = get_quarter_first_and_last_date(quarter)
+        daterange = pandas.date_range(
+            quarter_start_date,
+            quarter_end_date,
+        )
+        quarter_stocks_held = []
+        for single_date in daterange:
+            single_date = single_date.strftime("%Y-%m-%d")
+            date_stocks_held = [d for d in items if d["date"] == single_date]
+            for single_date_object in date_stocks_held:
+                quarter_stocks_held.append(single_date_object)
+
+        # get unique stocks
+        symbols = []
+        for temp_loop in quarter_stocks_held:
+            symbols.append(temp_loop["symbol"])
+            symbols = list(dict.fromkeys(symbols))
+
+        for symbol in symbols:
+            single_stock_data = [
+                d for d in quarter_stocks_held if d["symbol"] == symbol
+            ]
+            temp_object = {
+                "date": quarter,
+                "value": sum(d["dividend"] for d in single_stock_data),
+                "category": symbol,
+            }
+            result.append(temp_object)
+    return result
+
+
+def get_year_ytd_data(items, start_date, end_date):
+    """Get year and ytd data"""
+    result = []
+    months = get_months(start_date, end_date)
+    for month in months:
+        month_start_date = month.replace(day=1)
+        month_start_date = month_start_date.strftime("%Y-%m-%d")
+        month_end_date = month.strftime("%Y-%m-%d")
+        daterange = pandas.date_range(
+            month_start_date,
+            month_end_date,
+        )
+        month_stocks_held = []
+        for single_date in daterange:
+            single_date = single_date.strftime("%Y-%m-%d")
+            date_stocks_held = [d for d in items if d["date"] == single_date]
+            for single_date_object in date_stocks_held:
+                month_stocks_held.append(single_date_object)
+
+        # get unique stocks
+        symbols = []
+        for temp_loop in month_stocks_held:
+            symbols.append(temp_loop["symbol"])
+            symbols = list(dict.fromkeys(symbols))
+
+        for symbol in symbols:
+            single_stock_data = [d for d in month_stocks_held if d["symbol"] == symbol]
+            temp_object = {
+                "date": month.strftime("%Y %B"),
+                "value": sum(d["dividend"] for d in single_stock_data),
+                "category": symbol,
+            }
+            result.append(temp_object)
+    return result
+
+
+def get_month_week_data(items, start_date, end_date):
+    """Get month and week data"""
+    # get data by week
+    weeks = get_weeks(start_date, end_date)
+    result = []
+    for week in weeks:
+        week_start_date = week - timedelta(days=week.weekday())
+        week_start_date = week_start_date.strftime("%Y-%m-%d")
+        week_end_date = week.strftime("%Y-%m-%d")
+        daterange = pandas.date_range(
+            week_start_date,
+            week_end_date,
+        )
+        week_stocks_held = []
+        for single_date in daterange:
+            single_date = single_date.strftime("%Y-%m-%d")
+            date_stocks_held = [d for d in items if d["date"] == single_date]
+            for single_date_object in date_stocks_held:
+                week_stocks_held.append(single_date_object)
+
+        # get unique stocks
+        symbols = []
+        for temp_loop in week_stocks_held:
+            symbols.append(temp_loop["symbol"])
+            symbols = list(dict.fromkeys(symbols))
+
+        for symbol in symbols:
+            single_stock_data = [d for d in week_stocks_held if d["symbol"] == symbol]
+            temp_object = {
+                "date": week.strftime("%Y %U"),
+                "value": sum(d["dividend"] for d in single_stock_data),
+                "category": symbol,
+            }
+            result.append(temp_object)
+    return result
 
 
 def datatogetswitch(datatoget):
@@ -196,11 +208,15 @@ def month_to_quarter(month):
 
 def get_quarters(start_date, end_date):
     """Get quarters between start and end date"""
-    quarters = pandas.date_range(
-        pandas.to_datetime(start_date),
-        pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(1),
-        freq="Q",
-    ).tolist()
+    quarters = (
+        pandas.date_range(
+            pandas.to_datetime(start_date),
+            pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(1),
+            freq="Q",
+        )
+        .strftime("%B %Y")
+        .tolist()
+    )
     output_quarters = []
     for quarter in quarters:
         quarter_and_year = quarter.split(" ")
