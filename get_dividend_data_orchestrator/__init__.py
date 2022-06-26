@@ -17,7 +17,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # initialize variables
     symbols = []
     query = "TIME_SERIES_WEEKLY_ADJUSTED"
-    stock_data = {}
     output_list = []
     transactions = context.get_input()
 
@@ -53,10 +52,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
                     "dividend": float(single_day_dividends),
                 }
             output_list.append(output_object)
-    stock_data.update({"dividends": output_list})
 
     # return dictionary
-    return stock_data
+    return {"dividends": output_list}
 
 
 main = df.Orchestrator.create(orchestrator_function)
