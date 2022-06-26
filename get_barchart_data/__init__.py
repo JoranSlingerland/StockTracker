@@ -1,10 +1,10 @@
 """Module to get line chart data"""
 # pylint: disable=logging-fstring-interpolation
+# pylint: disable=too-many-locals
 
 import logging
 import json
 from datetime import date, timedelta
-from time import strftime
 import azure.functions as func
 import pandas
 
