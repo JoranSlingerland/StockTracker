@@ -14,23 +14,23 @@ def inputoptions(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
         return {
-            "type": row["name"],
-            "value": row['total_value'],
+            "type": row["symbol"],
+            "value": row["total_value"],
         }
     if datatype == "currency":
         return {
             "type": row["currency"],
-            "value": row['total_value'],
+            "value": row["total_value"],
         }
     if datatype == "country":
         return {
             "type": row["country"],
-            "value": row['total_value'],
+            "value": row["total_value"],
         }
     if datatype == "sector":
         return {
             "type": row["sector"],
-            "value": row['total_value'],
+            "value": row["total_value"],
         }
 
     # return nothing if no match
@@ -55,7 +55,7 @@ def remove_duplicates(datatype, input_list):
             filterd_input_list = [d for d in input_list if d["type"] == currency]
             temp_object = {
                 "type": currency,
-                "value": sum([d["value"] for d in filterd_input_list]),
+                "value": sum(d["value"] for d in filterd_input_list),
             }
             output_list.append(temp_object)
         return output_list
@@ -73,7 +73,7 @@ def remove_duplicates(datatype, input_list):
             filterd_input_list = [d for d in input_list if d["type"] == country]
             temp_object = {
                 "type": country,
-                "value": sum([d["value"] for d in filterd_input_list]),
+                "value": sum(d["value"] for d in filterd_input_list),
             }
             output_list.append(temp_object)
         return output_list
@@ -91,7 +91,7 @@ def remove_duplicates(datatype, input_list):
             filterd_input_list = [d for d in input_list if d["type"] == sector]
             temp_object = {
                 "type": sector,
-                "value": sum([d["value"] for d in filterd_input_list]),
+                "value": sum(d["value"] for d in filterd_input_list),
             }
             output_list.append(temp_object)
         return output_list

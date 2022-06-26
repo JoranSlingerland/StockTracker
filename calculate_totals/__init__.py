@@ -38,16 +38,17 @@ def main(payload: str) -> str:
         temp_object = {
             "id": str(uuid.uuid4()),
             "date": single_date,
-            "total_cost": sum([d["total_cost"] for d in stocks_single_date]),
-            "total_value": sum([d["total_value"] for d in stocks_single_date]),
+            "total_cost": sum(d["total_cost"] for d in stocks_single_date),
+            "total_value": sum(d["total_value"] for d in stocks_single_date),
             "total_invested": invested_single_date[0]["invested"],
-            "total_pl": sum([d["total_value"] for d in stocks_single_date])
+            "total_pl": sum(d["total_value"] for d in stocks_single_date)
             - invested_single_date[0]["invested"],
             "total_pl_percentage": (
-                sum([d["total_value"] for d in stocks_single_date])
+                sum(d["total_value"] for d in stocks_single_date)
                 - invested_single_date[0]["invested"]
             )
             / invested_single_date[0]["invested"],
+            "total_dividends": sum(d["total_dividends"] for d in stocks_single_date),
         }
 
         temp_list.append(temp_object)

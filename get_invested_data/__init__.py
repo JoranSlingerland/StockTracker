@@ -72,7 +72,7 @@ def calculate_deposits_and_withdrawals(invested, daterange):
         if deposits:
             temp_object = {
                 "date": single_date,
-                "amount": sum([d["amount"] for d in deposits]),
+                "amount": sum(d["amount"] for d in deposits),
                 "transaction_type": "Deposit",
             }
             output_list.append(temp_object)
@@ -84,7 +84,7 @@ def calculate_deposits_and_withdrawals(invested, daterange):
         if withdrawals:
             temp_object = {
                 "date": single_date,
-                "amount": sum([d["amount"] for d in withdrawals]),
+                "amount": sum(d["amount"] for d in withdrawals),
                 "transaction_type": "Withdrawal",
             }
             output_list.append(temp_object)

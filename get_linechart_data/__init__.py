@@ -74,6 +74,14 @@ def inputoptions(datatype, item):
                 "category": "Invested",
             },
         ]
+    if datatype == "total_gains":
+        return [
+            {
+                "date": item["date"],
+                "value": item["total_pl"],
+                "category": "Gains",
+            }
+        ]
 
     # return nothing if no match
     return None

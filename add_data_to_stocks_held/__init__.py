@@ -16,18 +16,40 @@ def main(payload: str) -> str:
     stock_data = payload[1]
     forex_data = payload[2]
     stock_meta_data = payload[3]
+    dividend_data = payload[4]
+    transactions = payload[5]
 
     output_list = []
-    # initialize variables
+    total_dividends = {}
+    symbols = []
+    for temp_loop in transactions["transactions"]:
+        symbols.append(temp_loop["symbol"])
+        symbols = list(dict.fromkeys(symbols))
 
+    for symbol in symbols:
+        total_dividends.update({symbol: 0.0})
+
+    # initialize variables
     for stock in stocks_held["stocks_held"]:
         days_to_substract = 0
+        stock_dividend_data = [
+            d for d in dividend_data["dividends"] if d["symbol"] == stock["symbol"]
+        ]
+        temp_total_dividends = total_dividends[stock["symbol"]]
         while True:
             try:
                 date_string = f"{stock['date']} 00:00:00"
                 date_object = datetime.fromisoformat(date_string)
                 date_object = date_object - timedelta(days=days_to_substract)
                 date_object = date_object.strftime("%Y-%m-%d")
+                single_day_dividend_data = [
+                    d for d in stock_dividend_data if d["date"] == date_object
+                ]
+                single_day_dividend_data = float(
+                    single_day_dividend_data[0]["dividend"]
+                )
+                temp_total_dividends += single_day_dividend_data
+                total_dividends.update({stock["symbol"]: temp_total_dividends})
 
                 stock_open = float(
                     stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
@@ -75,6 +97,8 @@ def main(payload: str) -> str:
                             - (stock["average_cost"] * stock["quantity"])
                         )
                         / (stock_close * forex_high * stock["quantity"]),
+                        "dividend": single_day_dividend_data,
+                        "total_dividends": total_dividends[stock["symbol"]] * forex_high,
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
                         "description": stock_meta_data[f"{stock['symbol']}"][
                             "description"

@@ -105,12 +105,12 @@ def calculate_sells_and_buys(stocks_held, daterange):
             temp_object = {
                 "date": single_date,
                 "symbol": symbol_buys,
-                "average_cost": sum([d["cost"] for d in date_stock_held_buys])
-                / sum([d["quantity"] for d in date_stock_held_buys]),
-                "quantity": sum([d["quantity"] for d in date_stock_held_buys]),
+                "average_cost": sum(d["cost"] for d in date_stock_held_buys)
+                / sum(d["quantity"] for d in date_stock_held_buys),
+                "quantity": sum(d["quantity"] for d in date_stock_held_buys),
                 "transaction_type": "Buy",
                 "transaction_cost": sum(
-                    [d["transaction_cost"] for d in date_stock_held_buys]
+                    d["transaction_cost"] for d in date_stock_held_buys
                 ),
                 "currency": date_stock_held_buys[0]["currency"],
             }
@@ -125,12 +125,12 @@ def calculate_sells_and_buys(stocks_held, daterange):
             temp_object = {
                 "date": single_date,
                 "symbol": symbol_sells,
-                "average_cost": sum([d["cost"] for d in date_stock_held_sells])
-                / sum([d["quantity"] for d in date_stock_held_sells]),
-                "quantity": sum([d["quantity"] for d in date_stock_held_sells]),
+                "average_cost": sum(d["cost"] for d in date_stock_held_sells)
+                / sum(d["quantity"] for d in date_stock_held_sells),
+                "quantity": sum(d["quantity"] for d in date_stock_held_sells),
                 "transaction_type": "Sell",
                 "transaction_cost": sum(
-                    [d["transaction_cost"] for d in date_stock_held_sells]
+                    d["transaction_cost"] for d in date_stock_held_sells
                 ),
                 "currency": date_stock_held_sells[0]["currency"],
             }
