@@ -77,12 +77,20 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 6 - add stock_data to stock_held
     data = yield context.call_activity(
         "add_data_to_stocks_held",
-        [stock_held, stock_data, forex_data, stock_meta_data, dividend_data],
+        [
+            stock_held,
+            stock_data,
+            forex_data,
+            stock_meta_data,
+            dividend_data,
+            transactions,
+        ],
     )
 
     # step 7 - Calulate totals
     data = yield context.call_activity(
-        "calculate_totals", [data, invested, transactions, days_to_update]
+        "calculate_totals",
+        [data, invested, transactions, days_to_update],
     )
 
     # step 8 recreate containers / remove items

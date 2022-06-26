@@ -17,16 +17,24 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     stock_meta_data = payload[3]
     dividend_data = payload[4]
+    transactions = payload[5]
 
     output_list = []
     total_dividends = {}
-    for stock in stocks_held["stocks_held"]:
-        total_dividends.update({stock["symbol"]: 0.0})
+    symbols = []
+    for temp_loop in transactions["transactions"]:
+        symbols.append(temp_loop["symbol"])
+        symbols = list(dict.fromkeys(symbols))
+
+    for symbol in symbols:
+        total_dividends.update({symbol: 0.0})
 
     # initialize variables
     for stock in stocks_held["stocks_held"]:
         days_to_substract = 0
-        stock_dividends_data = dividend_data[stock["symbol"]]
+        stock_dividend_data = [
+            d for d in dividend_data["dividends"] if d["symbol"] == stock["symbol"]
+        ]
         temp_total_dividends = total_dividends[stock["symbol"]]
         while True:
             try:
@@ -34,16 +42,12 @@ def main(payload: str) -> str:
                 date_object = datetime.fromisoformat(date_string)
                 date_object = date_object - timedelta(days=days_to_substract)
                 date_object = date_object.strftime("%Y-%m-%d")
-
-                single_day_dividend_data = {
-                    key: value
-                    for key, value in stock_dividends_data.items()
-                    if key == date_object
-                }
-                single_day_dividend_data = single_day_dividend_data[date_object][
-                    "dividend"
+                single_day_dividend_data = [
+                    d for d in stock_dividend_data if d["date"] == date_object
                 ]
-                single_day_dividend_data = float(single_day_dividend_data)
+                single_day_dividend_data = float(
+                    single_day_dividend_data[0]["dividend"]
+                )
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 

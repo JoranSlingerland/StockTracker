@@ -48,6 +48,7 @@ def main(payload: str) -> str:
                 - invested_single_date[0]["invested"]
             )
             / invested_single_date[0]["invested"],
+            "total_dividends": sum([d["total_dividends"] for d in stocks_single_date]),
         }
 
         temp_list.append(temp_object)
