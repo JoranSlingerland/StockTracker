@@ -45,9 +45,12 @@ def main(payload: str) -> str:
                 single_day_dividend_data = [
                     d for d in stock_dividend_data if d["date"] == date_object
                 ]
-                single_day_dividend_data = float(
-                    single_day_dividend_data[0]["dividend"]
-                )
+                if single_day_dividend_data:
+                    single_day_dividend_data = float(
+                        single_day_dividend_data[0]["dividend"]
+                    )
+                else:
+                    single_day_dividend_data = 0.0
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 
@@ -98,7 +101,8 @@ def main(payload: str) -> str:
                         )
                         / (stock_close * forex_high * stock["quantity"]),
                         "dividend": single_day_dividend_data,
-                        "total_dividends": total_dividends[stock["symbol"]] * forex_high,
+                        "total_dividends": total_dividends[stock["symbol"]]
+                        * forex_high,
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
                         "description": stock_meta_data[f"{stock['symbol']}"][
                             "description"
