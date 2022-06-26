@@ -31,6 +31,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             "total_value_gain": items[0]["total_value"],
             "total_pl": items[0]["total_pl"],
             "total_pl_percentage": items[0]["total_pl_percentage"],
+            "total_dividends": items[0]["total_dividends"],
         }
     else:
         start_date = datatogetswitch(datatoget)
@@ -56,6 +57,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 end_date_totals[0]["total_pl"] - start_date_totals[0]["total_pl"]
             )
             / start_date_totals[0]["total_value"],
+            "total_dividends": end_date_totals[0]["total_dividends"]
+            - start_date_totals[0]["total_dividends"],
         }
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200
