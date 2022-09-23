@@ -1,11 +1,8 @@
-requests
-pandas
-jsonschema
-ratelimit
-pyodbc
-python-dotenv
-azure-functions-durable
-azure-functions
-pylint
-black
+requests==2.28.0
+pandas==1.4.3
+python-dotenv==0.20.0
+azure-functions-durable==1.1.4
+azure-functions==1.11.2
+pylint==2.14.3
+black==22.3.0
 azure-cosmos == 4.3.0b4
