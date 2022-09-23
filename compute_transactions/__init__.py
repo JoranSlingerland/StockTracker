@@ -1,5 +1,4 @@
 """Compute transactions object"""
-# pylint: disable=logging-fstring-interpolation
 # pylint: disable=expression-not-assigned
 
 import logging

@@ -1,6 +1,5 @@
 """Create sql tables"""
 # pylint: disable=unused-argument
-# pylint: disable=logging-fstring-interpolation
 # pylint: disable=line-too-long
 # pylint: disable=consider-using-from-import
 

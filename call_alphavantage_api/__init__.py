@@ -1,7 +1,5 @@
 """Call alphavantage API"""
-# pylint: disable=logging-fstring-interpolation
 
-import json
 import logging
 import time
 import requests
@@ -17,7 +15,7 @@ def main(payload: str) -> str:
     while True:
         logging.info(f"Calling API: {url}")
         url = f"{url}&apikey={api_key}"
-        data = requests.get(url)
+        data = requests.get(url, timeout=10)
 
         if data.status_code != 200:
             logging.error(f"Error: {data.status_code}")

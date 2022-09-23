@@ -1,6 +1,5 @@
 "Get Transactions data"
 # pylint: disable=unused-argument
-# pylint: disable=consider-using-from-import
 # pylint: disable=expression-not-assigned
 
 import logging

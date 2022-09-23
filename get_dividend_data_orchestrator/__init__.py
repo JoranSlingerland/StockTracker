@@ -3,8 +3,7 @@
 
 
 import logging
-import json
-from datetime import date, timedelta
+from datetime import date
 import pandas
 import azure.functions as func
 import azure.durable_functions as df

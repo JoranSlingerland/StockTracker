@@ -1,11 +1,6 @@
 """Function to output data to CosmosDB"""
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=consider-using-from-import
-# pylint: disable=broad-except
-# pylint: disable=raise-missing-from
 
 import logging
-import asyncio
 from azure.cosmos.aio import CosmosClient
 from shared_code import get_config, aio_helper
 
