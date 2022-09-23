@@ -1,6 +1,4 @@
 """Get topbar data from Azure cosmos DB"""
-# pylint: disable=logging-fstring-interpolation
-
 
 import logging
 import json

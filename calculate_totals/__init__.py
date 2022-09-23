@@ -1,5 +1,5 @@
 """"Function to calulate totals"""
-# pylint: disable=logging-fstring-interpolation
+
 import logging
 from datetime import timedelta, date
 import uuid

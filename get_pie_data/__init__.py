@@ -1,5 +1,4 @@
 """Function to query sql server for pie data"""
-# pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-return-statements
 # pylint: disable=inconsistent-return-statements
 

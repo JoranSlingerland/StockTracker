@@ -1,5 +1,4 @@
 """Function to output data to CosmosDB"""
-# pylint: disable=logging-fstring-interpolation
 # pylint: disable=consider-using-from-import
 
 import logging

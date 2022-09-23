@@ -1,5 +1,4 @@
 """Module to get line chart data"""
-# pylint: disable=logging-fstring-interpolation
 
 import logging
 import json

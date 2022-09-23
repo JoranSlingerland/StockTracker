@@ -1,6 +1,5 @@
 """Function to add stock data to stocks held"""
 # pylint: disable=line-too-long
-# pylint: disable=logging-fstring-interpolation
 # pylint: disable=too-many-locals
 
 import logging

@@ -2,9 +2,7 @@
     "python.linting.pylintEnabled": true,
     "python.formatting.provider": "black",
     "python.linting.enabled": true,
-    "python.linting.pylintArgs": [
-        "--extension-pkg-whitelist=pyodbc"
-    ],
+    "python.linting.pylintArgs": [],
     "python.terminal.activateEnvironment": true,
     "azureFunctions.deploySubpath": ".",
     "azureFunctions.scmDoBuildDuringDeployment": true,

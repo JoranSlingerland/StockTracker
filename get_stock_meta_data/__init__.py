@@ -1,6 +1,4 @@
 """Gets stock meta data from the API"""
-# pylint: disable=logging-fstring-interpolation
-# pylint: disable=line-too-long
 
 import logging
 import requests
@@ -12,7 +10,7 @@ def call_clearbit_api(url: str, clearbit_api_key: str) -> dict:
     logging.info(f"Calling Clearbit API: {url}")
 
     requestheaders = {"Authorization": f"Bearer {clearbit_api_key}"}
-    response = requests.get(url, headers=requestheaders)
+    response = requests.get(url, headers=requestheaders, timeout=10)
     if response.status_code == 200:
         return response.json()
     return None
