@@ -68,6 +68,11 @@ def get_max_data(items, start_date, end_date):
     """Get max data"""
     quarters = get_quarters(start_date, end_date)
     result = []
+    all_symbols = []
+    for temp_loop in items:
+        all_symbols.append(temp_loop["symbol"])
+        all_symbols = list(dict.fromkeys(all_symbols))
+
     for quarter in quarters:
         quarter_start_date, quarter_end_date = get_quarter_first_and_last_date(quarter)
         daterange = pandas.date_range(
@@ -87,15 +92,22 @@ def get_max_data(items, start_date, end_date):
             symbols.append(temp_loop["symbol"])
             symbols = list(dict.fromkeys(symbols))
 
-        for symbol in symbols:
+        for symbol in all_symbols:
             single_stock_data = [
                 d for d in quarter_stocks_held if d["symbol"] == symbol
             ]
-            temp_object = {
-                "date": quarter,
-                "value": sum(d["dividend"] for d in single_stock_data),
-                "category": symbol,
-            }
+            if symbol in symbols:
+                temp_object = {
+                    "date": quarter,
+                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            else:
+                temp_object = {
+                    "date": quarter,
+                    "value": 0.00,
+                    "category": symbol,
+                }
             result.append(temp_object)
     return result
 
@@ -104,6 +116,10 @@ def get_year_ytd_data(items, start_date, end_date):
     """Get year and ytd data"""
     result = []
     months = get_months(start_date, end_date)
+    all_symbols = []
+    for temp_loop in items:
+        all_symbols.append(temp_loop["symbol"])
+        all_symbols = list(dict.fromkeys(all_symbols))
     for month in months:
         month_start_date = month.replace(day=1)
         month_start_date = month_start_date.strftime("%Y-%m-%d")
@@ -125,13 +141,20 @@ def get_year_ytd_data(items, start_date, end_date):
             symbols.append(temp_loop["symbol"])
             symbols = list(dict.fromkeys(symbols))
 
-        for symbol in symbols:
+        for symbol in all_symbols:
             single_stock_data = [d for d in month_stocks_held if d["symbol"] == symbol]
-            temp_object = {
-                "date": month.strftime("%Y %B"),
-                "value": sum(d["dividend"] for d in single_stock_data),
-                "category": symbol,
-            }
+            if symbol in symbols:
+                temp_object = {
+                    "date": month.strftime("%Y %B"),
+                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            else:
+                temp_object = {
+                    "date": month.strftime("%Y %B"),
+                    "value": 0.00,
+                    "category": symbol,
+                }
             result.append(temp_object)
     return result
 
@@ -141,6 +164,10 @@ def get_month_week_data(items, start_date, end_date):
     # get data by week
     weeks = get_weeks(start_date, end_date)
     result = []
+    all_symbols = []
+    for temp_loop in items:
+        all_symbols.append(temp_loop["symbol"])
+        all_symbols = list(dict.fromkeys(all_symbols))
     for week in weeks:
         week_start_date = week - timedelta(days=week.weekday())
         week_start_date = week_start_date.strftime("%Y-%m-%d")
@@ -162,13 +189,20 @@ def get_month_week_data(items, start_date, end_date):
             symbols.append(temp_loop["symbol"])
             symbols = list(dict.fromkeys(symbols))
 
-        for symbol in symbols:
+        for symbol in all_symbols:
             single_stock_data = [d for d in week_stocks_held if d["symbol"] == symbol]
-            temp_object = {
-                "date": week.strftime("%Y %U"),
-                "value": sum(d["dividend"] for d in single_stock_data),
-                "category": symbol,
-            }
+            if symbol in symbols:
+                temp_object = {
+                    "date": week.strftime("%Y %U"),
+                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            else:
+                temp_object = {
+                    "date": week.strftime("%Y %U"),
+                    "value": 0.00,
+                    "category": symbol,
+                }
             result.append(temp_object)
     return result
 

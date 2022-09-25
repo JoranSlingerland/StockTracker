@@ -99,7 +99,7 @@ def main(payload: str) -> str:
                             - (stock["average_cost"] * stock["quantity"])
                         )
                         / (stock_close * forex_high * stock["quantity"]),
-                        "dividend": single_day_dividend_data,
+                        "dividend": single_day_dividend_data * forex_high,
                         "total_dividends": total_dividends[stock["symbol"]]
                         * forex_high,
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
