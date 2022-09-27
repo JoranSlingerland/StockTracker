@@ -33,7 +33,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             "transaction_cost": items[0]["transaction_cost"],
         }
     else:
-        start_date = date_time_helper.datatogetswitch(datatoget)
+        start_date = (date_time_helper.datatogetswitch(datatoget))[0]
         container = cosmosdb_module.cosmosdb_container("single_day_totals")
         end_date_totals = list(container.read_all_items())
         container = cosmosdb_module.cosmosdb_container("totals")
@@ -58,7 +58,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             / start_date_totals[0]["total_value"],
             "total_dividends": end_date_totals[0]["total_dividends"]
             - start_date_totals[0]["total_dividends"],
-            "transaction_cost": abs(end_date_totals[0]["transaction_cost"]),
+            "transaction_cost": end_date_totals[0]["transaction_cost"],
         }
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200
