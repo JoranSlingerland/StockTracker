@@ -1,5 +1,6 @@
 """Module to get line chart data"""
 # pylint: disable=too-many-locals
+# pylint: disable=line-too-long
 
 import logging
 import json
@@ -25,8 +26,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
+    if datatype == "dividend":
+        container = cosmosdb_module.cosmosdb_container("stocks_held")
 
-    container = cosmosdb_module.cosmosdb_container("stocks_held")
+    if datatype == "transaction_cost":
+        container = cosmosdb_module.cosmosdb_container("input_transactions")
+
     if datatoget == "max":
         items = list(container.read_all_items())
     else:
@@ -44,14 +49,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     result = []
     if datatoget == "max":
         # get data by quarter
+        if datatype == "transaction_cost":
+            items.sort(key=lambda x: x["date"])
         start_date = items[0]["date"]
         end_date = date.today()
-        result = get_max_data(items, start_date, end_date)
+        result = get_max_data(items, start_date, end_date, datatype)
     if datatoget in ["year", "ytd"]:
-        result = get_year_ytd_data(items, start_date, end_date)
+        result = get_year_ytd_data(items, start_date, end_date, datatype)
 
     if datatoget in ["month", "week"]:
-        result = get_month_week_data(items, start_date, end_date)
+        result = get_month_week_data(items, start_date, end_date, datatype)
 
     if not result:
         return func.HttpResponse(
@@ -64,7 +71,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def get_max_data(items, start_date, end_date):
+def get_max_data(items, start_date, end_date, datatype):
     """Get max data"""
     quarters = date_time_helper.get_quarters(start_date, end_date)
     result = []
@@ -99,10 +106,16 @@ def get_max_data(items, start_date, end_date):
             single_stock_data = [
                 d for d in quarter_stocks_held if d["symbol"] == symbol
             ]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": quarter,
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": quarter,
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -112,10 +125,17 @@ def get_max_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": quarter,
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
     return result
 
 
-def get_year_ytd_data(items, start_date, end_date):
+def get_year_ytd_data(items, start_date, end_date, datatype):
     """Get year and ytd data"""
     result = []
     months = date_time_helper.get_months(start_date, end_date)
@@ -146,10 +166,16 @@ def get_year_ytd_data(items, start_date, end_date):
 
         for symbol in all_symbols:
             single_stock_data = [d for d in month_stocks_held if d["symbol"] == symbol]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": month.strftime("%Y %B"),
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": month.strftime("%Y %B"),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -159,10 +185,17 @@ def get_year_ytd_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": month.strftime("%Y %B"),
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
     return result
 
 
-def get_month_week_data(items, start_date, end_date):
+def get_month_week_data(items, start_date, end_date, datatype):
     """Get month and week data"""
     # get data by week
     weeks = date_time_helper.get_weeks(start_date, end_date)
@@ -194,10 +227,16 @@ def get_month_week_data(items, start_date, end_date):
 
         for symbol in all_symbols:
             single_stock_data = [d for d in week_stocks_held if d["symbol"] == symbol]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": week.strftime("%Y %U"),
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": week.strftime("%Y %U"),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -207,4 +246,12 @@ def get_month_week_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": week.strftime("%Y %U"),
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
+
     return result
