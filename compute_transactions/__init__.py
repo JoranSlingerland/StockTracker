@@ -15,12 +15,12 @@ def main(payload: str) -> str:
 
     # setup dates
     transactions = sorted(
-        transactions["transactions"], key=lambda k: k["transaction_date"]
+        transactions["transactions"], key=lambda k: k["date"]
     )
 
     end_date = date.today()
     if days_to_update == "all":
-        start_date = transactions[0]["transaction_date"]
+        start_date = transactions[0]["date"]
     else:
         start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
@@ -42,7 +42,7 @@ def get_transactions_by_day(transactions, daterange):
         logging.debug(f"Getting transactions for {single_date}")
         single_date = single_date.strftime("%Y-%m-%d")
         filterd_stocks_held = [
-            d for d in transactions if d["transaction_date"] <= single_date
+            d for d in transactions if d["date"] <= single_date
         ]
         # create object
 
@@ -59,7 +59,6 @@ def get_transactions_by_day(transactions, daterange):
             temp_list.append(temp_object)
 
     # return dictionary
-    [d.pop("transaction_date", None) for d in temp_list]
     stocks_held = {"stocks_held": temp_list}
     return stocks_held
 

@@ -18,7 +18,7 @@ def main(payload: str) -> str:
     # get dates
     end_date = date.today()
     if days_to_update == "all":
-        start_date = transactions["transactions"][0]["transaction_date"]
+        start_date = transactions["transactions"][0]["date"]
     else:
         start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
@@ -49,6 +49,7 @@ def main(payload: str) -> str:
             )
             / invested_single_date[0]["invested"],
             "total_dividends": sum(d["total_dividends"] for d in stocks_single_date),
+            "transaction_cost": sum(d["transaction_cost"] for d in stocks_single_date)
         }
 
         temp_list.append(temp_object)

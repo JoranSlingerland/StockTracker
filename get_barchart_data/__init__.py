@@ -1,5 +1,6 @@
 """Module to get line chart data"""
 # pylint: disable=too-many-locals
+# pylint: disable=line-too-long
 
 import logging
 import json
@@ -7,7 +8,7 @@ from datetime import date, timedelta
 import azure.functions as func
 import pandas
 
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, date_time_helper
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -25,12 +26,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
+    if datatype == "dividend":
+        container = cosmosdb_module.cosmosdb_container("stocks_held")
 
-    container = cosmosdb_module.cosmosdb_container("stocks_held")
+    if datatype == "transaction_cost":
+        container = cosmosdb_module.cosmosdb_container("input_transactions")
+
     if datatoget == "max":
         items = list(container.read_all_items())
     else:
-        start_date, end_date = datatogetswitch(datatoget)
+        start_date, end_date = date_time_helper.datatogetswitch(datatoget)
         items = list(
             container.query_items(
                 query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
@@ -44,14 +49,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     result = []
     if datatoget == "max":
         # get data by quarter
+        if datatype == "transaction_cost":
+            items.sort(key=lambda x: x["date"])
         start_date = items[0]["date"]
         end_date = date.today()
-        result = get_max_data(items, start_date, end_date)
+        result = get_max_data(items, start_date, end_date, datatype)
     if datatoget in ["year", "ytd"]:
-        result = get_year_ytd_data(items, start_date, end_date)
+        result = get_year_ytd_data(items, start_date, end_date, datatype)
 
     if datatoget in ["month", "week"]:
-        result = get_month_week_data(items, start_date, end_date)
+        result = get_month_week_data(items, start_date, end_date, datatype)
 
     if not result:
         return func.HttpResponse(
@@ -64,9 +71,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def get_max_data(items, start_date, end_date):
+def get_max_data(items, start_date, end_date, datatype):
     """Get max data"""
-    quarters = get_quarters(start_date, end_date)
+    quarters = date_time_helper.get_quarters(start_date, end_date)
     result = []
     all_symbols = []
     for temp_loop in items:
@@ -74,7 +81,10 @@ def get_max_data(items, start_date, end_date):
         all_symbols = list(dict.fromkeys(all_symbols))
 
     for quarter in quarters:
-        quarter_start_date, quarter_end_date = get_quarter_first_and_last_date(quarter)
+        (
+            quarter_start_date,
+            quarter_end_date,
+        ) = date_time_helper.get_quarter_first_and_last_date(quarter)
         daterange = pandas.date_range(
             quarter_start_date,
             quarter_end_date,
@@ -96,10 +106,16 @@ def get_max_data(items, start_date, end_date):
             single_stock_data = [
                 d for d in quarter_stocks_held if d["symbol"] == symbol
             ]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": quarter,
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": quarter,
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -109,13 +125,20 @@ def get_max_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": quarter,
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
     return result
 
 
-def get_year_ytd_data(items, start_date, end_date):
+def get_year_ytd_data(items, start_date, end_date, datatype):
     """Get year and ytd data"""
     result = []
-    months = get_months(start_date, end_date)
+    months = date_time_helper.get_months(start_date, end_date)
     all_symbols = []
     for temp_loop in items:
         all_symbols.append(temp_loop["symbol"])
@@ -143,10 +166,16 @@ def get_year_ytd_data(items, start_date, end_date):
 
         for symbol in all_symbols:
             single_stock_data = [d for d in month_stocks_held if d["symbol"] == symbol]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": month.strftime("%Y %B"),
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": month.strftime("%Y %B"),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -156,13 +185,20 @@ def get_year_ytd_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": month.strftime("%Y %B"),
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
     return result
 
 
-def get_month_week_data(items, start_date, end_date):
+def get_month_week_data(items, start_date, end_date, datatype):
     """Get month and week data"""
     # get data by week
-    weeks = get_weeks(start_date, end_date)
+    weeks = date_time_helper.get_weeks(start_date, end_date)
     result = []
     all_symbols = []
     for temp_loop in items:
@@ -191,10 +227,16 @@ def get_month_week_data(items, start_date, end_date):
 
         for symbol in all_symbols:
             single_stock_data = [d for d in week_stocks_held if d["symbol"] == symbol]
-            if symbol in symbols:
+            if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": week.strftime("%Y %U"),
                     "value": sum(d["dividend"] for d in single_stock_data),
+                    "category": symbol,
+                }
+            elif symbol in symbols and datatype == "transaction_cost":
+                temp_object = {
+                    "date": week.strftime("%Y %U"),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -204,100 +246,12 @@ def get_month_week_data(items, start_date, end_date):
                     "category": symbol,
                 }
             result.append(temp_object)
+        if not all_symbols:
+            temp_object = {
+                "date": week.strftime("%Y %U"),
+                "value": 0.00,
+                "category": "",
+            }
+            result.append(temp_object)
+
     return result
-
-
-def datatogetswitch(datatoget):
-    """Home made match function"""
-    end_date = date.today()
-    if datatoget == "year":
-        start_date = end_date - timedelta(days=365)
-    if datatoget == "month":
-        start_date = end_date - timedelta(days=30)
-    if datatoget == "week":
-        start_date = end_date - timedelta(days=7)
-    if datatoget == "ytd":
-        start_date = date(end_date.year, 1, 1)
-
-    start_date = start_date.strftime("%Y-%m-%d")
-    end_date = end_date.strftime("%Y-%m-%d")
-
-    # return nothing if no match
-    return start_date, end_date
-
-
-def month_to_quarter(month):
-    """Convert month to quarter"""
-    if month in ["January", "February", "March"]:
-        return "Q1"
-    if month in ["April", "May", "June"]:
-        return "Q2"
-    if month in ["July", "August", "September"]:
-        return "Q3"
-    if month in ["October", "November", "December"]:
-        return "Q4"
-    return None
-
-
-def get_quarters(start_date, end_date):
-    """Get quarters between start and end date"""
-    quarters = (
-        pandas.date_range(
-            pandas.to_datetime(start_date),
-            pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(1),
-            freq="Q",
-        )
-        .strftime("%B %Y")
-        .tolist()
-    )
-    output_quarters = []
-    for quarter in quarters:
-        quarter_and_year = quarter.split(" ")
-        quarter = month_to_quarter(quarter_and_year[0])
-        year = quarter_and_year[1]
-        output_quarters.append(f"{quarter} {year}")
-    return output_quarters
-
-
-def get_months(start_date, end_date):
-    """Get months between start and end date"""
-    months = pandas.date_range(
-        pandas.to_datetime(start_date),
-        pandas.to_datetime(end_date) + pandas.offsets.MonthBegin(1),
-        freq="M",
-    ).tolist()
-    return months
-
-
-def get_weeks(start_date, end_date):
-    """Get weeks between start and end date"""
-    weeks = pandas.date_range(
-        pandas.to_datetime(start_date),
-        pandas.to_datetime(end_date) + pandas.offsets.Week(1),
-        freq="W",
-    ).tolist()
-    return weeks
-
-
-def get_quarter_first_and_last_date(quarter):
-    """Get first and last date of quarter"""
-    quarter_and_year = quarter.split(" ")
-    quarter = quarter_and_year[0]
-    year = quarter_and_year[1]
-    if quarter == "Q1":
-        quarter_start_date = date(int(year), 1, 1)
-        quarter_end_date = date(int(year), 3, 31)
-        return quarter_start_date, quarter_end_date
-    if quarter == "Q2":
-        quarter_start_date = date(int(year), 4, 1)
-        quarter_end_date = date(int(year), 6, 30)
-        return quarter_start_date, quarter_end_date
-    if quarter == "Q3":
-        quarter_start_date = date(int(year), 7, 1)
-        quarter_end_date = date(int(year), 9, 30)
-        return quarter_start_date, quarter_end_date
-    if quarter == "Q4":
-        quarter_start_date = date(int(year), 10, 1)
-        quarter_end_date = date(int(year), 12, 31)
-        return quarter_start_date, quarter_end_date
-    return None, None

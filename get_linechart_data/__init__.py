@@ -5,7 +5,7 @@ import json
 from datetime import date, timedelta
 import azure.functions as func
 
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, date_time_helper
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -28,7 +28,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if datatoget == "max":
         items = list(container.read_all_items())
     else:
-        start_date, end_date = datatogetswitch(datatoget)
+        start_date, end_date = date_time_helper.datatogetswitch(datatoget)
         items = list(
             container.query_items(
                 query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
@@ -84,22 +84,3 @@ def inputoptions(datatype, item):
 
     # return nothing if no match
     return None
-
-
-def datatogetswitch(datatoget):
-    """Home made match function"""
-    end_date = date.today()
-    if datatoget == "year":
-        start_date = end_date - timedelta(days=365)
-    if datatoget == "month":
-        start_date = end_date - timedelta(days=30)
-    if datatoget == "week":
-        start_date = end_date - timedelta(days=7)
-    if datatoget == "ytd":
-        start_date = date(end_date.year, 1, 1)
-
-    start_date = start_date.strftime("%Y-%m-%d")
-    end_date = end_date.strftime("%Y-%m-%d")
-
-    # return nothing if no match
-    return start_date, end_date
