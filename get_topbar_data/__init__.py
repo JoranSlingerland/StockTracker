@@ -5,7 +5,7 @@ import json
 from datetime import date, timedelta
 import azure.functions as func
 
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, date_time_helper
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -30,10 +30,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             "total_pl": items[0]["total_pl"],
             "total_pl_percentage": items[0]["total_pl_percentage"],
             "total_dividends": items[0]["total_dividends"],
-            "transaction_cost": items[0]["transaction_cost"]
+            "transaction_cost": items[0]["transaction_cost"],
         }
     else:
-        start_date = datatogetswitch(datatoget)
+        start_date = date_time_helper.datatogetswitch(datatoget)
         container = cosmosdb_module.cosmosdb_container("single_day_totals")
         end_date_totals = list(container.read_all_items())
         container = cosmosdb_module.cosmosdb_container("totals")
@@ -63,20 +63,3 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200
     )
-
-
-def datatogetswitch(datatoget):
-    """Home made match function"""
-    end_date = date.today()
-    if datatoget == "year":
-        start_date = end_date - timedelta(days=365)
-    if datatoget == "month":
-        start_date = end_date - timedelta(days=30)
-    if datatoget == "week":
-        start_date = end_date - timedelta(days=7)
-    if datatoget == "ytd":
-        start_date = date(end_date.year, 1, 1)
-
-    start_date = start_date.strftime("%Y-%m-%d")
-
-    return start_date
