@@ -27,7 +27,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if containername in ("input_invested", "input_transactions"):
         #sort result by transaction_date
-        result = sorted(result, key=lambda k: k["transaction_date"], reverse=True)
+        result = sorted(result, key=lambda k: k["date"], reverse=True)
 
     if not result:
         return func.HttpResponse(

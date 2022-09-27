@@ -13,9 +13,9 @@ def main(payload: str) -> str:
     transactions = data["transactions"]
     invested = data["invested"]
     #sort transactions
-    transactions.sort(key=lambda x: x["transaction_date"])
+    transactions.sort(key=lambda x: x["date"])
     #sort invested
-    invested.sort(key=lambda x: x["transaction_date"])
+    invested.sort(key=lambda x: x["date"])
 
     new_object = {
         "invested": invested,

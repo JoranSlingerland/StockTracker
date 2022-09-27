@@ -79,7 +79,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 [
   {
     "id": "2460ebe2-5610-4e02-8f54-ac5b79fae125",
-    "transaction_date": "2019-01-21",
+    "date": "2019-01-21",
     "transaction_type": "Deposit",
     "amount": 100,
     "_rid": "i5Q5AJKVpVMBAAAAAAAAAA==",
@@ -98,7 +98,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
   {
     "id": "ec82b0bc-84b1-4bf9-824e-b704b523e652",
     "symbol": "AMD",
-    "transaction_date": "2020-06-25",
+    "date": "2020-06-25",
     "cost": 233.9,
     "quantity": 3,
     "transaction_type": "Buy",

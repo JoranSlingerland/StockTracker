@@ -20,10 +20,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     transactions = context.get_input()
 
     transactions = sorted(
-        transactions["transactions"], key=lambda k: k["transaction_date"]
+        transactions["transactions"], key=lambda k: k["date"]
     )
     end_date = date.today()
-    start_date = transactions[0]["transaction_date"]
+    start_date = transactions[0]["date"]
     daterange = pandas.date_range(start_date, end_date)
 
     # get unique symbols

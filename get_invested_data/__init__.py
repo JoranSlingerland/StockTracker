@@ -14,13 +14,13 @@ def main(payload: str) -> str:
     days_to_update = payload[1]
 
     transactions_dates = sorted(
-        transactions["transactions"], key=lambda k: k["transaction_date"]
+        transactions["transactions"], key=lambda k: k["date"]
     )
 
     # grab dates
     end_date = date.today()
     if days_to_update == "all":
-        start_date = transactions_dates[0]["transaction_date"]
+        start_date = transactions_dates[0]["date"]
     else:
         start_date = end_date - timedelta(days=days_to_update)
     daterange = pandas.date_range(start_date, end_date)
@@ -42,7 +42,7 @@ def get_invested_day_by_day(transactions, daterange):
         single_date = single_date.strftime("%Y-%m-%d")
 
         filterd_invested = [
-            d for d in transactions["invested"] if d["transaction_date"] <= single_date
+            d for d in transactions["invested"] if d["date"] <= single_date
         ]
 
         for filterd_i_held in filterd_invested:
