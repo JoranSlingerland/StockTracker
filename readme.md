@@ -128,7 +128,8 @@ All Azure functions availible in the api.
 | get_barchart_data                | Function will get data for barcharts.                      | /api/get_barchart_data/{datatype}/{datatoget}         |
 | get_linechart_data               | Function will get data for linecharts.                     | /api/get_linechart_data/{datatype}/{datatoget}        |
 | get_pie_data                     | Function will get data for piecharts.                      | /api/get_pie_data/{datatype}                          |
-| get_table_data                   | Function will get data used by tables.                     | /api/get_table_data/{containername}                   |
+| get_table_data_basic             | Function will get data used by tables.                     | /api/get_table_data_basic/{containername}             |
+| get_table_data_performance       | Function will get data used by tables.                     | /api/get_table_data_performance/{datatoget}           |
 | get_topbar_data                  | Function will get data used by the topbar                  | /api/get_topbar_data/{datatoget}                      |
 
 ### Main stocktracker function
