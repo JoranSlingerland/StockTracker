@@ -52,7 +52,6 @@ def main(payload: str) -> str:
                     single_day_dividend_data = 0.0
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
-
                 stock_open = float(
                     stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                         "1. open"
@@ -73,11 +72,6 @@ def main(payload: str) -> str:
                         "4. close"
                     ]
                 )
-                stock_volume = float(
-                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
-                        "5. volume"
-                    ]
-                )
                 forex_high = float(
                     forex_data[stock["currency"]]["Time Series FX (Daily)"][
                         date_object
@@ -90,7 +84,6 @@ def main(payload: str) -> str:
                         "high_value": stock_high * forex_high,
                         "low_value": stock_low * forex_high,
                         "close_value": stock_close * forex_high,
-                        "volume": stock_volume,
                         "total_value": stock_close * forex_high * stock["quantity"],
                         "total_pl": (stock_close * forex_high * stock["quantity"])
                         - (stock["average_cost"] * stock["quantity"]),

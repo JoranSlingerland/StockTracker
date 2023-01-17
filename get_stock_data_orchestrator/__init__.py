@@ -3,9 +3,9 @@
 
 
 import logging
-import json
-import azure.functions as func
+
 import azure.durable_functions as df
+import azure.functions as func
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
@@ -14,7 +14,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # initialize variables
     symbols = []
-    query = "TIME_SERIES_DAILY"
+    query = "TIME_SERIES_DAILY_ADJUSTED"
     stock_data = {}
     transactions = context.get_input()
 
