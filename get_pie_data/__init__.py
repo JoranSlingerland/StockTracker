@@ -7,6 +7,7 @@ import json
 
 import azure.functions as func
 from shared_code import cosmosdb_module
+from colorhash import ColorHash
 
 
 def inputoptions(datatype, row):
@@ -98,6 +99,16 @@ def remove_duplicates(datatype, input_list):
     return None
 
 
+def convert_pie_object_to_chartjs_output(input_object):
+    """Converts the pie object to a chartjs compatible object"""
+    output_object = {"labels": [], "data": [], "color": []}
+    for data in input_object:
+        output_object["labels"].append(data["type"])
+        output_object["data"].append(data["value"])
+        output_object["color"].append(ColorHash(data).hex)
+    return output_object
+
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main function"""
     logging.info("Getting table data")
@@ -120,6 +131,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result_list.append(temp_object)
 
     result = remove_duplicates(datatype, result_list)
+    result = convert_pie_object_to_chartjs_output(result)
+
     if not result:
         return func.HttpResponse(
             body='{"status": Please pass a valid name on the query string or in the request body"}',
