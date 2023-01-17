@@ -2,11 +2,13 @@
 # pylint: disable=too-many-return-statements
 # pylint: disable=line-too-long
 
-import logging
 import json
+import logging
 
 import azure.functions as func
+
 from shared_code import cosmosdb_module
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main fucntion"""
@@ -26,7 +28,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     result = list(container.read_all_items())
 
     if containername in ("input_invested", "input_transactions"):
-        #sort result by transaction_date
+        # sort result by transaction_date
         result = sorted(result, key=lambda k: k["date"], reverse=True)
 
     if not result:
