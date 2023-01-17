@@ -66,7 +66,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 | COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Thoughput >         | 1000                                             |
 
 - Startup the API by pressing `f5` in vscode while in a python file.
-- run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
+- run the command `swa start http://localhost:8080 --run "npm run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
 - Go to the website [http://localhost:4280/](http://localhost:4280/) and Login to the website. make sure you give yourself the admin role.
 
 ## Usage
