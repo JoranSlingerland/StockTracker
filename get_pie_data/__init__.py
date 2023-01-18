@@ -6,8 +6,8 @@ import logging
 import json
 
 import azure.functions as func
-from shared_code import cosmosdb_module
 from colorhash import ColorHash
+from shared_code import cosmosdb_module
 
 
 def inputoptions(datatype, row):
