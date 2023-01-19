@@ -1,10 +1,12 @@
 """Function to query sql server for container data"""
 # pylint: disable=too-many-return-statements
 # pylint: disable=line-too-long
+# pylint: disable=too-many-locals
 
 import logging
 import json
 
+from datetime import timedelta, datetime
 import azure.functions as func
 from shared_code import cosmosdb_module, date_time_helper
 
@@ -42,15 +44,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 enable_cross_partition_query=True,
             )
         )
-        end_data = list(
-            container.query_items(
-                query="SELECT * FROM c WHERE c.date = @end_date",
-                parameters=[
-                    {"name": "@end_date", "value": end_date},
-                ],
-                enable_cross_partition_query=True,
+        end_data = []
+        counter = 0
+        while not end_data:
+            end_data = list(
+                container.query_items(
+                    query="SELECT * FROM c WHERE c.date = @end_date",
+                    parameters=[
+                        {"name": "@end_date", "value": end_date},
+                    ],
+                    enable_cross_partition_query=True,
+                )
             )
-        )
+            end_date = (
+                datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=1)
+            ).strftime("%Y-%m-%d")
+            counter += 1
+            if counter > 10:
+                return func.HttpResponse(
+                    body='{"status": "No data found for this date range"}',
+                    mimetype="application/json",
+                    status_code=400,
+                )
 
         start_date_symbols = []
         end_date_symbols = []

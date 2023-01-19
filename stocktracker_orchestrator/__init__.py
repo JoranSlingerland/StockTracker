@@ -54,17 +54,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Step 2.3: Getting stock meta data")
     stock_meta_data = yield context.call_activity("get_stock_meta_data", [transactions])
 
-    # Step 2.4 - Get dividend data via the API
-    # provisioning_tasks = []
-    # id_ = 0
-    # id_ += 1
-    # child_id = f"{context.instance_id}:{id_}"
-    # provision_task = context.call_sub_orchestrator(
-    #     "get_dividend_data_orchestrator", transactions, child_id
-    # )
-    # provisioning_tasks.append(provision_task)
-    # dividend_data = (yield context.task_all(provisioning_tasks))[0]
-
     # Step 3 - Rebuild the transactions object
     logging.info("Step 3: Rebuilding transactions")
     transactions = yield context.call_activity(
@@ -92,7 +81,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             stock_data,
             forex_data,
             stock_meta_data,
-            # dividend_data,
             transactions,
         ],
     )
@@ -113,7 +101,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     result = yield context.call_activity("output_singleday_to_cosmosdb", data)
 
     # step 9.2 - output everything else to cosmosdb
-    logging.info("Step 9.1: Output everything else to cosmosdb")
+    logging.info("Step 9.2: Output everything else to cosmosdb")
     for container_name, items in data.items():
         result = yield context.call_activity(
             "output_to_cosmosdb", [container_name, items]
