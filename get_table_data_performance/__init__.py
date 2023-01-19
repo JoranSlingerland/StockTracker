@@ -1,6 +1,7 @@
 """Function to query sql server for container data"""
 # pylint: disable=too-many-return-statements
 # pylint: disable=line-too-long
+# pylint: disable=too-many-locals
 
 import logging
 import json
