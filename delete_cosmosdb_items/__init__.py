@@ -59,7 +59,11 @@ def drop_selected_dates(containers, days_to_update):
                 container["container_name"]
             )
             for item in container_client.query_items(
-                query=f"SELECT * FROM c WHERE c.date >= '{start_date}' and c.date <= '{end_date}'",
+                query="SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date",
+                parameters=[
+                    {"name": "@start_date", "value": start_date},
+                    {"name": "@end_date", "value": end_date},
+                ],
                 enable_cross_partition_query=True,
             ):
                 logging.info(item)
