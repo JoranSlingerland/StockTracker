@@ -131,6 +131,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result_list.append(temp_object)
 
     result = remove_duplicates(datatype, result_list)
+    # sort by key value
+    result = sorted(result, key=lambda k: k["value"], reverse=True)
     result = convert_pie_object_to_chartjs_output(result)
 
     if not result:
