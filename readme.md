@@ -131,6 +131,7 @@ All Azure functions availible in the api.
 | get_table_data_basic             | Function will get data used by tables.                     | /api/get_table_data_basic/{containername}             |
 | get_table_data_performance       | Function will get data used by tables.                     | /api/get_table_data_performance/{datatoget}           |
 | get_topbar_data                  | Function will get data used by the topbar                  | /api/get_topbar_data/{datatoget}                      |
+| add_item_to_input                | Function will add an item to the input table               | /api/add_item_to_input/ (Settings in body)            |
 
 ### Main stocktracker function
 
