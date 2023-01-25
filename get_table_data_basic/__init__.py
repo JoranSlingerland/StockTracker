@@ -22,6 +22,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+    if containername not in ("input_invested", "input_transactions"):
+        logging.error("Invalid container name provided")
+        return func.HttpResponse(
+            body='{"status": "Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
+            status_code=400,
+        )
+
     logging.info(f"Getting data for container {containername}")
 
     container = cosmosdb_module.cosmosdb_container(containername)
@@ -33,9 +41,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if not result:
         return func.HttpResponse(
-            body='{"status": "Please pass a valid name on the query string or in the request body"}',
+            body='{"status": "No data found"}',
             mimetype="application/json",
-            status_code=400,
+            status_code=500,
         )
 
     return func.HttpResponse(
