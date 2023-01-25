@@ -22,7 +22,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
-    if containername not in ("input_invested", "input_transactions"):
+    if containername not in ("input_invested", "input_transactions", "single_day"):
         logging.error("Invalid container name provided")
         return func.HttpResponse(
             body='{"status": "Please pass a valid name on the query string or in the request body"}',
