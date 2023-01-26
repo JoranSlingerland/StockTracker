@@ -14,9 +14,7 @@ def main(payload: str) -> str:
     days_to_update = payload[1]
 
     # setup dates
-    transactions = sorted(
-        transactions["transactions"], key=lambda k: k["date"]
-    )
+    transactions = sorted(transactions["transactions"], key=lambda k: k["date"])
 
     end_date = date.today()
     if days_to_update == "all":
@@ -36,16 +34,14 @@ def get_transactions_by_day(transactions, daterange):
     """Get transactions by day"""
     logging.info("Getting transactions by day")
 
-    temp_list = []
+    output_list = []
     # loop through dates
     for single_date in daterange:
         logging.debug(f"Getting transactions for {single_date}")
         single_date = single_date.strftime("%Y-%m-%d")
-        filterd_stocks_held = [
-            d for d in transactions if d["date"] <= single_date
-        ]
-        # create object
+        filterd_stocks_held = [d for d in transactions if d["date"] <= single_date]
 
+        # create object
         for filterd_stock_held in filterd_stocks_held:
             temp_object = {
                 "date": single_date,
@@ -56,10 +52,10 @@ def get_transactions_by_day(transactions, daterange):
                 "transaction_cost": filterd_stock_held["transaction_cost"],
                 "currency": filterd_stock_held["currency"],
             }
-            temp_list.append(temp_object)
+            output_list.append(temp_object)
 
     # return dictionary
-    stocks_held = {"stocks_held": temp_list}
+    stocks_held = {"stocks_held": output_list}
     return stocks_held
 
 
@@ -77,22 +73,19 @@ def calculate_sells_and_buys(stocks_held, daterange):
         symbols_sells = []
 
         single_date = single_date.strftime("%Y-%m-%d")
-        date_stocks_held = [
-            d for d in stocks_held["stocks_held"] if d["date"] == single_date
-        ]
         date_stocks_held_buys = [
-            d for d in date_stocks_held if d["transaction_type"] == "Buy"
+            d
+            for d in stocks_held["stocks_held"]
+            if d["date"] == single_date and d["transaction_type"] == "Buy"
         ]
         date_stocks_held_sells = [
-            d for d in date_stocks_held if d["transaction_type"] == "Sell"
+            d
+            for d in stocks_held["stocks_held"]
+            if d["date"] == single_date and d["transaction_type"] == "Sell"
         ]
 
-        for temp_loop in date_stocks_held_buys:
-            symbols_buys.append(temp_loop["symbol"])
-            symbols_buys = list(dict.fromkeys(symbols_buys))
-        for temp_loop in date_stocks_held_sells:
-            symbols_sells.append(temp_loop["symbol"])
-            symbols_sells = list(dict.fromkeys(symbols_sells))
+        symbols_buys = get_unique_items(date_stocks_held_buys, "symbol")
+        symbols_sells = get_unique_items(date_stocks_held_sells, "symbol")
 
         for symbol_buys in symbols_buys:
             date_stock_held_buys = [
@@ -100,18 +93,9 @@ def calculate_sells_and_buys(stocks_held, daterange):
             ]
             if not date_stock_held_buys:
                 continue
-            temp_object = {
-                "date": single_date,
-                "symbol": symbol_buys,
-                "average_cost": sum(d["cost"] for d in date_stock_held_buys)
-                / sum(d["quantity"] for d in date_stock_held_buys),
-                "quantity": sum(d["quantity"] for d in date_stock_held_buys),
-                "transaction_type": "Buy",
-                "transaction_cost": sum(
-                    d["transaction_cost"] for d in date_stock_held_buys
-                ),
-                "currency": date_stock_held_buys[0]["currency"],
-            }
+            temp_object = create_buys_and_sells_object(
+                single_date, symbol_buys, date_stock_held_buys, "Buy"
+            )
             output_list.append(temp_object)
 
         for symbol_sells in symbols_sells:
@@ -120,18 +104,9 @@ def calculate_sells_and_buys(stocks_held, daterange):
             ]
             if not date_stock_held_sells:
                 continue
-            temp_object = {
-                "date": single_date,
-                "symbol": symbol_sells,
-                "average_cost": sum(d["cost"] for d in date_stock_held_sells)
-                / sum(d["quantity"] for d in date_stock_held_sells),
-                "quantity": sum(d["quantity"] for d in date_stock_held_sells),
-                "transaction_type": "Sell",
-                "transaction_cost": sum(
-                    d["transaction_cost"] for d in date_stock_held_sells
-                ),
-                "currency": date_stock_held_sells[0]["currency"],
-            }
+            temp_object = create_buys_and_sells_object(
+                single_date, symbol_sells, date_stock_held_sells, "Sell"
+            )
             output_list.append(temp_object)
 
     return output_list
@@ -141,7 +116,7 @@ def merge_sells_and_buys_new(stocks_held, daterange):
     """Loop through buys and sells and merge them together"""
     logging.info("Merging sells and buys")
 
-    temp_list = []
+    output_list = []
     for single_date in daterange:
         logging.debug(f"Merging sells and buys for {single_date}")
 
@@ -152,9 +127,7 @@ def merge_sells_and_buys_new(stocks_held, daterange):
         date_stocks_held = [d for d in stocks_held if d["date"] == single_date]
 
         # get symbols
-        for temp_loop in date_stocks_held:
-            symbols.append(temp_loop["symbol"])
-            symbols = list(dict.fromkeys(symbols))
+        symbols = get_unique_items(date_stocks_held, "symbol")
 
         # loop through symbols
         for symbol in symbols:
@@ -164,35 +137,86 @@ def merge_sells_and_buys_new(stocks_held, daterange):
                 len(single_stock_list) == 1
                 and single_stock_list[0]["transaction_type"] == "Buy"
             ):
-                temp_object = {
-                    "id": str(uuid.uuid4()),
-                    "date": single_date,
-                    "symbol": symbol,
-                    "average_cost": single_stock_list[0]["average_cost"],
-                    "total_cost": single_stock_list[0]["average_cost"]
-                    * single_stock_list[0]["quantity"],
-                    "quantity": single_stock_list[0]["quantity"],
-                    "transaction_cost": single_stock_list[0]["transaction_cost"],
-                    "currency": single_stock_list[0]["currency"],
-                }
-                temp_list.append(temp_object)
+                temp_object = create_merged_stock_object(
+                    single_date, symbol, single_stock_list, "Buy"
+                )
             elif len(single_stock_list) == 2:
                 single_stock_list = sorted(
                     single_stock_list, key=lambda k: k["transaction_type"]
                 )
-                temp_object = {
-                    "id": str(uuid.uuid4()),
-                    "date": single_date,
-                    "symbol": symbol,
-                    "average_cost": single_stock_list[0]["average_cost"],
-                    "total_cost": single_stock_list[0]["average_cost"]
-                    * single_stock_list[0]["quantity"],
-                    "quantity": single_stock_list[0]["quantity"]
-                    - single_stock_list[1]["quantity"],
-                    "transaction_cost": single_stock_list[0]["transaction_cost"]
-                    + single_stock_list[1]["transaction_cost"],
-                    "currency": single_stock_list[0]["currency"],
-                }
-                if temp_object["quantity"] > 0:
-                    temp_list.append(temp_object)
-    return {"stocks_held": temp_list}
+                temp_object = create_merged_stock_object(
+                    single_date, symbol, single_stock_list, "Sell_and_Buy"
+                )
+            else:
+                continue
+            if temp_object["quantity"] > 0:
+                output_list.append(temp_object)
+    return {"stocks_held": output_list}
+
+
+def create_buys_and_sells_object(
+    single_date, symbol, date_stock_held, transaction_type
+):
+    """Create object for buys and sells"""
+    return {
+        "date": single_date,
+        "symbol": symbol,
+        "average_cost": sum(d["cost"] for d in date_stock_held)
+        / sum(d["quantity"] for d in date_stock_held),
+        "quantity": sum(d["quantity"] for d in date_stock_held),
+        "transaction_type": transaction_type,
+        "transaction_cost": sum(d["transaction_cost"] for d in date_stock_held),
+        "currency": date_stock_held[0]["currency"],
+    }
+
+
+def create_merged_stock_object(
+    single_date, symbol, single_stock_list, transaction_type
+):
+    """Create object for merged stocks"""
+    output_object = {
+        "id": str(uuid.uuid4()),
+        "date": single_date,
+        "symbol": symbol,
+        "average_cost": single_stock_list[0]["average_cost"],
+        "currency": single_stock_list[0]["currency"],
+    }
+    if transaction_type == "Buy":
+        output_object.update({"quantity": single_stock_list[0]["quantity"]})
+        output_object.update(
+            {"transaction_cost": single_stock_list[0]["transaction_cost"]}
+        )
+        output_object.update(
+            {
+                "total_cost": single_stock_list[0]["average_cost"]
+                * single_stock_list[0]["quantity"],
+            }
+        )
+    if transaction_type == "Sell_and_Buy":
+        output_object.update(
+            {
+                "quantity": single_stock_list[0]["quantity"]
+                - single_stock_list[1]["quantity"],
+            }
+        )
+        output_object.update(
+            {
+                "transaction_cost": single_stock_list[0]["transaction_cost"]
+                + single_stock_list[1]["transaction_cost"],
+            }
+        )
+        output_object.update(
+            {
+                "total_cost": single_stock_list[0]["average_cost"]
+                * (single_stock_list[0]["quantity"] - single_stock_list[1]["quantity"]),
+            }
+        )
+    return output_object
+
+
+def get_unique_items(items, key_to_filter):
+    """Get unique items from list of dictionaries by key"""
+    output_list = []
+    for item in items:
+        output_list.append(item[key_to_filter])
+    return list(dict.fromkeys(output_list))
