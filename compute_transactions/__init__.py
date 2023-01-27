@@ -26,8 +26,7 @@ def main(payload: str) -> str:
 
     stocks_held = get_transactions_by_day(transactions, daterange)
     stocks_held = calculate_sells_and_buys(stocks_held, daterange)
-    stocks_held = merge_sells_and_buys_new(stocks_held, daterange)
-    # stocks_held = merge_sells_and_buys(stocks_held)
+    stocks_held = merge_sells_and_buys(stocks_held, daterange)
     return stocks_held
 
 
@@ -105,7 +104,7 @@ def calculate_sells_and_buys(stocks_held, daterange):
     return output_list
 
 
-def merge_sells_and_buys_new(stocks_held, daterange):
+def merge_sells_and_buys(stocks_held, daterange):
     """Loop through buys and sells and merge them together"""
     logging.info("Merging sells and buys")
 
