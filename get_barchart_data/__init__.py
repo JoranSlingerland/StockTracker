@@ -8,7 +8,7 @@ from datetime import date, timedelta
 import azure.functions as func
 import pandas
 
-from shared_code import cosmosdb_module, date_time_helper
+from shared_code import cosmosdb_module, date_time_helper, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -75,10 +75,7 @@ def get_max_data(items, start_date, end_date, datatype):
     """Get max data"""
     quarters = date_time_helper.get_quarters(start_date, end_date)
     result = []
-    all_symbols = []
-    for temp_loop in items:
-        all_symbols.append(temp_loop["symbol"])
-        all_symbols = list(dict.fromkeys(all_symbols))
+    all_symbols = utils.get_unique_items(items, "symbol")
 
     for quarter in quarters:
         (
@@ -97,10 +94,7 @@ def get_max_data(items, start_date, end_date, datatype):
                 quarter_stocks_held.append(single_date_object)
 
         # get unique stocks
-        symbols = []
-        for temp_loop in quarter_stocks_held:
-            symbols.append(temp_loop["symbol"])
-            symbols = list(dict.fromkeys(symbols))
+        symbols = utils.get_unique_items(quarter_stocks_held, "symbol")
 
         for symbol in all_symbols:
             single_stock_data = [
@@ -139,10 +133,8 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
     """Get year and ytd data"""
     result = []
     months = date_time_helper.get_months(start_date, end_date)
-    all_symbols = []
-    for temp_loop in items:
-        all_symbols.append(temp_loop["symbol"])
-        all_symbols = list(dict.fromkeys(all_symbols))
+    all_symbols = utils.get_unique_items(items, "symbol")
+
     for month in months:
         month_start_date = month.replace(day=1)
         month_start_date = month_start_date.strftime("%Y-%m-%d")
@@ -159,10 +151,7 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
                 month_stocks_held.append(single_date_object)
 
         # get unique stocks
-        symbols = []
-        for temp_loop in month_stocks_held:
-            symbols.append(temp_loop["symbol"])
-            symbols = list(dict.fromkeys(symbols))
+        symbols = utils.get_unique_items(month_stocks_held, "symbol")
 
         for symbol in all_symbols:
             single_stock_data = [d for d in month_stocks_held if d["symbol"] == symbol]
@@ -200,10 +189,8 @@ def get_month_week_data(items, start_date, end_date, datatype):
     # get data by week
     weeks = date_time_helper.get_weeks(start_date, end_date)
     result = []
-    all_symbols = []
-    for temp_loop in items:
-        all_symbols.append(temp_loop["symbol"])
-        all_symbols = list(dict.fromkeys(all_symbols))
+    all_symbols = utils.get_unique_items(items, "symbol")
+
     for week in weeks:
         week_start_date = week - timedelta(days=week.weekday())
         week_start_date = week_start_date.strftime("%Y-%m-%d")
@@ -220,10 +207,7 @@ def get_month_week_data(items, start_date, end_date, datatype):
                 week_stocks_held.append(single_date_object)
 
         # get unique stocks
-        symbols = []
-        for temp_loop in week_stocks_held:
-            symbols.append(temp_loop["symbol"])
-            symbols = list(dict.fromkeys(symbols))
+        symbols = utils.get_unique_items(week_stocks_held, "symbol")
 
         for symbol in all_symbols:
             single_stock_data = [d for d in week_stocks_held if d["symbol"] == symbol]

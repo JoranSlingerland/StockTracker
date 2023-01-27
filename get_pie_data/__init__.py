@@ -7,7 +7,7 @@ import json
 
 import azure.functions as func
 from colorhash import ColorHash
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, utils
 
 
 def inputoptions(datatype, row):
@@ -42,13 +42,10 @@ def remove_duplicates(datatype, input_list):
     if datatype == "stocks":
         return input_list
     if datatype == "currency":
-        currencies = []
         output_list = []
 
         # get unique currencies
-        for temp_loop in input_list:
-            currencies.append(temp_loop["type"])
-            currencies = list(dict.fromkeys(currencies))
+        currencies = utils.get_unique_items(input_list, "type")
 
         # loop through currencies and add to temp_list
         for currency in currencies:
@@ -60,13 +57,10 @@ def remove_duplicates(datatype, input_list):
             output_list.append(temp_object)
         return output_list
     if datatype == "country":
-        countries = []
         output_list = []
 
         # get unique countries
-        for temp_loop in input_list:
-            countries.append(temp_loop["type"])
-            countries = list(dict.fromkeys(countries))
+        countries = utils.get_unique_items(input_list, "type")
 
         # loop through countries and add to temp_list
         for country in countries:
@@ -78,13 +72,10 @@ def remove_duplicates(datatype, input_list):
             output_list.append(temp_object)
         return output_list
     if datatype == "sector":
-        sectors = []
         output_list = []
 
         # get unique sectors
-        for temp_loop in input_list:
-            sectors.append(temp_loop["type"])
-            sectors = list(dict.fromkeys(sectors))
+        sectors = utils.get_unique_items(input_list, "type")
 
         # loop through sectors and add to temp_list
         for sector in sectors:

@@ -5,6 +5,7 @@ import logging
 from datetime import date, timedelta
 import uuid
 import pandas
+from shared_code import utils
 
 
 def main(payload: str) -> str:
@@ -84,8 +85,8 @@ def calculate_sells_and_buys(stocks_held, daterange):
             if d["date"] == single_date and d["transaction_type"] == "Sell"
         ]
 
-        symbols_buys = get_unique_items(date_stocks_held_buys, "symbol")
-        symbols_sells = get_unique_items(date_stocks_held_sells, "symbol")
+        symbols_buys = utils.get_unique_items(date_stocks_held_buys, "symbol")
+        symbols_sells = utils.get_unique_items(date_stocks_held_sells, "symbol")
 
         for symbol_buys in symbols_buys:
             date_stock_held_buys = [
@@ -127,7 +128,7 @@ def merge_sells_and_buys_new(stocks_held, daterange):
         date_stocks_held = [d for d in stocks_held if d["date"] == single_date]
 
         # get symbols
-        symbols = get_unique_items(date_stocks_held, "symbol")
+        symbols = utils.get_unique_items(date_stocks_held, "symbol")
 
         # loop through symbols
         for symbol in symbols:
@@ -212,11 +213,3 @@ def create_merged_stock_object(
             }
         )
     return output_object
-
-
-def get_unique_items(items, key_to_filter):
-    """Get unique items from list of dictionaries by key"""
-    output_list = []
-    for item in items:
-        output_list.append(item[key_to_filter])
-    return list(dict.fromkeys(output_list))

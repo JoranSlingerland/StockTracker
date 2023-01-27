@@ -7,6 +7,7 @@ from datetime import date
 import pandas
 import azure.functions as func
 import azure.durable_functions as df
+from shared_code import utils
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
@@ -14,22 +15,17 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Getting dividend data")
 
     # initialize variables
-    symbols = []
     query = "TIME_SERIES_WEEKLY_ADJUSTED"
     output_list = []
     transactions = context.get_input()
 
-    transactions = sorted(
-        transactions["transactions"], key=lambda k: k["date"]
-    )
+    transactions = sorted(transactions["transactions"], key=lambda k: k["date"])
     end_date = date.today()
     start_date = transactions[0]["date"]
     daterange = pandas.date_range(start_date, end_date)
 
     # get unique symbols
-    for temp_loop in transactions:
-        symbols.append(temp_loop["symbol"])
-        symbols = list(dict.fromkeys(symbols))
+    symbols = utils.get_unique_items(transactions, "symbol")
 
     # get data for all symbols
     for symbol in symbols:

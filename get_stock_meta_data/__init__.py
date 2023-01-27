@@ -2,7 +2,7 @@
 
 import logging
 import requests
-from shared_code import get_config
+from shared_code import get_config, utils
 
 
 def call_clearbit_api(url: str, clearbit_api_key: str) -> dict:
@@ -21,15 +21,12 @@ def main(payload: str) -> str:
     logging.info("Getting stock meta data")
 
     # initialize variables
-    symbols = []
     stock_meta_data = {}
     transactions = payload[0]
     clearbit_api_key = get_config.get_clearbit_api_key()
 
     # get unique symbols and domains
-    for temp_loop in transactions["transactions"]:
-        symbols.append(temp_loop["symbol"])
-        symbols = list(dict.fromkeys(symbols))
+    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
     # iterate over list in increments of 2
     for symbol in symbols:

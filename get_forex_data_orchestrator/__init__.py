@@ -2,10 +2,11 @@
 # pylint: disable=line-too-long
 
 import logging
-import json
 
 import azure.functions as func
 import azure.durable_functions as df
+
+from shared_code import utils
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
@@ -15,15 +16,12 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     transactions = context.get_input()
 
     # initialize variables
-    currencies = []
     query = "FX_DAILY"
     forex_data = {}
     base_currency = "EUR"
 
     # get unique currencies
-    for temp_loop in transactions["transactions"]:
-        currencies.append(temp_loop["currency"])
-        currencies = list(dict.fromkeys(currencies))
+    currencies = utils.get_unique_items(transactions["transactions"], "currency")
 
     # get data for all currencies
     for currency in currencies:

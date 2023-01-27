@@ -6,6 +6,7 @@ import logging
 
 import azure.durable_functions as df
 import azure.functions as func
+from shared_code import utils
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
@@ -13,15 +14,12 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Getting stock data")
 
     # initialize variables
-    symbols = []
     query = "TIME_SERIES_DAILY_ADJUSTED"
     stock_data = {}
     transactions = context.get_input()
 
     # get unique symbols
-    for temp_loop in transactions["transactions"]:
-        symbols.append(temp_loop["symbol"])
-        symbols = list(dict.fromkeys(symbols))
+    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
     # get data for all symbols
     for symbol in symbols:
