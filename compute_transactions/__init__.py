@@ -69,9 +69,6 @@ def calculate_sells_and_buys(stocks_held, daterange):
     # loop through dates
     for single_date in daterange:
         logging.debug(f"Calculating sells and buys for {single_date}")
-        # initialize variables
-        symbols_buys = []
-        symbols_sells = []
 
         single_date = single_date.strftime("%Y-%m-%d")
         date_stocks_held_buys = [
@@ -89,25 +86,20 @@ def calculate_sells_and_buys(stocks_held, daterange):
         symbols_sells = utils.get_unique_items(date_stocks_held_sells, "symbol")
 
         for symbol_buys in symbols_buys:
-            date_stock_held_buys = [
-                d for d in date_stocks_held_buys if d["symbol"] == symbol_buys
-            ]
-            if not date_stock_held_buys:
-                continue
             temp_object = create_buys_and_sells_object(
-                single_date, symbol_buys, date_stock_held_buys, "Buy"
+                single_date, symbol_buys, date_stocks_held_buys, "Buy"
             )
+            if not temp_object:
+                continue
+
             output_list.append(temp_object)
 
         for symbol_sells in symbols_sells:
-            date_stock_held_sells = [
-                d for d in date_stocks_held_sells if d["symbol"] == symbol_sells
-            ]
-            if not date_stock_held_sells:
-                continue
             temp_object = create_buys_and_sells_object(
-                single_date, symbol_sells, date_stock_held_sells, "Sell"
+                single_date, symbol_sells, date_stocks_held_sells, "Sell"
             )
+            if not temp_object:
+                continue
             output_list.append(temp_object)
 
     return output_list
@@ -156,9 +148,12 @@ def merge_sells_and_buys_new(stocks_held, daterange):
 
 
 def create_buys_and_sells_object(
-    single_date, symbol, date_stock_held, transaction_type
+    single_date, symbol, date_stocks_held, transaction_type
 ):
     """Create object for buys and sells"""
+    date_stock_held = [d for d in date_stocks_held if d["symbol"] == symbol]
+    if not date_stock_held:
+        return None
     return {
         "date": single_date,
         "symbol": symbol,
