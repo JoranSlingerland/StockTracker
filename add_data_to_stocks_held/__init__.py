@@ -4,6 +4,7 @@
 
 import logging
 from datetime import datetime, timedelta
+from shared_code import utils
 
 
 def main(payload: str) -> str:
@@ -19,10 +20,7 @@ def main(payload: str) -> str:
 
     output_list = []
     total_dividends = {}
-    symbols = []
-    for temp_loop in transactions["transactions"]:
-        symbols.append(temp_loop["symbol"])
-        symbols = list(dict.fromkeys(symbols))
+    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
     for symbol in symbols:
         total_dividends.update({symbol: 0.0})
