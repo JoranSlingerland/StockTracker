@@ -92,10 +92,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "total_pl": end_data_single_stock[0]["total_pl"]
                     - start_data_single_stock[0]["total_pl"],
                     "total_pl_percentage": (
-                        end_data_single_stock[0]["total_pl"]
-                        - start_data_single_stock[0]["total_pl"]
+                        end_data_single_stock[0]["total_value"]
+                        - start_data_single_stock[0]["total_value"]
                     )
-                    / start_data_single_stock[0]["total_pl"],
+                    / start_data_single_stock[0]["total_value"],
                     "total_dividends": end_data_single_stock[0]["total_dividends"]
                     - start_data_single_stock[0]["total_dividends"],
                     "logo": end_data_single_stock[0]["logo"],
