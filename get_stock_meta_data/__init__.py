@@ -43,7 +43,7 @@ def main(payload: str) -> str:
             "country": temp_data["geo"]["country"],
             "sector": temp_data["category"]["sector"],
             "domain": domain,
-            "logo": temp_data["logo"],
+            "logo": f"https://logo.uplead.com/{domain}",
         }
 
         stock_meta_data.update({symbol: temp_object})
