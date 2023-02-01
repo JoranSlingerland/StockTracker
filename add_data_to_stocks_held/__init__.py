@@ -2,8 +2,9 @@
 # pylint: disable=line-too-long
 # pylint: disable=too-many-locals
 
+from typing import Union
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from shared_code import utils
 
 
@@ -17,8 +18,9 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     stock_meta_data = payload[3]
     transactions = payload[4]
+    days_to_update = payload[5]
 
-    output_list = []
+    output = []
     total_dividends = {}
     symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
@@ -68,7 +70,7 @@ def main(payload: str) -> str:
                         ]
                     )
                     * forex_high
-                )
+                ) * stock["quantity"]
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 
@@ -79,13 +81,6 @@ def main(payload: str) -> str:
                         "low_value": stock_low * forex_high,
                         "close_value": stock_close * forex_high,
                         "total_value": stock_close * forex_high * stock["quantity"],
-                        "total_pl": (stock_close * forex_high * stock["quantity"])
-                        - (stock["average_cost"] * stock["quantity"]),
-                        "total_pl_percentage": (
-                            (stock_close * forex_high * stock["quantity"])
-                            - (stock["average_cost"] * stock["quantity"])
-                        )
-                        / (stock_close * forex_high * stock["quantity"]),
                         "dividend": single_day_dividend_data,
                         "total_dividends": total_dividends[stock["symbol"]],
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
@@ -98,11 +93,45 @@ def main(payload: str) -> str:
                         "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
                     }
                 )
+                stock.update(
+                    {
+                        "value_change": stock["total_value"] - stock["total_cost"],
+                        "value_change_percentage": (
+                            stock["total_value"] - stock["total_cost"]
+                        )
+                        / stock["total_cost"],
+                        "total_pl": stock["total_value"]
+                        - stock["total_cost"]
+                        + stock["total_dividends"]
+                        - stock["transaction_cost"],
+                        "total_pl_percentage": (
+                            stock["total_value"]
+                            - stock["total_cost"]
+                            + stock["total_dividends"]
+                            - stock["transaction_cost"]
+                        )
+                        / stock["total_cost"],
+                    }
+                )
                 break
             except KeyError:
                 days_to_substract += 1
                 logging.debug(
                     f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
                 )
-        output_list.append(stock)
-    return {"stocks_held": output_list}
+        output.append(stock)
+    output = filter_output(output, days_to_update)
+    return {"stocks_held": output}
+
+
+def filter_output(output: list, days_to_update: Union[int, str]) -> list:
+    """Filter output list"""
+    if days_to_update == "all":
+        return output
+
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days_to_update)
+
+    filtered_output = [d for d in output if date.fromisoformat(d["date"]) >= start_date]
+
+    return filtered_output

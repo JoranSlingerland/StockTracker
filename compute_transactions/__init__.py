@@ -2,7 +2,7 @@
 # pylint: disable=expression-not-assigned
 
 import logging
-from datetime import date, timedelta
+from datetime import date
 import uuid
 import pandas
 from shared_code import utils
@@ -12,16 +12,12 @@ def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
     transactions = payload[0]
-    days_to_update = payload[1]
 
     # setup dates
     transactions = sorted(transactions["transactions"], key=lambda k: k["date"])
 
     end_date = date.today()
-    if days_to_update == "all":
-        start_date = transactions[0]["date"]
-    else:
-        start_date = end_date - timedelta(days=days_to_update)
+    start_date = transactions[0]["date"]
     daterange = pandas.date_range(start_date, end_date)
 
     stocks_held = get_transactions_by_day(transactions, daterange)
@@ -177,33 +173,27 @@ def create_merged_stock_object(
         "currency": single_stock_list[0]["currency"],
     }
     if transaction_type == "Buy":
-        output_object.update({"quantity": single_stock_list[0]["quantity"]})
         output_object.update(
-            {"transaction_cost": single_stock_list[0]["transaction_cost"]}
-        )
-        output_object.update(
+            {"quantity": single_stock_list[0]["quantity"]},
+            {"transaction_cost": single_stock_list[0]["transaction_cost"]},
             {
                 "total_cost": single_stock_list[0]["average_cost"]
                 * single_stock_list[0]["quantity"],
-            }
+            },
         )
     if transaction_type == "Sell_and_Buy":
         output_object.update(
             {
                 "quantity": single_stock_list[0]["quantity"]
                 - single_stock_list[1]["quantity"],
-            }
-        )
-        output_object.update(
+            },
             {
                 "transaction_cost": single_stock_list[0]["transaction_cost"]
                 + single_stock_list[1]["transaction_cost"],
-            }
-        )
-        output_object.update(
+            },
             {
                 "total_cost": single_stock_list[0]["average_cost"]
                 * (single_stock_list[0]["quantity"] - single_stock_list[1]["quantity"]),
-            }
+            },
         )
     return output_object
