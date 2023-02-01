@@ -81,13 +81,6 @@ def main(payload: str) -> str:
                         "low_value": stock_low * forex_high,
                         "close_value": stock_close * forex_high,
                         "total_value": stock_close * forex_high * stock["quantity"],
-                        "total_pl": (stock_close * forex_high * stock["quantity"])
-                        - (stock["average_cost"] * stock["quantity"]),
-                        "total_pl_percentage": (
-                            (stock_close * forex_high * stock["quantity"])
-                            - (stock["average_cost"] * stock["quantity"])
-                        )
-                        / (stock_close * forex_high * stock["quantity"]),
                         "dividend": single_day_dividend_data,
                         "total_dividends": total_dividends[stock["symbol"]],
                         "name": stock_meta_data[f"{stock['symbol']}"]["name"],
@@ -98,6 +91,26 @@ def main(payload: str) -> str:
                         "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
                         "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
                         "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
+                    }
+                )
+                stock.update(
+                    {
+                        "value_change": stock["total_value"] - stock["total_cost"],
+                        "value_change_percentage": (
+                            stock["total_value"] - stock["total_cost"]
+                        )
+                        / stock["total_cost"],
+                        "total_pl": stock["total_value"]
+                        - stock["total_cost"]
+                        + stock["total_dividends"]
+                        - stock["transaction_cost"],
+                        "total_pl_percentage": (
+                            stock["total_value"]
+                            - stock["total_cost"]
+                            + stock["total_dividends"]
+                            - stock["transaction_cost"]
+                        )
+                        / stock["total_cost"],
                     }
                 )
                 break
