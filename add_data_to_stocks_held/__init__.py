@@ -2,8 +2,9 @@
 # pylint: disable=line-too-long
 # pylint: disable=too-many-locals
 
+from typing import Union
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from shared_code import utils
 
 
@@ -17,8 +18,9 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     stock_meta_data = payload[3]
     transactions = payload[4]
+    days_to_update = payload[5]
 
-    output_list = []
+    output = []
     total_dividends = {}
     symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
@@ -104,5 +106,19 @@ def main(payload: str) -> str:
                 logging.debug(
                     f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
                 )
-        output_list.append(stock)
-    return {"stocks_held": output_list}
+        output.append(stock)
+    output = filter_output(output, days_to_update)
+    return {"stocks_held": output}
+
+
+def filter_output(output: list, days_to_update: Union[int, str]) -> list:
+    """Filter output list"""
+    if days_to_update == "all":
+        return output
+
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days_to_update)
+
+    filtered_output = [d for d in output if date.fromisoformat(d["date"]) >= start_date]
+
+    return filtered_output
