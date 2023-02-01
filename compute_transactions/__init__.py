@@ -173,33 +173,27 @@ def create_merged_stock_object(
         "currency": single_stock_list[0]["currency"],
     }
     if transaction_type == "Buy":
-        output_object.update({"quantity": single_stock_list[0]["quantity"]})
         output_object.update(
-            {"transaction_cost": single_stock_list[0]["transaction_cost"]}
-        )
-        output_object.update(
+            {"quantity": single_stock_list[0]["quantity"]},
+            {"transaction_cost": single_stock_list[0]["transaction_cost"]},
             {
                 "total_cost": single_stock_list[0]["average_cost"]
                 * single_stock_list[0]["quantity"],
-            }
+            },
         )
     if transaction_type == "Sell_and_Buy":
         output_object.update(
             {
                 "quantity": single_stock_list[0]["quantity"]
                 - single_stock_list[1]["quantity"],
-            }
-        )
-        output_object.update(
+            },
             {
                 "transaction_cost": single_stock_list[0]["transaction_cost"]
                 + single_stock_list[1]["transaction_cost"],
-            }
-        )
-        output_object.update(
+            },
             {
                 "total_cost": single_stock_list[0]["average_cost"]
                 * (single_stock_list[0]["quantity"] - single_stock_list[1]["quantity"]),
-            }
+            },
         )
     return output_object
