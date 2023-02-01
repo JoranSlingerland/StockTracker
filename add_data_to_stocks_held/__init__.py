@@ -68,7 +68,7 @@ def main(payload: str) -> str:
                         ]
                     )
                     * forex_high
-                )
+                ) * stock["quantity"]
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 
