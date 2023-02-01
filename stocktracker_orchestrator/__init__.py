@@ -63,13 +63,13 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 4 - Compute transactions
     logging.info("Step 4: Computing transactions")
     stock_held = yield context.call_activity(
-        "compute_transactions", [transactions, days_to_update]
+        "compute_transactions", [transactions]
     )
 
     # step 5 - Get invested data
     logging.info("Step 5: Get invested data")
     invested = yield context.call_activity(
-        "get_invested_data", [transactions, days_to_update]
+        "get_invested_data", [transactions]
     )
 
     # step 6 - add stock_data to stock_held
@@ -82,6 +82,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             forex_data,
             stock_meta_data,
             transactions,
+            days_to_update,
         ],
     )
 
@@ -107,6 +108,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             "output_to_cosmosdb", [container_name, items]
         )
 
+    logging.info("Step 10: Returning result")
     return result
 
 

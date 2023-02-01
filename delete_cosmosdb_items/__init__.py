@@ -81,29 +81,3 @@ def drop_selected_dates(containers, days_to_update):
         id=single_day_container_setup[0]["container_name"],
         partition_key=PartitionKey(path=single_day_container_setup[0]["partition_key"]),
     )
-
-
-def create_items(data):
-    """Function to create items"""
-    logging.info("Creating items")
-    stocks_held = data["stocks_held"]
-    totals = data["totals"]
-    invested = data["invested"]
-
-    container = cosmosdb_module.cosmosdb_container("stocks_held")
-    for item in stocks_held:
-        container.upsert_item(item)
-
-    container = cosmosdb_module.cosmosdb_container("totals")
-    for item in totals:
-        container.upsert_item(item)
-
-    container = cosmosdb_module.cosmosdb_container("invested")
-    for item in invested:
-        container.upsert_item(item)
-
-    today = date.today().strftime("%Y-%m-%d")
-    single_day_stocks = [d for d in stocks_held if d["date"] == today]
-    container = cosmosdb_module.cosmosdb_container("single_day")
-    for item in single_day_stocks:
-        container.upsert_item(item)

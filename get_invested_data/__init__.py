@@ -1,7 +1,7 @@
 """Calculate invested data"""
 
 import logging
-from datetime import date, timedelta
+from datetime import date
 import json
 import uuid
 import pandas
@@ -11,18 +11,12 @@ def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
     transactions = payload[0]
-    days_to_update = payload[1]
 
-    transactions_dates = sorted(
-        transactions["transactions"], key=lambda k: k["date"]
-    )
+    transactions_dates = sorted(transactions["transactions"], key=lambda k: k["date"])
 
     # grab dates
     end_date = date.today()
-    if days_to_update == "all":
-        start_date = transactions_dates[0]["date"]
-    else:
-        start_date = end_date - timedelta(days=days_to_update)
+    start_date = transactions_dates[0]["date"]
     daterange = pandas.date_range(start_date, end_date)
 
     invested = get_invested_day_by_day(transactions, daterange)
