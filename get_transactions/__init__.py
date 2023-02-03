@@ -14,7 +14,7 @@ def main(payload: str) -> str:
 
     transactions_container = cosmosdb_module.cosmosdb_container("input_transactions")
     transactions_list = list(transactions_container.read_all_items())
-    #pop keys to pop
+    # pop keys to pop
     for key_to_pop in keys_to_pop:
         [d.pop(key_to_pop, None) for d in transactions_list]
 
@@ -24,6 +24,8 @@ def main(payload: str) -> str:
     for key_to_pop in keys_to_pop:
         [d.pop(key_to_pop, None) for d in invested_list]
 
+    transactions_list.sort(key=lambda x: x["date"])
+    invested_list.sort(key=lambda x: x["date"])
 
     invested = {"transactions": transactions_list, "invested": invested_list}
 
