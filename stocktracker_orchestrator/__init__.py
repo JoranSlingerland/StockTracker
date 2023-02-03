@@ -55,22 +55,18 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     stock_meta_data = yield context.call_activity("get_stock_meta_data", [transactions])
 
     # Step 3 - Rebuild the transactions object
-    # logging.info("Step 3: Rebuilding transactions")
-    # transactions = yield context.call_activity(
-    #     "rebuild_transactions", [transactions, forex_data]
-    # )
+    logging.info("Step 3: Get transactions by day")
+    transactions_by_day = yield context.call_activity(
+        "get_transactions_by_day", [transactions, forex_data]
+    )
 
     # step 4 - Compute transactions
     logging.info("Step 4: Computing transactions")
-    stock_held = yield context.call_activity(
-        "compute_transactions", [transactions]
-    )
+    stock_held = yield context.call_activity("compute_transactions", [transactions])
 
     # step 5 - Get invested data
     logging.info("Step 5: Get invested data")
-    invested = yield context.call_activity(
-        "get_invested_data", [transactions]
-    )
+    invested = yield context.call_activity("get_invested_data", [transactions])
 
     # step 6 - add stock_data to stock_held
     logging.info("Step 6: Add data to stocks held")
