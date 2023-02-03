@@ -1,4 +1,5 @@
 """Function will rebuild the transactions object"""
+# pylint: disable=inconsistent-return-statements
 
 import logging
 import json
@@ -97,8 +98,8 @@ def calculate_realized_and_unrealized(single_day_transactions):
     if len(buys) > 0 and len(sells) == 0:
         return {"unrealized": single_day_transactions, "realized": []}
     if len(buys) > 0 and len(sells) > 0:
-        total_sells = sum([d["quantity"] for d in sells])
-        total_buys = sum([d["quantity"] for d in buys])
+        total_sells = sum(d["quantity"] for d in sells)
+        total_buys = sum(d["quantity"] for d in buys)
         if total_sells >= total_buys:
             return {"unrealized": [], "realized": single_day_transactions}
         if total_sells < total_buys:

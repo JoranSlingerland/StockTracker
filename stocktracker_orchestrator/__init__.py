@@ -56,9 +56,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # Step 3 - Rebuild the transactions object
     logging.info("Step 3: Get transactions by day")
-    transactions_by_day = yield context.call_activity(
-        "get_transactions_by_day", [transactions, forex_data]
-    )
+    # transactions_by_day = yield context.call_activity(
+    #     "get_transactions_by_day", [transactions, forex_data]
+    # )
 
     # step 4 - Compute transactions
     logging.info("Step 4: Computing transactions")
