@@ -15,6 +15,7 @@ def main(payload: str) -> str:
 
     # get input data
     transactions = payload[0]["transactions"]
+    invested = payload[0]["invested"]
     forex_data = payload[1]
 
     end_date = date.today()
@@ -25,7 +26,10 @@ def main(payload: str) -> str:
     transactions = add_data(transactions, forex_data)
     transactions = get_day_by_day_transactions(transactions, daterange)
 
-    return transactions
+    invested = add_data_invested(invested)
+    invested = get_day_by_day_invested(invested, daterange)
+
+    return {"transactions": transactions, "invested": invested}
 
 
 def add_data(transactions, forex_data):
@@ -54,6 +58,7 @@ def add_data(transactions, forex_data):
             except KeyError:
                 days_to_substract += 1
         transaction.pop("date")
+        transaction.pop("id")
         output.append(transaction)
     return output
 
@@ -120,24 +125,50 @@ def calculate_realized_and_unrealized(single_day_transactions):
                             "cost": buy["cost"] + total_sells * buy["cost_per_share"],
                         }
                     )
-                    static_buys.append(buy)
+                    realized.append(buy)
+                    buy = copy.deepcopy(buy)
                     buy.update(
                         {
                             "quantity": abs(total_sells),
                             "cost": abs(total_sells) * buy["cost_per_share"],
                         }
                     )
-                    realized.append(buy)
+                    static_buys.append(buy)
                     break
 
             realized.extend(sells)
             return {"unrealized": static_buys, "realized": realized}
 
 
-def add_date(transactions, single_date):
+def add_date(items, single_date):
     """Add date to transactions"""
     output = []
-    for transaction in transactions:
-        transaction.update({"date": single_date})
-        output.append(transaction)
+    for item in items:
+        item.update({"date": single_date})
+        output.append(item)
+    return output
+
+
+def add_data_invested(invested):
+    """Add data to invested"""
+    output = []
+    for invest in invested:
+        invest.update({"transaction_date": invest["date"]})
+        invest.pop("date")
+        invest.pop("id")
+        output.append(invest)
+    return output
+
+
+def get_day_by_day_invested(invested: list, daterange):
+    """Get day by day invested"""
+    output = []
+    for single_date in daterange:
+        single_date = single_date.strftime("%Y-%m-%d")
+        temp_invested = copy.deepcopy(invested)
+        invested_single_date = [
+            d for d in temp_invested if d["transaction_date"] <= single_date
+        ]
+        invested_single_date = add_date(invested_single_date, single_date)
+        output.extend(invested_single_date)
     return output
