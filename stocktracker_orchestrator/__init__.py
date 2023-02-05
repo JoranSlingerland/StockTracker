@@ -66,11 +66,13 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         "compute_transactions", [transactions, transactions_by_day]
     )
 
-    return stock_held
     # step 5 - Get invested data
     logging.info("Step 5: Get invested data")
-    invested = yield context.call_activity("get_invested_data", [transactions])
+    invested = yield context.call_activity(
+        "get_invested_data", [transactions, transactions_by_day]
+    )
 
+    return invested
     # step 6 - add stock_data to stock_held
     logging.info("Step 6: Add data to stocks held")
     data = yield context.call_activity(
