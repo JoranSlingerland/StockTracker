@@ -86,14 +86,14 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         ],
     )
 
-    return data
-
     # step 7 - Calulate totals
     logging.info("Step 7: Calculate totals")
     data = yield context.call_activity(
         "calculate_totals",
         [data, invested, transactions, days_to_update],
     )
+
+    return data
 
     # step 8 recreate containers / remove items
     logging.info("Step 8: Delete cosmosdb items")
