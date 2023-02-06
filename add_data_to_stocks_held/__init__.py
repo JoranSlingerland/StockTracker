@@ -13,13 +13,92 @@ def main(payload: str) -> str:
     logging.info("Adding stock data to stocks held")
 
     # get data
-    stocks_held = payload[0]
+    stocks_held_realized = payload[0]["realized"]
+    stocks_held_unrealized = payload[0]["unrealized"]
     stock_data = payload[1]
     forex_data = payload[2]
     stock_meta_data = payload[3]
     transactions = payload[4]
     days_to_update = payload[5]
 
+    stocks_held_realized = update_realized(stocks_held_realized)
+    stocks_held_unrealized = update_unrealized(
+        transactions, stocks_held_unrealized, stock_data, forex_data
+    )
+
+    stocks_held_realized = add_stock_meta_data(stocks_held_realized, stock_meta_data)
+    stocks_held_unrealized = add_stock_meta_data(
+        stocks_held_unrealized, stock_meta_data
+    )
+
+    stocks_held_realized = filter_output(stocks_held_realized, days_to_update)
+    stocks_held_unrealized = filter_output(stocks_held_unrealized, days_to_update)
+
+    stocks = stocks_held_realized + stocks_held_unrealized
+
+    return stocks
+
+
+def filter_output(output: list, days_to_update: Union[int, str]) -> list:
+    """Filter output list"""
+    if days_to_update == "all":
+        return output
+
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days_to_update)
+
+    filtered_output = [d for d in output if date.fromisoformat(d["date"]) >= start_date]
+
+    return filtered_output
+
+
+def add_stock_meta_data(stock_data: list, stock_meta_data: dict) -> dict:
+    """Add stock meta data to stock data"""
+    output = []
+    for stock in stock_data:
+        stock.update(
+            {
+                "name": stock_meta_data[f"{stock['symbol']}"]["name"],
+                "description": stock_meta_data[f"{stock['symbol']}"]["description"],
+                "country": stock_meta_data[f"{stock['symbol']}"]["country"],
+                "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
+                "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
+                "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
+            }
+        )
+        output.append(stock)
+    return output
+
+
+def update_realized(stock_data: list) -> list:
+    """Update realized stock data"""
+    output = []
+    for stock in stock_data:
+        stock.update(
+            {
+                "value_change": stock["sell_price"] - stock["buy_price"],
+                "value_change_percentage": (
+                    stock["sell_price"] - stock["buy_price"] / stock["buy_price"]
+                ),
+                "total_pl": stock["sell_price"]
+                - stock["buy_price"]
+                - stock["transaction_cost"],
+                "total_pl_percentage": (
+                    stock["sell_price"]
+                    - stock["buy_price"]
+                    - stock["transaction_cost"] / stock["buy_price"]
+                ),
+                "realized": True,
+            }
+        )
+        output.append(stock)
+    return output
+
+
+def update_unrealized(
+    transactions: dict, stocks_held, stock_data: dict, forex_data: dict
+) -> list:
+    """Update unrealized stock data"""
     output = []
     total_dividends = {}
     symbols = utils.get_unique_items(transactions["transactions"], "symbol")
@@ -28,7 +107,7 @@ def main(payload: str) -> str:
         total_dividends.update({symbol: 0.0})
 
     # initialize variables
-    for stock in stocks_held["stocks_held"]:
+    for stock in stocks_held:
         days_to_substract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
         while True:
@@ -83,14 +162,7 @@ def main(payload: str) -> str:
                         "total_value": stock_close * forex_high * stock["quantity"],
                         "dividend": single_day_dividend_data,
                         "total_dividends": total_dividends[stock["symbol"]],
-                        "name": stock_meta_data[f"{stock['symbol']}"]["name"],
-                        "description": stock_meta_data[f"{stock['symbol']}"][
-                            "description"
-                        ],
-                        "country": stock_meta_data[f"{stock['symbol']}"]["country"],
-                        "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
-                        "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
-                        "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
+                        "realized": False,
                     }
                 )
                 stock.update(
@@ -120,18 +192,4 @@ def main(payload: str) -> str:
                     f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
                 )
         output.append(stock)
-    output = filter_output(output, days_to_update)
-    return {"stocks_held": output}
-
-
-def filter_output(output: list, days_to_update: Union[int, str]) -> list:
-    """Filter output list"""
-    if days_to_update == "all":
-        return output
-
-    end_date = date.today()
-    start_date = end_date - timedelta(days=days_to_update)
-
-    filtered_output = [d for d in output if date.fromisoformat(d["date"]) >= start_date]
-
-    return filtered_output
+    return output

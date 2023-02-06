@@ -72,7 +72,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         "get_invested_data", [transactions, transactions_by_day]
     )
 
-    return invested
     # step 6 - add stock_data to stock_held
     logging.info("Step 6: Add data to stocks held")
     data = yield context.call_activity(
@@ -86,6 +85,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             days_to_update,
         ],
     )
+
+    return data
 
     # step 7 - Calulate totals
     logging.info("Step 7: Calculate totals")
