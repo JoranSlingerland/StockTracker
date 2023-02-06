@@ -33,7 +33,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(f"Getting data for container {containername}")
 
     container = cosmosdb_module.cosmosdb_container(containername)
-    result = list(container.read_all_items())
+    if containername in [
+        "totals",
+        "single_day_totals",
+        "input_transactions",
+        "input_invested",
+    ]:
+        result = list(container.read_all_items())
+    else:
+        result = list(
+            container.query_items(
+                query="select * from c where c.realized = false",
+                enable_cross_partition_query=True,
+            )
+        )
 
     if containername in ("input_invested", "input_transactions"):
         # sort result by transaction_date

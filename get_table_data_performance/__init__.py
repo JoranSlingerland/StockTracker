@@ -29,7 +29,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     # get data for max
     if datatoget == "max":
         container = cosmosdb_module.cosmosdb_container("single_day")
-        result = list(container.read_all_items())
+        result = list(container.query_items(
+            query="SELECT * FROM c WHERE c.realized = false",
+            enable_cross_partition_query=True,
+        ))
 
     # get data for year, ytd, month, week
     if datatoget in ("year", "ytd", "month", "week"):
@@ -37,7 +40,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         start_date, end_date = date_time_helper.datatogetswitch(datatoget)
         start_data = list(
             container.query_items(
-                query="SELECT * FROM c WHERE c.date = @start_date",
+                query="SELECT * FROM c WHERE c.date = @start_date and c.realized = false",
                 parameters=[
                     {"name": "@start_date", "value": start_date},
                 ],
@@ -49,7 +52,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         while not end_data:
             end_data = list(
                 container.query_items(
-                    query="SELECT * FROM c WHERE c.date = @end_date",
+                    query="SELECT * FROM c WHERE c.date = @end_date and c.realized = false",
                     parameters=[
                         {"name": "@end_date", "value": end_date},
                     ],

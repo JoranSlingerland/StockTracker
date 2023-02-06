@@ -93,8 +93,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         [data, invested, transactions, days_to_update],
     )
 
-    return data
-
     # step 8 recreate containers / remove items
     logging.info("Step 8: Delete cosmosdb items")
     result = yield context.call_activity("delete_cosmosdb_items", days_to_update)

@@ -28,24 +28,43 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(f"Getting data for {datatype}")
     if datatype == "dividend":
         container = cosmosdb_module.cosmosdb_container("stocks_held")
+        if datatoget == "max":
+            items = list(
+                container.query_items(
+                    query="SELECT * FROM c WHERE c.realized = false",
+                    enable_cross_partition_query=True,
+                )
+            )
+        else:
+            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
+            items = list(
+                container.query_items(
+                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date and c.realized = false",
+                    parameters=[
+                        {"name": "@start_date", "value": start_date},
+                        {"name": "@end_date", "value": end_date},
+                    ],
+                    enable_cross_partition_query=True,
+                )
+            )
 
     if datatype == "transaction_cost":
         container = cosmosdb_module.cosmosdb_container("input_transactions")
-
-    if datatoget == "max":
-        items = list(container.read_all_items())
-    else:
-        start_date, end_date = date_time_helper.datatogetswitch(datatoget)
-        items = list(
-            container.query_items(
-                query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
-                parameters=[
-                    {"name": "@start_date", "value": start_date},
-                    {"name": "@end_date", "value": end_date},
-                ],
-                enable_cross_partition_query=True,
+        if datatoget == "max":
+            items = list(container.read_all_items())
+        else:
+            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
+            items = list(
+                container.query_items(
+                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
+                    parameters=[
+                        {"name": "@start_date", "value": start_date},
+                        {"name": "@end_date", "value": end_date},
+                    ],
+                    enable_cross_partition_query=True,
+                )
             )
-        )
+
     result = []
     if datatoget == "max":
         # get data by quarter
