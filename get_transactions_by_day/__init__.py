@@ -4,8 +4,7 @@
 import logging
 import json
 import copy
-from datetime import date, datetime, timedelta
-import pandas
+from datetime import datetime, timedelta
 from shared_code import utils
 
 
@@ -16,11 +15,8 @@ def main(payload: str) -> str:
     # get input data
     transactions = payload[0]["transactions"]
     invested = payload[0]["invested"]
+    daterange = payload[0]["daterange"]
     forex_data = payload[1]
-
-    end_date = date.today()
-    start_date = transactions[0]["date"]
-    daterange = pandas.date_range(start_date, end_date)
 
     # add data to transactions
     transactions = add_data(transactions, forex_data)
@@ -65,11 +61,9 @@ def add_data(transactions, forex_data):
 
 def get_day_by_day_transactions(transactions: list, daterange):
     """Get day by day transactions"""
-    # output = {"realized": [], "unrealized": []}
     realized = []
     unrealized = []
     for single_date in daterange:
-        single_date = single_date.strftime("%Y-%m-%d")
         temp_transactions = copy.deepcopy(transactions)
         transactions_single_date = [
             d for d in temp_transactions if d["transaction_date"] <= single_date
@@ -164,7 +158,6 @@ def get_day_by_day_invested(invested: list, daterange):
     """Get day by day invested"""
     output = []
     for single_date in daterange:
-        single_date = single_date.strftime("%Y-%m-%d")
         temp_invested = copy.deepcopy(invested)
         invested_single_date = [
             d for d in temp_invested if d["transaction_date"] <= single_date

@@ -16,10 +16,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # initialize variables
     query = "TIME_SERIES_DAILY_ADJUSTED"
     stock_data = {}
-    transactions = context.get_input()
-
-    # get unique symbols
-    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
+    symbols = context.get_input()["symbols"]
 
     # get data for all symbols
     for symbol in symbols:

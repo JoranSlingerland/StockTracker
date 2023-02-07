@@ -2,25 +2,16 @@
 # pylint: disable=expression-not-assigned
 
 import logging
-from datetime import date
 import uuid
-import pandas
 from shared_code import utils
 
 
 def main(payload: str) -> str:
     """Compute transactions"""
     logging.info("Computing transactions")
-    transactions = payload[0]
+    daterange = payload[0]["daterange"]
     realized = payload[1]["transactions"]["realized"]
     unrealized = payload[1]["transactions"]["unrealized"]
-
-    # setup dates
-    transactions = sorted(transactions["transactions"], key=lambda k: k["date"])
-
-    end_date = date.today()
-    start_date = transactions[0]["date"]
-    daterange = pandas.date_range(start_date, end_date)
 
     realized = calculate_sells_and_buys(realized, daterange)
     unrealized = calculate_sells_and_buys(unrealized, daterange)
@@ -39,7 +30,6 @@ def calculate_sells_and_buys(stocks_held, daterange):
     for single_date in daterange:
         logging.debug(f"Calculating sells and buys for {single_date}")
 
-        single_date = single_date.strftime("%Y-%m-%d")
         date_stocks_held_buys = [
             d
             for d in stocks_held
@@ -85,7 +75,6 @@ def merge_sells_and_buys(stocks_held, daterange, transaction_type):
         # initialize variables
         symbols = []
 
-        single_date = single_date.strftime("%Y-%m-%d")
         date_stocks_held = [d for d in stocks_held if d["date"] == single_date]
 
         # get symbols

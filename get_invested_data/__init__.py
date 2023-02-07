@@ -1,24 +1,15 @@
 """Calculate invested data"""
 
 import logging
-from datetime import date
 import json
 import uuid
-import pandas
 
 
 def main(payload: str) -> str:
     """Get the day by day invested data"""
     logging.info("Getting invested data")
-    transactions = payload[0]
+    daterange = payload[0]["daterange"]
     transactions_by_day = payload[1]["invested"]
-
-    transactions_dates = sorted(transactions["transactions"], key=lambda k: k["date"])
-
-    # grab dates
-    end_date = date.today()
-    start_date = transactions_dates[0]["date"]
-    daterange = pandas.date_range(start_date, end_date)
 
     invested = calculate_deposits_and_withdrawals(transactions_by_day, daterange)
     invested = merge_deposits_and_withdrawals(invested, daterange)
@@ -32,8 +23,6 @@ def calculate_deposits_and_withdrawals(invested, daterange):
     output_list = []
 
     for single_date in daterange:
-        single_date = single_date.strftime("%Y-%m-%d")
-
         # get deposits
         invested_single_date = [d for d in invested if d["date"] == single_date]
         deposits = [
@@ -69,8 +58,6 @@ def merge_deposits_and_withdrawals(invested, daterange):
     output_list = []
 
     for single_date in daterange:
-        single_date = single_date.strftime("%Y-%m-%d")
-
         # get deposits
         invested_single_date = [d for d in invested if d["date"] == single_date]
         if (
