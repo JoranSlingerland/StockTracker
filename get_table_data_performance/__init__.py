@@ -29,10 +29,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     # get data for max
     if datatoget == "max":
         container = cosmosdb_module.cosmosdb_container("single_day")
-        result = list(container.query_items(
-            query="SELECT * FROM c WHERE c.realized = false",
-            enable_cross_partition_query=True,
-        ))
+        result = list(
+            container.query_items(
+                query="SELECT * FROM c WHERE c.fully_realized = false",
+                enable_cross_partition_query=True,
+            )
+        )
 
     # get data for year, ytd, month, week
     if datatoget in ("year", "ytd", "month", "week"):
@@ -40,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         start_date, end_date = date_time_helper.datatogetswitch(datatoget)
         start_data = list(
             container.query_items(
-                query="SELECT * FROM c WHERE c.date = @start_date and c.realized = false",
+                query="SELECT * FROM c WHERE c.date = @start_date and c.fully_realized = false",
                 parameters=[
                     {"name": "@start_date", "value": start_date},
                 ],
@@ -52,7 +54,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         while not end_data:
             end_data = list(
                 container.query_items(
-                    query="SELECT * FROM c WHERE c.date = @end_date and c.realized = false",
+                    query="SELECT * FROM c WHERE c.date = @end_date and c.fully_realized = false",
                     parameters=[
                         {"name": "@end_date", "value": end_date},
                     ],
@@ -90,18 +92,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
                 temp_object = {
                     "symbol": end_date_symbol,
-                    "transaction_cost": end_data_single_stock[0]["transaction_cost"]
-                    - start_data_single_stock[0]["transaction_cost"],
-                    "total_pl": end_data_single_stock[0]["total_pl"]
-                    - start_data_single_stock[0]["total_pl"],
-                    "total_pl_percentage": (
-                        end_data_single_stock[0]["total_value"]
-                        - start_data_single_stock[0]["total_value"]
-                    )
-                    / start_data_single_stock[0]["total_value"],
-                    "total_dividends": end_data_single_stock[0]["total_dividends"]
-                    - start_data_single_stock[0]["total_dividends"],
-                    "logo": end_data_single_stock[0]["logo"],
+                    "realized": {
+                        "transaction_cost": end_data_single_stock[0]["realized"][
+                            "transaction_cost"
+                        ]
+                        - start_data_single_stock[0]["realized"]["transaction_cost"],
+                        "total_dividends": end_data_single_stock[0]["realized"][
+                            "total_dividends"
+                        ]
+                        - start_data_single_stock[0]["realized"]["total_dividends"],
+                    },
+                    "unrealized": {
+                        "total_pl": end_data_single_stock[0]["unrealized"]["total_pl"]
+                        - start_data_single_stock[0]["unrealized"]["total_pl"],
+                        "total_pl_percentage": (
+                            end_data_single_stock[0]["unrealized"]["total_value"]
+                            - start_data_single_stock[0]["unrealized"]["total_value"]
+                        )
+                        / start_data_single_stock[0]["unrealized"]["total_value"],
+                    },
+                    "meta": {
+                        "logo": end_data_single_stock[0]["meta"]["logo"],
+                    },
                 }
             elif end_date_symbol not in start_date_symbols:
                 end_data_single_stock = [
@@ -109,13 +121,23 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 ]
                 temp_object = {
                     "symbol": end_date_symbol,
-                    "transaction_cost": end_data_single_stock[0]["transaction_cost"],
-                    "total_pl": end_data_single_stock[0]["total_pl"],
-                    "total_pl_percentage": end_data_single_stock[0][
-                        "total_pl_percentage"
-                    ],
-                    "total_dividends": end_data_single_stock[0]["total_dividends"],
-                    "logo": end_data_single_stock[0]["logo"],
+                    "realized": {
+                        "transaction_cost": end_data_single_stock[0]["realized"][
+                            "transaction_cost"
+                        ],
+                        "total_dividends": end_data_single_stock[0]["realized"][
+                            "total_dividends"
+                        ],
+                    },
+                    "unrealized": {
+                        "total_pl": end_data_single_stock[0]["unrealized"]["total_pl"],
+                        "total_pl_percentage": end_data_single_stock[0]["unrealized"][
+                            "total_pl_percentage"
+                        ],
+                    },
+                    "meta": {
+                        "logo": end_data_single_stock[0]["meta"]["logo"],
+                    },
                 }
             result.append(temp_object)
 

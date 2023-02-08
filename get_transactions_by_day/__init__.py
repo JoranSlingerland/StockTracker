@@ -125,6 +125,7 @@ def calculate_realized_and_unrealized(single_day_transactions):
                         {
                             "quantity": abs(total_sells),
                             "cost": abs(total_sells) * buy["cost_per_share"],
+                            "transaction_cost": float(0),
                         }
                     )
                     static_buys.append(buy)

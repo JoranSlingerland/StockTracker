@@ -43,7 +43,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     else:
         result = list(
             container.query_items(
-                query="select * from c where c.realized = false",
+                query="select * from c where c.fully_realized = false",
                 enable_cross_partition_query=True,
             )
         )

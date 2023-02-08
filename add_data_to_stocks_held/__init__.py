@@ -5,7 +5,9 @@
 from typing import Union
 import logging
 from datetime import datetime, timedelta, date
+import uuid
 from shared_code import utils
+import copy
 
 
 def main(payload: str) -> str:
@@ -18,23 +20,19 @@ def main(payload: str) -> str:
     stock_data = payload[1]
     forex_data = payload[2]
     stock_meta_data = payload[3]
-    transactions = payload[4]
+    symbols = payload[4]["symbols"]
+    daterange = payload[4]["daterange"]
     days_to_update = payload[5]
 
-    stocks_held_realized = update_realized(stocks_held_realized)
-    stocks_held_unrealized = update_unrealized(
-        transactions, stocks_held_unrealized, stock_data, forex_data
+    # stocks_held_realized = update_realized(stocks_held_realized)
+
+    stocks = merge_realized_unrealized(
+        stocks_held_realized, stocks_held_unrealized, symbols, daterange
     )
-
-    stocks_held_realized = add_stock_meta_data(stocks_held_realized, stock_meta_data)
-    stocks_held_unrealized = add_stock_meta_data(
-        stocks_held_unrealized, stock_meta_data
-    )
-
-    stocks_held_realized = filter_output(stocks_held_realized, days_to_update)
-    stocks_held_unrealized = filter_output(stocks_held_unrealized, days_to_update)
-
-    stocks = stocks_held_realized + stocks_held_unrealized
+    stocks = pop_keys(stocks, ["date", "symbol", "currency"])
+    stocks = add_stock_data(symbols, stocks, stock_data, forex_data)
+    stocks = add_stock_meta_data(stocks, stock_meta_data)
+    stocks = filter_output(stocks, days_to_update)
 
     return stocks
 
@@ -56,7 +54,7 @@ def add_stock_meta_data(stock_data: list, stock_meta_data: dict) -> dict:
     """Add stock meta data to stock data"""
     output = []
     for stock in stock_data:
-        stock.update(
+        stock["meta"].update(
             {
                 "name": stock_meta_data[f"{stock['symbol']}"]["name"],
                 "description": stock_meta_data[f"{stock['symbol']}"]["description"],
@@ -66,42 +64,21 @@ def add_stock_meta_data(stock_data: list, stock_meta_data: dict) -> dict:
                 "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
             }
         )
-        output.append(stock)
-    return output
-
-
-def update_realized(stock_data: list) -> list:
-    """Update realized stock data"""
-    output = []
-    for stock in stock_data:
         stock.update(
             {
-                "value_change": stock["sell_price"] - stock["buy_price"],
-                "value_change_percentage": (
-                    stock["sell_price"] - stock["buy_price"] / stock["buy_price"]
-                ),
-                "total_pl": stock["sell_price"]
-                - stock["buy_price"]
-                - stock["transaction_cost"],
-                "total_pl_percentage": (
-                    stock["sell_price"]
-                    - stock["buy_price"]
-                    - stock["transaction_cost"] / stock["buy_price"]
-                ),
-                "realized": True,
+                "id": str(uuid.uuid4()),
             }
         )
         output.append(stock)
     return output
 
 
-def update_unrealized(
-    transactions: dict, stocks_held, stock_data: dict, forex_data: dict
+def add_stock_data(
+    symbols: list, stocks_held, stock_data: dict, forex_data: dict
 ) -> list:
     """Update unrealized stock data"""
     output = []
     total_dividends = {}
-    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
     for symbol in symbols:
         total_dividends.update({symbol: 0.0})
@@ -110,6 +87,7 @@ def update_unrealized(
     for stock in stocks_held:
         days_to_substract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
+        stock = copy.deepcopy(stock)
         while True:
             try:
                 date_string = f"{stock['date']} 00:00:00"
@@ -137,7 +115,7 @@ def update_unrealized(
                     ]
                 )
                 forex_high = float(
-                    forex_data[stock["currency"]]["Time Series FX (Daily)"][
+                    forex_data[stock["meta"]["currency"]]["Time Series FX (Daily)"][
                         date_object
                     ]["2. high"]
                 )
@@ -149,40 +127,81 @@ def update_unrealized(
                         ]
                     )
                     * forex_high
-                ) * stock["quantity"]
+                ) * stock["unrealized"]["quantity"]
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 
-                stock.update(
+                stock["unrealized"].update(
                     {
                         "open_value": stock_open * forex_high,
                         "high_value": stock_high * forex_high,
                         "low_value": stock_low * forex_high,
                         "close_value": stock_close * forex_high,
-                        "total_value": stock_close * forex_high * stock["quantity"],
-                        "dividend": single_day_dividend_data,
-                        "total_dividends": total_dividends[stock["symbol"]],
-                        "realized": False,
+                        "total_value": stock_close
+                        * forex_high
+                        * stock["unrealized"]["quantity"],
                     }
                 )
-                stock.update(
+                stock["realized"].update(
                     {
-                        "value_change": stock["total_value"] - stock["total_cost"],
-                        "value_change_percentage": (
-                            stock["total_value"] - stock["total_cost"]
-                        )
-                        / stock["total_cost"],
-                        "total_pl": stock["total_value"]
-                        - stock["total_cost"]
-                        + stock["total_dividends"]
-                        - stock["transaction_cost"],
+                        "dividend": single_day_dividend_data,
+                        "total_dividends": total_dividends[stock["symbol"]],
+                        "value_change": stock["realized"]["sell_price"]
+                        - stock["realized"]["buy_price"],
+                        "total_pl": stock["realized"]["sell_price"]
+                        - stock["realized"]["buy_price"]
+                        - stock["realized"]["transaction_cost"]
+                        - stock["unrealized"]["transaction_cost"]
+                        + total_dividends[stock["symbol"]],
+                        "transaction_cost": stock["realized"]["transaction_cost"]
+                        + stock["unrealized"]["transaction_cost"],
+                    }
+                )
+                try:
+                    stock["realized"].update(
+                        {
+                            "value_change_percentage": (
+                                stock["realized"]["value_change"]
+                                / stock["realized"]["buy_price"]
+                            ),
+                            "total_pl_percentage": (
+                                stock["realized"]["total_pl"]
+                                / stock["realized"]["buy_price"]
+                            ),
+                        }
+                    )
+                except ZeroDivisionError:
+                    stock["realized"].update(
+                        {
+                            "value_change_percentage": 0.0,
+                            "total_pl_percentage": stock["realized"]["total_pl"]
+                            / stock["unrealized"]["total_value"],
+                        }
+                    )
+                stock["unrealized"].pop("transaction_cost", None)
+                stock["unrealized"].update(
+                    {
+                        "total_pl": stock["unrealized"]["total_value"]
+                        - stock["unrealized"]["total_cost"],
                         "total_pl_percentage": (
-                            stock["total_value"]
-                            - stock["total_cost"]
-                            + stock["total_dividends"]
-                            - stock["transaction_cost"]
+                            stock["unrealized"]["total_value"]
+                            - stock["unrealized"]["total_cost"]
                         )
-                        / stock["total_cost"],
+                        / stock["unrealized"]["total_cost"],
+                    }
+                )
+                stock["combined"].update(
+                    {
+                        "total_pl": stock["realized"]["total_pl"]
+                        + stock["unrealized"]["total_pl"],
+                        "total_pl_percentage": (
+                            stock["realized"]["total_pl"]
+                            + stock["unrealized"]["total_pl"]
+                        )
+                        / (
+                            stock["unrealized"]["total_cost"]
+                            + stock["realized"]["buy_price"]
+                        ),
                     }
                 )
                 break
@@ -193,3 +212,92 @@ def update_unrealized(
                 )
         output.append(stock)
     return output
+
+
+def merge_realized_unrealized(
+    realized: list, unrealized: list, symbols: list, daterange: list
+) -> list:
+    """Merge realized and unrealized stock data"""
+    output = []
+
+    empty_realized = {
+        "date": "",
+        "symbol": "",
+        "cost_per_share_buy": 0.0,
+        "cost_per_share_sell": 0.0,
+        "buy_price": 0.0,
+        "sell_price": 0.0,
+        "average_buy_fx_rate": 0.0,
+        "average_sell_fx_rate": 0.0,
+        "quantity": 0.0,
+        "transaction_cost": 0.0,
+        "currency": "",
+    }
+
+    empty_unrealized = {
+        "date": "",
+        "symbol": "",
+        "cost_per_share": 0.0,
+        "total_cost": 0.0,
+        "average_fx_rate": 0.0,
+        "quantity": 0.0,
+        "transaction_cost": 0.0,
+        "currency": "",
+    }
+
+    for single_date in daterange:
+        for symbol in symbols:
+            single_realized = [
+                d
+                for d in realized
+                if d["symbol"] == symbol and d["date"] == single_date
+            ]
+            single_unrealized = [
+                d
+                for d in unrealized
+                if d["symbol"] == symbol and d["date"] == single_date
+            ]
+            if single_realized and single_realized:
+                output_object = {
+                    "date": single_date,
+                    "symbol": symbol,
+                    "fully_realized": False,
+                    "realized": single_realized[0],
+                    "unrealized": single_unrealized[0],
+                    "combined": {},
+                    "meta": {"currency": single_realized[0]["currency"]},
+                }
+            elif single_realized:
+                output_object = {
+                    "date": single_date,
+                    "symbol": symbol,
+                    "fully_realized": True,
+                    "realized": single_realized[0],
+                    "unrealized": empty_unrealized,
+                    "combined": {},
+                    "meta": {"currency": single_realized[0]["currency"]},
+                }
+            elif single_unrealized:
+                output_object = {
+                    "date": single_date,
+                    "symbol": symbol,
+                    "fully_realized": False,
+                    "realized": empty_realized,
+                    "unrealized": single_unrealized[0],
+                    "combined": {},
+                    "meta": {"currency": single_unrealized[0]["currency"]},
+                }
+            else:
+                continue
+            output.append(output_object)
+
+    return output
+
+
+def pop_keys(stocks: list, keys_to_pop) -> list:
+    """Pop keys from stock data"""
+    for stock in stocks:
+        for key in keys_to_pop:
+            stock["realized"].pop(key, None)
+            stock["unrealized"].pop(key, None)
+    return stocks

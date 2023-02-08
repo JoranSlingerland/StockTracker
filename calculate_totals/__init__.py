@@ -31,7 +31,7 @@ def main(payload: str) -> str:
         stocks_single_date = [
             d
             for d in stocks_held
-            if d["date"] == single_date and d["realized"] is False
+            if d["date"] == single_date and d["fully_realized"] is False
         ]
         invested_single_date = [
             d for d in invested["invested"] if d["date"] == single_date
@@ -40,18 +40,26 @@ def main(payload: str) -> str:
         totals = {
             "id": str(uuid.uuid4()),
             "date": single_date,
-            "total_cost": sum(d["total_cost"] for d in stocks_single_date),
-            "total_value": sum(d["total_value"] for d in stocks_single_date),
+            "total_cost": sum(
+                d["unrealized"]["total_cost"] for d in stocks_single_date
+            ),
+            "total_value": sum(
+                d["unrealized"]["total_value"] for d in stocks_single_date
+            ),
             "total_invested": invested_single_date[0]["invested"],
-            "total_pl": sum(d["total_value"] for d in stocks_single_date)
+            "total_pl": sum(d["unrealized"]["total_value"] for d in stocks_single_date)
             - invested_single_date[0]["invested"],
             "total_pl_percentage": (
-                sum(d["total_value"] for d in stocks_single_date)
+                sum(d["unrealized"]["total_value"] for d in stocks_single_date)
                 - invested_single_date[0]["invested"]
             )
             / invested_single_date[0]["invested"],
-            "total_dividends": sum(d["total_dividends"] for d in stocks_single_date),
-            "transaction_cost": sum(d["transaction_cost"] for d in stocks_single_date),
+            "total_dividends": sum(
+                d["realized"]["total_dividends"] for d in stocks_single_date
+            ),
+            "transaction_cost": sum(
+                d["realized"]["transaction_cost"] for d in stocks_single_date
+            ),
         }
         output.append(totals)
 

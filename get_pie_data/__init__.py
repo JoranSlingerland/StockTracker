@@ -15,22 +15,22 @@ def inputoptions(datatype, row):
     if datatype == "stocks":
         return {
             "type": row["symbol"],
-            "value": row["total_value"],
+            "value": row["unrealized"]["total_value"],
         }
     if datatype == "currency":
         return {
-            "type": row["currency"],
-            "value": row["total_value"],
+            "type": row["meta"]["currency"],
+            "value": row["unrealized"]["total_value"],
         }
     if datatype == "country":
         return {
-            "type": row["country"],
-            "value": row["total_value"],
+            "type": row["meta"]["country"],
+            "value": row["unrealized"]["total_value"],
         }
     if datatype == "sector":
         return {
-            "type": row["sector"],
-            "value": row["total_value"],
+            "type": row["meta"]["sector"],
+            "value": row["unrealized"]["total_value"],
         }
 
     # return nothing if no match
@@ -117,7 +117,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     container = cosmosdb_module.cosmosdb_container("single_day")
     results = list(
         container.query_items(
-            query="select * from c where c.realized = false",
+            query="select * from c where c.fully_realized = false",
             enable_cross_partition_query=True,
         )
     )

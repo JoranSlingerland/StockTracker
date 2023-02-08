@@ -29,17 +29,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if datatype == "dividend":
         container = cosmosdb_module.cosmosdb_container("stocks_held")
         if datatoget == "max":
-            items = list(
-                container.query_items(
-                    query="SELECT * FROM c WHERE c.realized = false",
-                    enable_cross_partition_query=True,
-                )
-            )
+            items = list(container.read_all_items())
         else:
             start_date, end_date = date_time_helper.datatogetswitch(datatoget)
             items = list(
                 container.query_items(
-                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date and c.realized = false",
+                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
                     parameters=[
                         {"name": "@start_date", "value": start_date},
                         {"name": "@end_date", "value": end_date},
@@ -122,13 +117,15 @@ def get_max_data(items, start_date, end_date, datatype):
             if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": quarter,
-                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "value": sum(d["realized"]["dividend"] for d in single_stock_data),
                     "category": symbol,
                 }
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": quarter,
-                    "value": sum(d["transaction_cost"] for d in single_stock_data),
+                    "value": sum(
+                        d["transaction_cost"] for d in single_stock_data
+                    ),
                     "category": symbol,
                 }
             else:
@@ -177,13 +174,15 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
             if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": month.strftime("%Y %B"),
-                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "value": sum(d["realized"]["dividend"] for d in single_stock_data),
                     "category": symbol,
                 }
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": month.strftime("%Y %B"),
-                    "value": sum(d["transaction_cost"] for d in single_stock_data),
+                    "value": sum(
+                        d["transaction_cost"] for d in single_stock_data
+                    ),
                     "category": symbol,
                 }
             else:
@@ -233,13 +232,15 @@ def get_month_week_data(items, start_date, end_date, datatype):
             if symbol in symbols and datatype == "dividend":
                 temp_object = {
                     "date": week.strftime("%Y %U"),
-                    "value": sum(d["dividend"] for d in single_stock_data),
+                    "value": sum(d["realized"]["dividend"] for d in single_stock_data),
                     "category": symbol,
                 }
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": week.strftime("%Y %U"),
-                    "value": sum(d["transaction_cost"] for d in single_stock_data),
+                    "value": sum(
+                        d["transaction_cost"] for d in single_stock_data
+                    ),
                     "category": symbol,
                 }
             else:

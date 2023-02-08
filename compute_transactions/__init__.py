@@ -86,7 +86,6 @@ def merge_sells_and_buys(stocks_held, daterange, transaction_type):
 
             if (transaction_type == "unrealized") and (len(single_stock_list) == 1):
                 temp_object = single_stock_list[0]
-                temp_object.update({"id": str(uuid.uuid4())})
                 temp_object.pop("transaction_type")
             elif (transaction_type == "realized") and (len(single_stock_list) == 2):
                 single_stock_list = sorted(
@@ -106,7 +105,6 @@ def merge_sells_and_buys(stocks_held, daterange, transaction_type):
                         d["transaction_cost"] for d in single_stock_list
                     ),
                     "currency": single_stock_list[0]["currency"],
-                    "id": str(uuid.uuid4()),
                 }
             else:
                 continue
