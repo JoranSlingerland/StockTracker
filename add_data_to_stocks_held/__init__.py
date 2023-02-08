@@ -9,6 +9,7 @@ import copy
 import uuid
 from shared_code import utils
 
+
 def main(payload: str) -> str:
     """add data to stocks held"""
     logging.info("Adding stock data to stocks held")
@@ -178,17 +179,26 @@ def add_stock_data(
                         }
                     )
                 stock["unrealized"].pop("transaction_cost", None)
-                stock["unrealized"].update(
-                    {
-                        "total_pl": stock["unrealized"]["total_value"]
-                        - stock["unrealized"]["total_cost"],
-                        "total_pl_percentage": (
-                            stock["unrealized"]["total_value"]
-                            - stock["unrealized"]["total_cost"]
-                        )
-                        / stock["unrealized"]["total_cost"],
-                    }
-                )
+                try:
+                    stock["unrealized"].update(
+                        {
+                            "total_pl": stock["unrealized"]["total_value"]
+                            - stock["unrealized"]["total_cost"],
+                            "total_pl_percentage": (
+                                stock["unrealized"]["total_value"]
+                                - stock["unrealized"]["total_cost"]
+                            )
+                            / stock["unrealized"]["total_cost"],
+                        }
+                    )
+                except ZeroDivisionError:
+                    stock["unrealized"].update(
+                        {
+                            "total_pl": stock["unrealized"]["total_value"]
+                            - stock["unrealized"]["total_cost"],
+                            "total_pl_percentage": 0.0,
+                        }
+                    )
                 stock["combined"].update(
                     {
                         "total_pl": stock["realized"]["total_pl"]
@@ -256,17 +266,9 @@ def merge_realized_unrealized(
                 for d in unrealized
                 if d["symbol"] == symbol and d["date"] == single_date
             ]
-            if single_realized and single_realized:
-                output_object = {
-                    "date": single_date,
-                    "symbol": symbol,
-                    "fully_realized": False,
-                    "realized": single_realized[0],
-                    "unrealized": single_unrealized[0],
-                    "combined": {},
-                    "meta": {"currency": single_realized[0]["currency"]},
-                }
-            elif single_realized:
+            if not single_realized and not single_unrealized:
+                continue
+            if single_realized and not single_unrealized:
                 output_object = {
                     "date": single_date,
                     "symbol": symbol,
@@ -276,7 +278,7 @@ def merge_realized_unrealized(
                     "combined": {},
                     "meta": {"currency": single_realized[0]["currency"]},
                 }
-            elif single_unrealized:
+            if not single_realized and single_unrealized:
                 output_object = {
                     "date": single_date,
                     "symbol": symbol,
@@ -286,8 +288,16 @@ def merge_realized_unrealized(
                     "combined": {},
                     "meta": {"currency": single_unrealized[0]["currency"]},
                 }
-            else:
-                continue
+            if single_realized and single_unrealized:
+                output_object = {
+                    "date": single_date,
+                    "symbol": symbol,
+                    "fully_realized": False,
+                    "realized": single_realized[0],
+                    "unrealized": single_unrealized[0],
+                    "combined": {},
+                    "meta": {"currency": single_realized[0]["currency"]},
+                }
             output.append(output_object)
 
     return output

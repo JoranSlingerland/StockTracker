@@ -9,4 +9,5 @@
     "azureFunctions.pythonVenv": ".venv",
     "azureFunctions.projectLanguage": "Python",
     "azureFunctions.projectRuntime": "~4",
+    "python.analysis.typeCheckingMode": "off",
 }
