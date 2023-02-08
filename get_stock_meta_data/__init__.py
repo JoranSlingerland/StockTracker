@@ -22,16 +22,14 @@ def main(payload: str) -> str:
 
     # initialize variables
     stock_meta_data = {}
-    transactions = payload[0]
+    symbols = payload[0]["symbols"]
+    transactions = payload[0]["transactions"]
     clearbit_api_key = get_config.get_clearbit_api_key()
-
-    # get unique symbols and domains
-    symbols = utils.get_unique_items(transactions["transactions"], "symbol")
 
     # iterate over list in increments of 2
     for symbol in symbols:
         # list comprehension to get the domain
-        domain = [x for x in transactions["transactions"] if x["symbol"] == symbol]
+        domain = [x for x in transactions if x["symbol"] == symbol]
         domain = domain[0]["domain"]
 
         url = f"https://company.clearbit.com/v2/companies/find?domain={domain}"

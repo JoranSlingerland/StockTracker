@@ -3,7 +3,9 @@
 # pylint: disable=expression-not-assigned
 
 import logging
-from shared_code import cosmosdb_module
+from datetime import date
+import pandas
+from shared_code import cosmosdb_module, utils
 
 
 def main(payload: str) -> str:
@@ -13,18 +15,28 @@ def main(payload: str) -> str:
     keys_to_pop = ["_rid", "_self", "_etag", "_attachments", "_ts"]
 
     transactions_container = cosmosdb_module.cosmosdb_container("input_transactions")
-    transactions_list = list(transactions_container.read_all_items())
-    #pop keys to pop
+    transactions = list(transactions_container.read_all_items())
+    # pop keys to pop
     for key_to_pop in keys_to_pop:
-        [d.pop(key_to_pop, None) for d in transactions_list]
+        [d.pop(key_to_pop, None) for d in transactions]
 
-    invested_list = []
+    invested = []
     invested_container = cosmosdb_module.cosmosdb_container("input_invested")
-    invested_list = list(invested_container.read_all_items())
+    invested = list(invested_container.read_all_items())
     for key_to_pop in keys_to_pop:
-        [d.pop(key_to_pop, None) for d in invested_list]
+        [d.pop(key_to_pop, None) for d in invested]
 
+    transactions.sort(key=lambda x: x["date"])
+    invested.sort(key=lambda x: x["date"])
 
-    invested = {"transactions": transactions_list, "invested": invested_list}
+    end_date = date.today()
+    start_date = transactions[0]["date"]
+    daterange = [d.strftime('%Y-%m-%d') for d in pandas.date_range(start_date, end_date)]
+    symbols = utils.get_unique_items(transactions, "symbol")
 
-    return invested
+    return {
+        "transactions": transactions,
+        "invested": invested,
+        "daterange": daterange,
+        "symbols": symbols,
+    }

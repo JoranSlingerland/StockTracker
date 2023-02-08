@@ -64,7 +64,7 @@ def get_quarters(start_date, end_date):
     quarters = (
         pandas.date_range(
             pandas.to_datetime(start_date),
-            pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(1),
+            pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(startingMonth=1),
             freq="Q",
         )
         .strftime("%B %Y")

@@ -6,3 +6,8 @@ def get_unique_items(items, key_to_filter):
     for item in items:
         output_list.append(item[key_to_filter])
     return list(dict.fromkeys(output_list))
+
+
+def get_weighted_average(data: list, weight: list) -> float:
+    """Get weighted average"""
+    return float(sum(a * b for a, b in zip(data, weight)) / sum(weight))
