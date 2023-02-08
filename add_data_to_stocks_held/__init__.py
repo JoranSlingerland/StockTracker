@@ -5,10 +5,9 @@
 from typing import Union
 import logging
 from datetime import datetime, timedelta, date
+import copy
 import uuid
 from shared_code import utils
-import copy
-
 
 def main(payload: str) -> str:
     """add data to stocks held"""
