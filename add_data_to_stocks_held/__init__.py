@@ -114,11 +114,14 @@ def add_stock_data(
                         "4. close"
                     ]
                 )
-                forex_high = float(
-                    forex_data[stock["meta"]["currency"]]["Time Series FX (Daily)"][
-                        date_object
-                    ]["2. high"]
-                )
+                if stock["meta"]["currency"] == "EUR":
+                    forex_high = float(1)
+                else:
+                    forex_high = float(
+                        forex_data[stock["meta"]["currency"]]["Time Series FX (Daily)"][
+                            date_object
+                        ]["2. high"]
+                    )
 
                 single_day_dividend_data = (
                     float(

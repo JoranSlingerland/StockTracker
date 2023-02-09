@@ -39,6 +39,16 @@ def add_data(transactions, forex_data):
             date_object = date_object - timedelta(days=days_to_substract)
             date_object = date_object.strftime("%Y-%m-%d")
             try:
+                if transaction["currency"] == "EUR":
+                    transaction.update(
+                        {
+                            "cost_per_share": transaction["cost"]
+                            / transaction["quantity"],
+                            "forex_rate": 1,
+                            "transaction_date": transaction["date"],
+                        }
+                    )
+                    break
                 transaction.update(
                     {
                         "cost_per_share": transaction["cost"] / transaction["quantity"],
@@ -51,7 +61,9 @@ def add_data(transactions, forex_data):
                     }
                 )
                 break
-            except KeyError:
+            except KeyError as error:
+                if days_to_substract > 100:
+                    raise KeyError from error
                 days_to_substract += 1
         transaction.pop("date")
         transaction.pop("id")
