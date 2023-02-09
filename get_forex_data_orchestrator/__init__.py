@@ -2,10 +2,10 @@
 # pylint: disable=line-too-long
 
 import logging
+from datetime import datetime, timedelta
 
 import azure.functions as func
 import azure.durable_functions as df
-from datetime import datetime, timedelta
 
 from shared_code import utils
 
