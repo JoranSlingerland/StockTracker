@@ -1,6 +1,6 @@
 """main Orchestrator function"""
 # pylint: disable=too-many-locals
-
+# pylint: disable=too-many-statements
 import logging
 import sys
 import azure.functions as func
