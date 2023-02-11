@@ -63,4 +63,4 @@ def main(payload: str) -> str:
         }
         output.append(totals)
 
-    return {"stocks_held": stocks_held, "totals": output}
+    return None, None, {"stocks_held": stocks_held, "totals": output}

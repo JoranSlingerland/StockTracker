@@ -13,7 +13,7 @@ def main(payload: str) -> str:
 
     invested = calculate_deposits_and_withdrawals(transactions_by_day, daterange)
     invested = merge_deposits_and_withdrawals(invested, daterange)
-    return {"invested": invested}
+    return None, {"invested": invested}
 
 
 def calculate_deposits_and_withdrawals(invested, daterange):
