@@ -68,13 +68,22 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 5 - Get invested data
     logging.info("Step 5: Get invested data")
-    invested = yield context.call_activity(
+    (
+        transactions_by_day,
+        invested,  # Only used for return value everything else gets a None value to free up memory
+    ) = yield context.call_activity(
         "get_invested_data", [transactions, transactions_by_day]
     )
 
     # step 6 - add stock_data to stock_held
     logging.info("Step 6: Add data to stocks held")
-    data = yield context.call_activity(
+    (
+        stock_held,
+        stock_data,
+        forex_data,
+        stock_meta_data,
+        data,  # Only used for return value everything else gets a None value to free up memory
+    ) = yield context.call_activity(
         "add_data_to_stocks_held",
         [
             stock_held,
@@ -88,7 +97,11 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 7 - Calulate totals
     logging.info("Step 7: Calculate totals")
-    data = yield context.call_activity(
+    (
+        invested,
+        transactions,
+        data,  # Only used for return value everything else gets a None value to free up memory
+    ) = yield context.call_activity(
         "calculate_totals",
         [data, invested, transactions, days_to_update],
     )

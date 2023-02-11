@@ -34,7 +34,7 @@ def main(payload: str) -> str:
     stocks = add_stock_meta_data(stocks, stock_meta_data)
     stocks = filter_output(stocks, days_to_update)
 
-    return stocks
+    return None, None, None, None, stocks
 
 
 def filter_output(output: list, days_to_update: Union[int, str]) -> list:
