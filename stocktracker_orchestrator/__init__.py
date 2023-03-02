@@ -50,35 +50,20 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # Step 5 - Rebuild the transactions object
     logging.info("Step 5: Get transactions by day")
-    transactions_by_day = yield context.call_activity(
+    day_by_day = yield context.call_activity(
         "get_transactions_by_day", [transactions, api_data["forex_data"]]
-    )
-
-    # step 6 - Compute transactions
-    logging.info("Step 6: Computing transactions")
-    stock_held = yield context.call_activity(
-        "compute_transactions", [transactions, transactions_by_day]
-    )
-
-    # step 7 - Get invested data
-    logging.info("Step 7: Get invested data")
-    (
-        transactions_by_day,
-        invested,  # Only used for return value everything else gets a None value to free up memory
-    ) = yield context.call_activity(
-        "get_invested_data", [transactions, transactions_by_day]
     )
 
     # step 8 - add stock_data to stock_held
     logging.info("Step 8: Add data to stocks held")
     (
-        stock_held,
+        day_by_day["stock_held"],
         api_data,
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "add_data_to_stocks_held",
         [
-            stock_held,
+            day_by_day["stock_held"],
             api_data["stock_data"],
             api_data["forex_data"],
             transactions,
@@ -89,12 +74,12 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 9 - Calulate totals
     logging.info("Step 9: Calculate totals")
     (
-        invested,
+        day_by_day["invested"],
         transactions,
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "calculate_totals",
-        [data, invested, transactions, days_to_update],
+        [data, day_by_day["invested"], transactions, days_to_update],
     )
 
     # step 10.1 - output single_day_data to cosmosdb
