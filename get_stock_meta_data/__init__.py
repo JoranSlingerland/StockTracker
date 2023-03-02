@@ -1,6 +1,7 @@
 """Gets stock meta data from the API"""
 
 import logging
+import uuid
 import requests
 from shared_code import get_config, utils
 
@@ -21,7 +22,7 @@ def main(payload: str) -> str:
     logging.info("Getting stock meta data")
 
     # initialize variables
-    stock_meta_data = {}
+    stock_meta_data = []
     symbols = payload[0]["symbols"]
     transactions = payload[0]["transactions"]
     clearbit_api_key = get_config.get_clearbit_api_key()
@@ -36,13 +37,14 @@ def main(payload: str) -> str:
         temp_data = call_clearbit_api(url, clearbit_api_key)
 
         temp_object = {
+            "symbol": symbol,
             "name": temp_data["name"],
             "description": temp_data["description"],
             "country": temp_data["geo"]["country"],
             "sector": temp_data["category"]["sector"],
             "domain": domain,
             "logo": f"https://logo.uplead.com/{domain}",
+            "id": str(uuid.uuid4()),
         }
-
-        stock_meta_data.update({symbol: temp_object})
+        stock_meta_data.append(temp_object)
     return stock_meta_data

@@ -8,7 +8,7 @@ import json
 
 from datetime import timedelta, datetime
 import azure.functions as func
-from shared_code import cosmosdb_module, date_time_helper
+from shared_code import cosmosdb_module, date_time_helper, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -147,6 +147,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+    container = cosmosdb_module.cosmosdb_container("meta_data")
+    result = utils.add_meta_data_to_stock_data(result, container)
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
