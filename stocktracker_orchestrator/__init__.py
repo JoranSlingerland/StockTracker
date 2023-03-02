@@ -54,8 +54,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         "get_transactions_by_day", [transactions, api_data["forex_data"]]
     )
 
-    # step 8 - add stock_data to stock_held
-    logging.info("Step 8: Add data to stocks held")
+    # step 6 - add stock_data to stock_held
+    logging.info("Step 6: Add data to stocks held")
     (
         day_by_day["stock_held"],
         api_data,
@@ -71,8 +71,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         ],
     )
 
-    # step 9 - Calulate totals
-    logging.info("Step 9: Calculate totals")
+    # step 7 - Calulate totals
+    logging.info("Step 7: Calculate totals")
     (
         day_by_day["invested"],
         transactions,
@@ -82,18 +82,18 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         [data, day_by_day["invested"], transactions, days_to_update],
     )
 
-    # step 10.1 - output single_day_data to cosmosdb
-    logging.info("Step 10.1: Output single_day to cosmosdb")
+    # step 8.1 - output single_day_data to cosmosdb
+    logging.info("Step 8.1: Output single_day to cosmosdb")
     result = yield context.call_activity("output_singleday_to_cosmosdb", data)
 
-    # step 10.2 - output everything else to cosmosdb
-    logging.info("Step 10.2: Output everything else to cosmosdb")
+    # step 8.2 - output everything else to cosmosdb
+    logging.info("Step 8.2: Output everything else to cosmosdb")
     for container_name, items in data.items():
         result = yield context.call_activity(
             "output_to_cosmosdb", [container_name, items]
         )
 
-    logging.info("Step 11: Returning result")
+    logging.info("Step 9: Returning result")
     return result
 
 
