@@ -47,8 +47,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 enable_cross_partition_query=True,
             )
         )
-    container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(result, container)
+        container = cosmosdb_module.cosmosdb_container("meta_data")
+        result = utils.add_meta_data_to_stock_data(result, container)
 
     if containername in ("input_invested", "input_transactions"):
         # sort result by transaction_date

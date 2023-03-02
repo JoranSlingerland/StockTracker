@@ -30,7 +30,7 @@ def main(payload: str) -> str:
     stocks = add_stock_data(symbols, stocks, stock_data, forex_data)
     stocks = filter_output(stocks, days_to_update)
 
-    return None, None, None, stocks
+    return None, None, stocks
 
 
 def filter_output(output: list, days_to_update: Union[int, str]) -> list:
