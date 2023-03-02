@@ -94,6 +94,14 @@ def get_containers() -> dict:
                 "input_container": True,
                 "output_container": False,
             },
+            {
+                "container_name": "meta_data",
+                "partition_key": "/id",
+                "candelete": True,
+                "cantruncate": True,
+                "input_container": False,
+                "output_container": True,
+            },
         ]
     }
 

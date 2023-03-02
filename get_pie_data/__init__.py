@@ -19,7 +19,7 @@ def inputoptions(datatype, row):
         }
     if datatype == "currency":
         return {
-            "type": row["meta"]["currency"],
+            "type": row["currency"],
             "value": row["unrealized"]["total_value"],
         }
     if datatype == "country":
@@ -121,6 +121,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             enable_cross_partition_query=True,
         )
     )
+    container = cosmosdb_module.cosmosdb_container("meta_data")
+    result = utils.add_meta_data_to_stock_data(results, container)
+
     result_list = []
     for result in results:
         temp_object = inputoptions(datatype, result)

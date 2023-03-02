@@ -19,22 +19,18 @@ def main(payload: str) -> str:
     stocks_held_unrealized = payload[0]["unrealized"]
     stock_data = payload[1]
     forex_data = payload[2]
-    stock_meta_data = payload[3]
-    symbols = payload[4]["symbols"]
-    daterange = payload[4]["daterange"]
-    days_to_update = payload[5]
-
-    # stocks_held_realized = update_realized(stocks_held_realized)
+    symbols = payload[3]["symbols"]
+    daterange = payload[3]["daterange"]
+    days_to_update = payload[4]
 
     stocks = merge_realized_unrealized(
         stocks_held_realized, stocks_held_unrealized, symbols, daterange
     )
     stocks = pop_keys(stocks, ["date", "symbol", "currency"])
     stocks = add_stock_data(symbols, stocks, stock_data, forex_data)
-    stocks = add_stock_meta_data(stocks, stock_meta_data)
     stocks = filter_output(stocks, days_to_update)
 
-    return None, None, None, None, stocks
+    return None, None, None, stocks
 
 
 def filter_output(output: list, days_to_update: Union[int, str]) -> list:
@@ -48,29 +44,6 @@ def filter_output(output: list, days_to_update: Union[int, str]) -> list:
     filtered_output = [d for d in output if date.fromisoformat(d["date"]) >= start_date]
 
     return filtered_output
-
-
-def add_stock_meta_data(stock_data: list, stock_meta_data: dict) -> dict:
-    """Add stock meta data to stock data"""
-    output = []
-    for stock in stock_data:
-        stock["meta"].update(
-            {
-                "name": stock_meta_data[f"{stock['symbol']}"]["name"],
-                "description": stock_meta_data[f"{stock['symbol']}"]["description"],
-                "country": stock_meta_data[f"{stock['symbol']}"]["country"],
-                "sector": stock_meta_data[f"{stock['symbol']}"]["sector"],
-                "domain": stock_meta_data[f"{stock['symbol']}"]["domain"],
-                "logo": stock_meta_data[f"{stock['symbol']}"]["logo"],
-            }
-        )
-        stock.update(
-            {
-                "id": str(uuid.uuid4()),
-            }
-        )
-        output.append(stock)
-    return output
 
 
 def add_stock_data(
@@ -87,6 +60,12 @@ def add_stock_data(
     for stock in stocks_held:
         days_to_substract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
+        # add id
+        stock.update(
+            {
+                "id": str(uuid.uuid4()),
+            }
+        )
         stock = copy.deepcopy(stock)
         while True:
             try:
@@ -114,11 +93,11 @@ def add_stock_data(
                         "4. close"
                     ]
                 )
-                if stock["meta"]["currency"] == "EUR":
+                if stock["currency"] == "EUR":
                     forex_high = float(1)
                 else:
                     forex_high = float(
-                        forex_data[stock["meta"]["currency"]]["Time Series FX (Daily)"][
+                        forex_data[stock["currency"]]["Time Series FX (Daily)"][
                             date_object
                         ]["2. high"]
                     )
@@ -279,7 +258,7 @@ def merge_realized_unrealized(
                     "realized": single_realized[0],
                     "unrealized": empty_unrealized,
                     "combined": {},
-                    "meta": {"currency": single_realized[0]["currency"]},
+                    "currency": single_realized[0]["currency"],
                 }
             if not single_realized and single_unrealized:
                 output_object = {
@@ -289,7 +268,7 @@ def merge_realized_unrealized(
                     "realized": empty_realized,
                     "unrealized": single_unrealized[0],
                     "combined": {},
-                    "meta": {"currency": single_unrealized[0]["currency"]},
+                    "currency": single_unrealized[0]["currency"],
                 }
             if single_realized and single_unrealized:
                 output_object = {
@@ -299,7 +278,7 @@ def merge_realized_unrealized(
                     "realized": single_realized[0],
                     "unrealized": single_unrealized[0],
                     "combined": {},
-                    "meta": {"currency": single_realized[0]["currency"]},
+                    "currency": single_realized[0]["currency"],
                 }
             output.append(output_object)
 
