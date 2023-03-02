@@ -147,9 +147,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
-    else:
-        container = cosmosdb_module.cosmosdb_container("meta_data")
-        result = utils.add_meta_data_to_stock_data(result, container)
+    container = cosmosdb_module.cosmosdb_container("meta_data")
+    result = utils.add_meta_data_to_stock_data(result, container)
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
