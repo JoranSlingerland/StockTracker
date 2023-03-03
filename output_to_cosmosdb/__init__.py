@@ -35,7 +35,7 @@ async def main(payload: str) -> str:
         # fill event loop list
         tasks.append(insert_item_with_backoff(container, item))
     # wait for all tasks to complete
-    await aio_helper.gather_with_concurrency(500, *tasks)
+    await aio_helper.gather_with_concurrency(50, *tasks)
     await client.close()
     return '{"status": "Done"}'
 
