@@ -27,31 +27,16 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Step 1: Getting transactions")
     transactions = yield context.call_activity("get_transactions", "Go")
 
-    # Step 2.1 - Get data for stocks via the API
-    logging.info("Step 2.1: Getting stock data")
+    # Step 2 - Get api data
+    logging.info("Step 2.1: Getting api data")
     provisioning_tasks = []
     id_ = 0
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
-        "get_stock_data_orchestrator", transactions, child_id
+        "get_api_data", transactions, child_id
     )
     provisioning_tasks.append(provision_task)
-    stock_data = (yield context.task_all(provisioning_tasks))[0]
-
-    # Step 2.2 - Get forex data via the API
-    logging.info("Step 2.2: Getting forex data")
-    provisioning_tasks = []
-    id_ += 1
-    child_id = f"{context.instance_id}:{id_}"
-    provision_task = context.call_sub_orchestrator(
-        "get_forex_data_orchestrator", transactions, child_id
-    )
-    provisioning_tasks.append(provision_task)
-    forex_data = (yield context.task_all(provisioning_tasks))[0]
-
-    # Step 2.3 - Get stock meta data via the API
-    logging.info("Step 2.3: Getting stock meta data")
-    stock_meta_data = yield context.call_activity("get_stock_meta_data", [transactions])
+    api_data = (yield context.task_all(provisioning_tasks))[0]
 
     # step 3 recreate containers / remove items
     logging.info("Step 3: Delete cosmosdb items")
@@ -60,72 +45,55 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 4 - output meta data to cosmosdb
     logging.info("Step 4: Output meta data to cosmosdb")
     result = yield context.call_activity(
-        "output_to_cosmosdb", ["meta_data", stock_meta_data]
+        "output_to_cosmosdb", ["meta_data", api_data["stock_meta_data"]]
     )
-    del stock_meta_data
 
     # Step 5 - Rebuild the transactions object
     logging.info("Step 5: Get transactions by day")
-    transactions_by_day = yield context.call_activity(
-        "get_transactions_by_day", [transactions, forex_data]
+    day_by_day = yield context.call_activity(
+        "get_transactions_by_day", [transactions, api_data["forex_data"]]
     )
 
-    # step 6 - Compute transactions
-    logging.info("Step 6: Computing transactions")
-    stock_held = yield context.call_activity(
-        "compute_transactions", [transactions, transactions_by_day]
-    )
-
-    # step 7 - Get invested data
-    logging.info("Step 7: Get invested data")
+    # step 6 - add stock_data to stock_held
+    logging.info("Step 6: Add data to stocks held")
     (
-        transactions_by_day,
-        invested,  # Only used for return value everything else gets a None value to free up memory
-    ) = yield context.call_activity(
-        "get_invested_data", [transactions, transactions_by_day]
-    )
-
-    # step 8 - add stock_data to stock_held
-    logging.info("Step 8: Add data to stocks held")
-    (
-        stock_held,
-        stock_data,
-        forex_data,
+        day_by_day["stock_held"],
+        api_data,
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "add_data_to_stocks_held",
         [
-            stock_held,
-            stock_data,
-            forex_data,
+            day_by_day["stock_held"],
+            api_data["stock_data"],
+            api_data["forex_data"],
             transactions,
             days_to_update,
         ],
     )
 
-    # step 9 - Calulate totals
-    logging.info("Step 9: Calculate totals")
+    # step 7 - Calulate totals
+    logging.info("Step 7: Calculate totals")
     (
-        invested,
+        day_by_day["invested"],
         transactions,
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "calculate_totals",
-        [data, invested, transactions, days_to_update],
+        [data, day_by_day["invested"], transactions, days_to_update],
     )
 
-    # step 10.1 - output single_day_data to cosmosdb
-    logging.info("Step 10.1: Output single_day to cosmosdb")
+    # step 8.1 - output single_day_data to cosmosdb
+    logging.info("Step 8.1: Output single_day to cosmosdb")
     result = yield context.call_activity("output_singleday_to_cosmosdb", data)
 
-    # step 10.2 - output everything else to cosmosdb
-    logging.info("Step 10.2: Output everything else to cosmosdb")
+    # step 8.2 - output everything else to cosmosdb
+    logging.info("Step 8.2: Output everything else to cosmosdb")
     for container_name, items in data.items():
         result = yield context.call_activity(
             "output_to_cosmosdb", [container_name, items]
         )
 
-    logging.info("Step 11: Returning result")
+    logging.info("Step 9: Returning result")
     return result
 
 

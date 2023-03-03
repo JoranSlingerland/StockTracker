@@ -4,6 +4,7 @@
 import logging
 import json
 import copy
+import uuid
 from datetime import datetime, timedelta
 from shared_code import utils
 
@@ -25,9 +26,24 @@ def main(payload: str) -> str:
     invested = add_data_invested(invested)
     invested = get_day_by_day_invested(invested, daterange)
 
-    return {"transactions": transactions, "invested": invested}
+    # compute transactions
+    realized = transactions["realized"]
+    unrealized = transactions["unrealized"]
+
+    realized = calculate_sells_and_buys(realized, daterange)
+    unrealized = calculate_sells_and_buys(unrealized, daterange)
+    realized = merge_sells_and_buys(realized, daterange, "realized")
+    unrealized = merge_sells_and_buys(unrealized, daterange, "unrealized")
+    stocks_held = {"realized": realized, "unrealized": unrealized}
+
+    # compute invested
+    invested = calculate_deposits_and_withdrawals(invested, daterange)
+    invested = merge_deposits_and_withdrawals(invested, daterange)
+
+    return {"stock_held": stocks_held, "invested": invested}
 
 
+# start range rebuild_transactions
 def add_data(transactions, forex_data):
     """Add data to transactions"""
     output = []
@@ -167,6 +183,10 @@ def add_data_invested(invested):
     return output
 
 
+# end range rebuild transactions
+
+
+# start range compute transactions
 def get_day_by_day_invested(invested: list, daterange):
     """Get day by day invested"""
     output = []
@@ -178,3 +198,195 @@ def get_day_by_day_invested(invested: list, daterange):
         invested_single_date = add_date(invested_single_date, single_date)
         output.extend(invested_single_date)
     return output
+
+
+def calculate_sells_and_buys(stocks_held, daterange):
+    """Merge sells and buys together"""
+    logging.info("Calculating sells and buys")
+
+    output = []
+
+    # loop through dates
+    for single_date in daterange:
+        logging.debug(f"Calculating sells and buys for {single_date}")
+
+        date_stocks_held_buys = [
+            d
+            for d in stocks_held
+            if d["date"] == single_date and d["transaction_type"] == "Buy"
+        ]
+        date_stocks_held_sells = [
+            d
+            for d in stocks_held
+            if d["date"] == single_date and d["transaction_type"] == "Sell"
+        ]
+
+        symbols_buys = utils.get_unique_items(date_stocks_held_buys, "symbol")
+        symbols_sells = utils.get_unique_items(date_stocks_held_sells, "symbol")
+
+        for symbol_buys in symbols_buys:
+            temp_object = create_buys_and_sells_object(
+                single_date, symbol_buys, date_stocks_held_buys, "Buy"
+            )
+            if not temp_object:
+                continue
+
+            output.append(temp_object)
+
+        for symbol_sells in symbols_sells:
+            temp_object = create_buys_and_sells_object(
+                single_date, symbol_sells, date_stocks_held_sells, "Sell"
+            )
+            if not temp_object:
+                continue
+            output.append(temp_object)
+
+    return output
+
+
+def merge_sells_and_buys(stocks_held, daterange, transaction_type):
+    """Loop through buys and sells and merge them together"""
+    logging.info("Merging sells and buys")
+
+    output = []
+    for single_date in daterange:
+        logging.debug(f"Merging sells and buys for {single_date}")
+
+        # initialize variables
+        symbols = []
+
+        date_stocks_held = [d for d in stocks_held if d["date"] == single_date]
+
+        # get symbols
+        symbols = utils.get_unique_items(date_stocks_held, "symbol")
+
+        # loop through symbols
+        for symbol in symbols:
+            single_stock_list = [d for d in date_stocks_held if d["symbol"] == symbol]
+
+            if (transaction_type == "unrealized") and (len(single_stock_list) == 1):
+                temp_object = single_stock_list[0]
+                temp_object.pop("transaction_type")
+            elif (transaction_type == "realized") and (len(single_stock_list) == 2):
+                single_stock_list = sorted(
+                    single_stock_list, key=lambda k: k["transaction_type"]
+                )
+                temp_object = {
+                    "date": single_stock_list[0]["date"],
+                    "symbol": symbol,
+                    "cost_per_share_buy": single_stock_list[0]["cost_per_share"],
+                    "cost_per_share_sell": single_stock_list[1]["cost_per_share"],
+                    "buy_price": single_stock_list[0]["total_cost"],
+                    "sell_price": single_stock_list[1]["total_cost"],
+                    "average_buy_fx_rate": single_stock_list[0]["average_fx_rate"],
+                    "average_sell_fx_rate": single_stock_list[1]["average_fx_rate"],
+                    "quantity": single_stock_list[0]["quantity"],
+                    "transaction_cost": sum(
+                        d["transaction_cost"] for d in single_stock_list
+                    ),
+                    "currency": single_stock_list[0]["currency"],
+                }
+            else:
+                continue
+            if temp_object["quantity"] > 0:
+                output.append(temp_object)
+    return output
+
+
+def create_buys_and_sells_object(
+    single_date, symbol, date_stocks_held, transaction_type
+):
+    """Create object for buys and sells"""
+    date_stock_held = [d for d in date_stocks_held if d["symbol"] == symbol]
+    if not date_stock_held:
+        return None
+
+    cost = [d["cost"] for d in date_stock_held]
+    forex_rate = [d["forex_rate"] for d in date_stock_held]
+
+    return {
+        "date": single_date,
+        "symbol": symbol,
+        "cost_per_share": sum(d["cost"] for d in date_stock_held)
+        / sum(d["quantity"] for d in date_stock_held),
+        "total_cost": sum(d["cost"] for d in date_stock_held),
+        "average_fx_rate": utils.get_weighted_average(forex_rate, cost),
+        "quantity": sum(d["quantity"] for d in date_stock_held),
+        "transaction_type": transaction_type,
+        "transaction_cost": sum(d["transaction_cost"] for d in date_stock_held),
+        "currency": date_stock_held[0]["currency"],
+    }
+
+
+# end range compute transactions
+
+# start range compute transactions
+
+
+def calculate_deposits_and_withdrawals(invested, daterange):
+    """calculate depoisits and withdrawals"""
+    logging.info("Calculating deposits and withdrawals")
+
+    output_list = []
+
+    for single_date in daterange:
+        # get deposits
+        invested_single_date = [d for d in invested if d["date"] == single_date]
+        deposits = [
+            d for d in invested_single_date if d["transaction_type"] == "Deposit"
+        ]
+        if deposits:
+            temp_object = {
+                "date": single_date,
+                "amount": sum(d["amount"] for d in deposits),
+                "transaction_type": "Deposit",
+            }
+            output_list.append(temp_object)
+
+        # get withdrawals
+        withdrawals = [
+            d for d in invested_single_date if d["transaction_type"] == "Withdrawal"
+        ]
+        if withdrawals:
+            temp_object = {
+                "date": single_date,
+                "amount": sum(d["amount"] for d in withdrawals),
+                "transaction_type": "Withdrawal",
+            }
+            output_list.append(temp_object)
+    # return dictionary
+    return output_list
+
+
+def merge_deposits_and_withdrawals(invested, daterange):
+    """merge deposits and withdrawals"""
+    logging.info("Merging deposits and withdrawals")
+
+    output_list = []
+
+    for single_date in daterange:
+        # get deposits
+        invested_single_date = [d for d in invested if d["date"] == single_date]
+        if (
+            len(invested_single_date) == 1
+            and invested_single_date[0]["transaction_type"] == "Deposit"
+        ):
+            temp_object = {
+                "id": str(uuid.uuid4()),
+                "date": single_date,
+                "invested": invested_single_date[0]["amount"],
+            }
+            output_list.append(temp_object)
+        elif len(invested_single_date) == 2:
+            invested_single_date = sorted(
+                invested_single_date, key=lambda k: k["transaction_type"]
+            )
+            temp_object = {
+                "id": str(uuid.uuid4()),
+                "date": single_date,
+                "invested": invested_single_date[0]["amount"]
+                - invested_single_date[1]["amount"],
+            }
+            output_list.append(temp_object)
+    # return dictionary
+    return output_list
