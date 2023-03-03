@@ -51,8 +51,8 @@ async def insert_item_with_backoff(container, item):
             await container.create_item(item)
             break
         except Exception as err:
-            logging.info(err)
-            logging.critical(f"Retrying in {delay} seconds")
+            logging.debug(err)
+            logging.info(f"Retrying in {delay} seconds")
             await asyncio.sleep(delay)
             delay = min(delay * 2, max_delay) + (
                 random.uniform(0, 0.25) * min(retry_count, 1)
