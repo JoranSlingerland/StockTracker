@@ -3,10 +3,9 @@
 
 import logging
 import asyncio
+import random
 from azure.cosmos.aio import CosmosClient
 from shared_code import get_config, aio_helper
-
-# global variable
 
 
 async def main(payload: str) -> str:
@@ -55,7 +54,9 @@ async def insert_item_with_backoff(container, item):
             logging.debug(err)
             logging.critical(f"Retrying in {delay} seconds")
             await asyncio.sleep(delay)
-            delay = min(delay * 2, max_delay)
+            delay = min(delay * 2, max_delay) + (
+                random.uniform(0, 0.25) * min(retry_count, 1)
+            )
             retry_count += 1
     if retry_count == max_retries:
         # throw terminal error
