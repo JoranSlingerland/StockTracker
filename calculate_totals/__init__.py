@@ -34,7 +34,7 @@ def main(payload: str) -> str:
             if d["date"] == single_date and d["fully_realized"] is False
         ]
         invested_single_date = [
-            d for d in invested["invested"] if d["date"] == single_date
+            d for d in invested if d["date"] == single_date
         ]
 
         totals = {
