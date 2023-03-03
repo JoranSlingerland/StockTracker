@@ -1,10 +1,11 @@
 """Function to output data to CosmosDB"""
+# pylint: disable=broad-except
 
 import logging
+import asyncio
+import random
 from azure.cosmos.aio import CosmosClient
 from shared_code import get_config, aio_helper
-
-# global variable
 
 
 async def main(payload: str) -> str:
@@ -32,14 +33,31 @@ async def main(payload: str) -> str:
     container = database.get_container_client(container_name)
     for item in items:
         # fill event loop list
-        tasks.append(insert_item(container, item))
+        tasks.append(insert_item_with_backoff(container, item))
     # wait for all tasks to complete
-    await aio_helper.gather_with_concurrency(5, *tasks)
+    await aio_helper.gather_with_concurrency(500, *tasks)
     await client.close()
     return '{"status": "Done"}'
 
 
-async def insert_item(container, item):
-    """async fill"""
-
-    await container.create_item(item)
+async def insert_item_with_backoff(container, item):
+    """async fill with backoff"""
+    max_retries = 10
+    retry_count = 0
+    delay = random.uniform(0.2, 0.25)
+    max_delay = 60
+    while retry_count < max_retries:
+        try:
+            await container.create_item(item)
+            break
+        except Exception as err:
+            logging.debug(err)
+            logging.info(f"Retrying in {delay} seconds")
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, max_delay) + (
+                random.uniform(0, 0.25) * min(retry_count, 1)
+            )
+            retry_count += 1
+    if retry_count == max_retries:
+        # throw terminal error
+        raise Exception("Max retries exceeded")
