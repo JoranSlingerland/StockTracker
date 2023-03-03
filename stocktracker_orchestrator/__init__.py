@@ -23,7 +23,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
         days_to_update = days_to_update - 1
 
-    # step 1.1 - Get the input from the sql database
+    # step 1 - Get the input from the sql database
     logging.info("Step 1: Getting transactions")
     transactions = yield context.call_activity("get_transactions", "Go")
 

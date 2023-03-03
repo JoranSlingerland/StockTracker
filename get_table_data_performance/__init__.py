@@ -35,6 +35,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 enable_cross_partition_query=True,
             )
         )
+        container = cosmosdb_module.cosmosdb_container("meta_data")
+        result = utils.add_meta_data_to_stock_data(result, container)
 
     # get data for year, ytd, month, week
     if datatoget in ("year", "ytd", "month", "week"):
@@ -71,6 +73,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     mimetype="application/json",
                     status_code=400,
                 )
+        container = cosmosdb_module.cosmosdb_container("meta_data")
+        start_data = utils.add_meta_data_to_stock_data(start_data, container)
+        end_data = utils.add_meta_data_to_stock_data(end_data, container)
 
         start_date_symbols = []
         end_date_symbols = []
@@ -147,8 +152,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
-    container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(result, container)
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
