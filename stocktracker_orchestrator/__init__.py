@@ -88,10 +88,14 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 8.2 - output everything else to cosmosdb
     logging.info("Step 8.2: Output everything else to cosmosdb")
-    for container_name, items in data.items():
-        result = yield context.call_activity(
-            "output_to_cosmosdb", [container_name, items]
-        )
+    provisioning_tasks = []
+    id_ = 1
+    child_id = f"{context.instance_id}:{id_}"
+    provision_task = context.call_sub_orchestrator(
+        "output_to_cosmosdb_orchestrator", data, child_id
+    )
+    provisioning_tasks.append(provision_task)
+    result = (yield context.task_all(provisioning_tasks))[0]
 
     logging.info("Step 9: Returning result")
     return result
