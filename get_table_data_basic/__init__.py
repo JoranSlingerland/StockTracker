@@ -54,6 +54,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # sort result by transaction_date
         result = sorted(result, key=lambda k: k["date"], reverse=True)
 
+    if containername == "input_transactions":
+        container = cosmosdb_module.cosmosdb_container("meta_data")
+        result = utils.add_meta_data_to_stock_data(result, container)
+
     if not result:
         return func.HttpResponse(
             body='{"status": "No data found"}',
