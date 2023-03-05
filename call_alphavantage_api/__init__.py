@@ -5,6 +5,7 @@ import time
 import requests
 from shared_code import get_config
 
+
 def main(payload: str) -> str:
     """Get data from API"""
 
