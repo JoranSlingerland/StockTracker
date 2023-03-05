@@ -5,7 +5,7 @@ import logging
 import asyncio
 import random
 from azure.cosmos.aio import CosmosClient
-from azure.cosmos.exceptions import CosmosHttpResponseError
+from azure.cosmos import errors
 from shared_code import get_config, aio_helper
 
 
@@ -50,6 +50,9 @@ async def insert_item_with_backoff(container, item):
     while True:
         try:
             await container.create_item(item)
+            break
+        except errors.CosmosResourceExistsError:
+            logging.debug("Item already exists")
             break
         except Exception as err:
             if retry_count >= max_retries:
