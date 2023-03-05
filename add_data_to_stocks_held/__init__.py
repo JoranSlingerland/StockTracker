@@ -254,31 +254,34 @@ def merge_realized_unrealized(
                 output_object = {
                     "date": single_date,
                     "symbol": symbol,
+                    "currency": single_realized[0]["currency"],
                     "fully_realized": True,
+                    "partial_realized": False,
                     "realized": single_realized[0],
                     "unrealized": empty_unrealized,
                     "combined": {},
-                    "currency": single_realized[0]["currency"],
                 }
             if not single_realized and single_unrealized:
                 output_object = {
                     "date": single_date,
                     "symbol": symbol,
+                    "currency": single_unrealized[0]["currency"],
                     "fully_realized": False,
+                    "partial_realized": False,
                     "realized": empty_realized,
                     "unrealized": single_unrealized[0],
                     "combined": {},
-                    "currency": single_unrealized[0]["currency"],
                 }
             if single_realized and single_unrealized:
                 output_object = {
                     "date": single_date,
                     "symbol": symbol,
+                    "currency": single_realized[0]["currency"],
                     "fully_realized": False,
+                    "partial_realized": True,
                     "realized": single_realized[0],
                     "unrealized": single_unrealized[0],
                     "combined": {},
-                    "currency": single_realized[0]["currency"],
                 }
             output.append(output_object)
 
