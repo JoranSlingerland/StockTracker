@@ -5,6 +5,7 @@ import logging
 import asyncio
 import random
 from azure.cosmos.aio import CosmosClient
+from azure.cosmos.exceptions import CosmosHttpResponseError
 from shared_code import get_config, aio_helper
 
 
@@ -46,18 +47,18 @@ async def insert_item_with_backoff(container, item):
     retry_count = 0
     delay = random.uniform(0.2, 0.25)
     max_delay = 60
-    while retry_count < max_retries:
+    while True:
         try:
             await container.create_item(item)
             break
         except Exception as err:
+            if retry_count >= max_retries:
+                logging.error("Max retries reached")
+                raise err
             logging.debug(err)
-            logging.info(f"Retrying in {delay} seconds")
+            logging.debug(f"Retrying in {delay} seconds")
             await asyncio.sleep(delay)
             delay = min(delay * 2, max_delay) + (
                 random.uniform(0, 0.25) * min(retry_count, 1)
             )
             retry_count += 1
-    if retry_count == max_retries:
-        # throw terminal error
-        raise Exception("Max retries exceeded")
