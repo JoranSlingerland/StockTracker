@@ -1,6 +1,5 @@
 """Function to output data to CosmosDB"""
 # pylint: disable=broad-except
-# pylint: disable=broad-exception-raised
 
 import logging
 import asyncio

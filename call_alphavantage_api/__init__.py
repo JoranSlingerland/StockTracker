@@ -1,5 +1,4 @@
 """Call alphavantage API"""
-# pylint: disable=broad-exception-raised
 
 import logging
 import time
