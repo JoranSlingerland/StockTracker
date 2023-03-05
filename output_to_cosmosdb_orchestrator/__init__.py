@@ -11,7 +11,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     data = context.get_input()
 
     for container_name, items in data.items():
-        items = [items[i : i + 1000] for i in range(0, len(items), 1000)]
+        items = [items[i : i + 1000] for i in range(0, len(items), 20000)]
         for batch in items:
             result = yield context.call_activity(
                 "output_to_cosmosdb", [container_name, batch]
