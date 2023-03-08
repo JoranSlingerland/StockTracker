@@ -19,5 +19,8 @@ def add_meta_data_to_stock_data(stock_data, container):
     meta_data = list(container.read_all_items())
     for stock in stock_data:
         filtered_meta_data = [x for x in meta_data if x["symbol"] == stock["symbol"]]
-        stock["meta"] = filtered_meta_data[0]
+        if filtered_meta_data:
+            stock["meta"] = filtered_meta_data[0]
+        else:
+            stock["meta"] = {}
     return stock_data
