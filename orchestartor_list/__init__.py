@@ -13,7 +13,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
 
     client = df.DurableOrchestrationClient(starter)
 
-    output = {"instances": []}
+    output = []
     days = req.route_params["days"]
     end_data = datetime.today()
     start_date = end_data - timedelta(days=int(days))
@@ -25,7 +25,17 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     for instance in instances:
         instance = instance.to_json()
         if instance["name"] == "stocktracker_orchestrator":
-            output["instances"].append(instance)
+            output.append(instance)
+
+    output.sort(key=lambda x: x["createdTime"], reverse=True)
+
+    for instance in output:
+        instance["createdTime"] = instance["createdTime"].replace("T", " ")
+        instance["lastUpdatedTime"] = instance["lastUpdatedTime"].replace("T", " ")
+        instance["createdTime"] = instance["createdTime"].replace(".000000Z", "")
+        instance["lastUpdatedTime"] = instance["lastUpdatedTime"].replace(
+            ".000000Z", ""
+        )
 
     return func.HttpResponse(
         json.dumps(output), status_code=200, mimetype="application/json"
