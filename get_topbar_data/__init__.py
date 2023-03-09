@@ -25,8 +25,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         container = cosmosdb_module.cosmosdb_container("single_day_totals")
         items = list(container.read_all_items())
         output_object = {
-            "total_value": items[0]["total_value"],
             "total_value_gain": items[0]["total_value"],
+            "total_value_gain_percentage": 1,
             "total_pl": items[0]["total_pl"],
             "total_pl_percentage": items[0]["total_pl_percentage"],
             "total_dividends": items[0]["total_dividends"],
@@ -47,9 +47,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             )
         )
         output_object = {
-            "total_value": end_date_totals[0]["total_value"],
             "total_value_gain": end_date_totals[0]["total_value"]
             - start_date_totals[0]["total_value"],
+            "total_value_gain_percentage": (
+                end_date_totals[0]["total_value"] - start_date_totals[0]["total_value"]
+            )
+            / start_date_totals[0]["total_value"],
             "total_pl": end_date_totals[0]["total_pl"]
             - start_date_totals[0]["total_pl"],
             "total_pl_percentage": (
