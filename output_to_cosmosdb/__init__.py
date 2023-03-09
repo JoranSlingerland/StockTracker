@@ -2,11 +2,9 @@
 # pylint: disable=broad-except
 
 import logging
-import asyncio
-import random
+from functools import partial
 from azure.cosmos.aio import CosmosClient
-from azure.cosmos import errors
-from shared_code import get_config, aio_helper
+from shared_code import get_config, aio_helper, cosmosdb_module
 
 
 async def main(payload: str) -> str:
@@ -34,34 +32,12 @@ async def main(payload: str) -> str:
     container = database.get_container_client(container_name)
     for item in items:
         # fill event loop list
-        tasks.append(insert_item_with_backoff(container, item))
+        tasks.append(
+            cosmosdb_module.container_function_with_back_off(
+                partial(container.create_item, item)
+            )
+        )
     # wait for all tasks to complete
     await aio_helper.gather_with_concurrency(50, *tasks)
     await client.close()
     return '{"status": "Done"}'
-
-
-async def insert_item_with_backoff(container, item):
-    """async fill with backoff"""
-    max_retries = 10
-    retry_count = 0
-    delay = random.uniform(0.2, 0.25)
-    max_delay = 60
-    while True:
-        try:
-            await container.create_item(item)
-            break
-        except errors.CosmosResourceExistsError:
-            logging.debug("Item already exists")
-            break
-        except Exception as err:
-            if retry_count >= max_retries:
-                logging.error("Max retries reached")
-                raise err
-            logging.debug(err)
-            logging.debug(f"Retrying in {delay} seconds")
-            await asyncio.sleep(delay)
-            delay = min(delay * 2, max_delay) + (
-                random.uniform(0, 0.25) * min(retry_count, 1)
-            )
-            retry_count += 1

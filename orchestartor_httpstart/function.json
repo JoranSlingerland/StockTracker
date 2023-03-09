@@ -7,10 +7,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "route": "orchestrators/{functionName}/{days_to_update}",
-      "methods": [
-        "post",
-        "get"
-      ]
+      "methods": ["get"]
     },
     {
       "name": "$return",

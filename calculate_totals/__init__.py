@@ -14,6 +14,7 @@ def main(payload: str) -> str:
     invested = payload[1]
     transactions = payload[2]
     days_to_update = payload[3]
+    userid = payload[4]
 
     # get dates
     end_date = date.today()
@@ -33,12 +34,9 @@ def main(payload: str) -> str:
             for d in stocks_held
             if d["date"] == single_date and d["fully_realized"] is False
         ]
-        invested_single_date = [
-            d for d in invested if d["date"] == single_date
-        ]
+        invested_single_date = [d for d in invested if d["date"] == single_date]
 
         totals = {
-            "id": str(uuid.uuid4()),
             "date": single_date,
             "total_cost": sum(
                 d["unrealized"]["total_cost"] for d in stocks_single_date
@@ -60,6 +58,8 @@ def main(payload: str) -> str:
             "transaction_cost": sum(
                 d["realized"]["transaction_cost"] for d in stocks_single_date
             ),
+            "userid": userid,
+            "id": str(uuid.uuid4()),
         }
         output.append(totals)
 

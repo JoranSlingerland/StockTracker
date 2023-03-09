@@ -1,83 +1,59 @@
 """Function to output data to CosmosDB"""
 # pylint: disable=consider-using-from-import
+# pylint: disable=line-too-long
 
 import logging
+from functools import partial
 from datetime import date, timedelta
-import azure.cosmos.exceptions as exceptions
-from azure.cosmos.partition_key import PartitionKey
-from shared_code import get_config, cosmosdb_module
+from shared_code import get_config, cosmosdb_module, aio_helper
 
 
-def main(payload: str) -> str:
+async def main(payload: str) -> str:
     """Function to output data to CosmosDB"""
-    logging.info("Outputting data to CosmosDB")
+    logging.info("Delete CosmosDB items function started")
 
-    days_to_update = payload
+    days_to_update = payload[0]
+    userid = payload[1]
 
     containers = (get_config.get_containers())["containers"]
 
     if days_to_update == "all":
-        recreate_containers(containers)
+        query = "SELECT * FROM c WHERE c.userid = @userid"
+        parameters = [{"name": "@userid", "value": userid}]
     else:
-        drop_selected_dates(containers, days_to_update)
+        today = date.today()
+        end_date = today.strftime("%Y-%m-%d")
+        start_date = (today - timedelta(days=days_to_update)).strftime("%Y-%m-%d")
 
-    return '{"status": "Done"}'
+        query = "SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date and c.userid = @userid"
+        parameters = [
+            {"name": "@start_date", "value": start_date},
+            {"name": "@end_date", "value": end_date},
+            {"name": "@userid", "value": userid},
+        ]
 
-
-def recreate_containers(containers):
-    """Function to recreate containers"""
-    logging.info("Recreating containers")
-
-    database = cosmosdb_module.cosmosdb_database()
-    for container in containers:
-        if container["output_container"]:
-            try:
-                database.delete_container(container["container_name"])
-            except exceptions.CosmosResourceNotFoundError:
-                logging.info(f"Container {container['container_name']} does not exist")
+    tasks = []
 
     for container in containers:
-        if container["output_container"]:
-            database.create_container_if_not_exists(
-                id=container["container_name"],
-                partition_key=PartitionKey(path=container["partition_key"]),
-            )
-
-
-def drop_selected_dates(containers, days_to_update):
-    """Function to drop selected dates"""
-    logging.info("Dropping selected dates")
-    today = date.today()
-    end_date = today.strftime("%Y-%m-%d")
-    start_date = (today - timedelta(days=days_to_update)).strftime("%Y-%m-%d")
-    for container in containers:
-        if (
-            container["output_container"]
-            and container["container_name"] != "single_day"
-        ):
+        if container["output_container"] and container["container_name"] != "meta_data":
             container_client = cosmosdb_module.cosmosdb_container(
                 container["container_name"]
             )
-            for item in container_client.query_items(
-                query="SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date",
-                parameters=[
-                    {"name": "@start_date", "value": start_date},
-                    {"name": "@end_date", "value": end_date},
-                ],
+            items = container_client.query_items(
+                query=query,
+                parameters=parameters,
                 enable_cross_partition_query=True,
-            ):
-                logging.info(item)
-                container_client.delete_item(item, partition_key=item["id"])
+            )
 
-    database = cosmosdb_module.cosmosdb_database()
-    single_day_container_setup = [
-        d for d in containers if d["container_name"] == "single_day"
-    ]
-    try:
-        database.delete_container(single_day_container_setup[0]["container_name"])
-    except exceptions.CosmosResourceNotFoundError:
-        logging.info("Container single_day does not exist")
-    database.create_container_if_not_exists(
-        id=single_day_container_setup[0]["container_name"],
-        partition_key=PartitionKey(path=single_day_container_setup[0]["partition_key"]),
-    )
+            for item in items:
+                logging.debug(item)
+                tasks.append(
+                    cosmosdb_module.container_function_with_back_off(
+                        partial(
+                            container_client.delete_item, item, partition_key=item["id"]
+                        )
+                    )
+                )
+    await aio_helper.gather_with_concurrency(50, *tasks)
+
+    return '{"status": "Done"}'

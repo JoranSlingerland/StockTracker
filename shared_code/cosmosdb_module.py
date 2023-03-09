@@ -2,7 +2,11 @@
 # pylint: disable=unused-argument
 # pylint: disable=consider-using-from-import
 
+import logging
+import random
+import asyncio
 import azure.cosmos.cosmos_client as cosmos_client
+from azure.cosmos import errors
 from shared_code import get_config
 
 
@@ -28,3 +32,35 @@ def cosmosdb_container(container_name: str):
     database = cosmosdb_database()
     container = database.get_container_client(container_name)
     return container
+
+
+async def container_function_with_back_off(
+    function,
+    max_retries=10,
+    delay=random.uniform(0.2, 0.25),
+    max_delay=60,
+):
+    """async fill with backoff"""
+    retry_count = 0
+    while True:
+        try:
+            await function()
+            break
+        except errors.CosmosResourceExistsError:
+            logging.debug("Item already exists")
+            break
+        except errors.CosmosHttpResponseError as err:
+            if err.status_code == 404:
+                logging.debug("Item not found")
+                break
+        except Exception as err:
+            if retry_count >= max_retries:
+                logging.error("Max retries reached")
+                raise err
+            logging.debug(err)
+            logging.debug(f"Retrying in {delay} seconds")
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, max_delay) + (
+                random.uniform(0, 0.25) * min(retry_count, 1)
+            )
+            retry_count += 1

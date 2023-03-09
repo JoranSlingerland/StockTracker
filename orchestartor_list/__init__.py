@@ -50,7 +50,6 @@ async def get_orchestrations(start_date, end_date, client):
                 ".000000Z", ""
             )
             instance.pop("output", None)
-            instance.pop("input", None)
             instance.pop("customStatus", None)
             instance.pop("history", None)
             instance.pop("name", None)
