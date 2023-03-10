@@ -5,16 +5,14 @@ import logging
 
 import azure.functions as func
 import azure.durable_functions as df
+from shared_code import utils
 
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Http Trigger"""
     client = df.DurableOrchestrationClient(starter)
-    try:
-        req_body = req.get_json()
-    except ValueError:
-        req_body = {}
-    userid = req_body.get("userId", None)
+
+    userid = utils.get_user_id_from_req(req)
     functionname = req.route_params["functionName"]
     days_to_update = req.route_params["days_to_update"]
 

@@ -1,4 +1,5 @@
 """General utility functions"""
+import azure.functions as func
 
 
 def get_unique_items(items, key_to_filter):
@@ -24,3 +25,12 @@ def add_meta_data_to_stock_data(stock_data, container):
         else:
             stock["meta"] = {}
     return stock_data
+
+
+def get_user_id_from_req(req: func.HttpRequest) -> str or None:
+    """Get user id from body"""
+    try:
+        req_body = req.get_json()
+    except ValueError:
+        req_body = {}
+    return req_body.get("userId", None)

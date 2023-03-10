@@ -17,11 +17,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     datatype = (req.route_params.get("datatype")).lower()
     datatoget = (req.route_params.get("datatoget")).lower()
-    try:
-        req_body = req.get_json()
-    except ValueError:
-        req_body = {}
-    userid = req_body.get("userId", None)
+    userid = utils.get_user_id_from_req(req)
 
     if not datatype or not datatoget or not userid:
         logging.error("No datatype provided")
