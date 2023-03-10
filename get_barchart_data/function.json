@@ -6,7 +6,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["get"],
+      "methods": ["post"],
       "route": "get_barchart_data/{datatype}/{datatoget}"
     },
     {
