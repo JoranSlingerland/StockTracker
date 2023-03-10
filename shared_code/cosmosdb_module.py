@@ -37,8 +37,8 @@ def cosmosdb_container(container_name: str):
 async def container_function_with_back_off(
     function,
     max_retries=10,
-    delay=random.uniform(0.2, 0.25),
-    max_delay=60,
+    delay=random.uniform(0.0, 0.2),
+    max_delay=5,
 ):
     """async fill with backoff"""
     retry_count = 0
@@ -61,6 +61,6 @@ async def container_function_with_back_off(
             logging.debug(f"Retrying in {delay} seconds")
             await asyncio.sleep(delay)
             delay = min(delay * 2, max_delay) + (
-                random.uniform(0, 0.25) * min(retry_count, 1)
+                random.uniform(0, 1) * min(retry_count, 1)
             )
             retry_count += 1
