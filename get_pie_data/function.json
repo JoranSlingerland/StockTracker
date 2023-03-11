@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": [ "post" ],
-      "route": "get_pie_data/{datatype}",
+      "methods": ["post"],
+      "route": "get_pie_data",
       "authLevel": "anonymous"
     },
     {

@@ -13,17 +13,17 @@ from shared_code import cosmosdb_module, utils
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main fucntion"""
     logging.info("Getting container data")
-    containername = req.route_params.get("containername")
-    try:
-        body = json.loads(req.get_body().decode("utf-8"))
-    except Exception:
-        body = {}
+    containername = req.form.get("containername", None)
+    userid = req.form.get("userId", None)
 
-    andor = body.get("andor")
-    fully_realized = body.get("fully_realized")
-    partial_realized = body.get("partial_realized")
+    andor = req.form.get("andor", None)
+    fully_realized = req.form.get("fully_realized", None)
+    partial_realized = req.form.get("partial_realized", None)
 
-    if not containername:
+    if fully_realized is not None:
+        fully_realized = fully_realized == "true"
+
+    if not containername and userid:
         logging.error("No container name provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -31,7 +31,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
 
-    result = get_items(containername, andor, fully_realized, partial_realized)
+    result = get_items(containername, andor, fully_realized, partial_realized, userid)
 
     if isinstance(result, func.HttpResponse):
         return result
@@ -56,7 +56,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def get_items(containername, andor, fully_realized, partial_realized):
+def get_items(containername, andor, fully_realized, partial_realized, userid):
     """get items from container"""
     logging.info(f"Getting data for container {containername}")
     if containername not in ("input_invested", "input_transactions", "single_day"):
@@ -82,6 +82,7 @@ def get_items(containername, andor, fully_realized, partial_realized):
         container.query_items(
             query=query,
             parameters=[
+                {"name": "@userid", "value": userid},
                 {"name": "@fully_realized", "value": fully_realized},
                 {"name": "@partial_realized", "value": partial_realized},
             ],
@@ -98,14 +99,14 @@ def construct_query(andor, fully_realized, partial_realized):
     """construct query"""
     query = None
     if fully_realized is not None:
-        query = "select * from c where c.fully_realized = @fully_realized"
+        query = "select * from c where c.fully_realized = @fully_realized and c.userid = @userid"
     if partial_realized is not None:
-        query = "select * from c where c.partial_realized = @partial_realized"
+        query = "select * from c where c.partial_realized = @partial_realized and c.userid = @userid"
     if fully_realized is not None and partial_realized is not None:
         if andor == "or":
-            query = "select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized"
+            query = "select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid"
         if andor == "and":
-            query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized"
+            query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid"
     if query is None:
-        query = "select * from c"
+        query = "select * from c where c.userid = @userid"
     return query

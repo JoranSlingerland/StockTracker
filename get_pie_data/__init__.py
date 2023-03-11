@@ -14,8 +14,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """main function"""
     logging.info("Getting table data")
 
-    datatype = (req.route_params.get("datatype")).lower()
-    userid = utils.get_user_id_from_req(req)
+    datatype = req.form.get("dataType", None)
+    userid = req.form.get("userId", None)
 
     if not datatype or not userid:
         logging.error("No datatype provided")
@@ -24,6 +24,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+    datatype = datatype.lower()
+
     logging.info(f"Getting data for {datatype}")
     container = cosmosdb_module.cosmosdb_container("single_day")
     results = list(

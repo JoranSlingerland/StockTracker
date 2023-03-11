@@ -15,9 +15,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    datatype = (req.route_params.get("datatype")).lower()
-    datatoget = (req.route_params.get("datatoget")).lower()
-    userid = utils.get_user_id_from_req(req)
+    datatype = req.form.get("datatype", None)
+    datatoget = req.form.get("datatoget", None)
+    userid = req.form.get("userId", None)
 
     if not datatype or not datatoget or not userid:
         logging.error("No datatype provided")
@@ -26,6 +26,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+    datatype = datatype.lower()
+    datatoget = datatoget.lower()
 
     logging.info(f"Getting data for {datatype}")
     items, start_date, end_date = get_query_parameters(datatype, datatoget, userid)

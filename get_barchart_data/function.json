@@ -7,7 +7,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["post"],
-      "route": "get_barchart_data/{datatype}/{datatoget}"
+      "route": "get_barchart_data"
     },
     {
       "type": "http",

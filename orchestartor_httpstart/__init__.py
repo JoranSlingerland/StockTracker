@@ -12,7 +12,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Http Trigger"""
     client = df.DurableOrchestrationClient(starter)
 
-    userid = utils.get_user_id_from_req(req)
+    userid = req.form.get("userId", None)
     functionname = req.route_params["functionName"]
     days_to_update = req.route_params["days_to_update"]
 
