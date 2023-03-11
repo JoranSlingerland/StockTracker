@@ -15,8 +15,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    datatype = req.form.get("datatype", None)
-    datatoget = req.form.get("datatoget", None)
+    datatype = req.form.get("dataType", None)
+    datatoget = req.form.get("dataToGet", None)
     userid = req.form.get("userId", None)
 
     if not datatype or not datatoget or not userid:

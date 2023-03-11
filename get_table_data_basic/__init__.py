@@ -13,12 +13,12 @@ from shared_code import cosmosdb_module, utils
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main fucntion"""
     logging.info("Getting container data")
-    containername = req.form.get("containername", None)
+    containername = req.form.get("containerName", None)
     userid = req.form.get("userId", None)
 
-    andor = req.form.get("andor", None)
-    fully_realized = req.form.get("fully_realized", None)
-    partial_realized = req.form.get("partial_realized", None)
+    andor = req.form.get("andOr", None)
+    fully_realized = req.form.get("fullyRealized", None)
+    partial_realized = req.form.get("partialRealized", None)
 
     if fully_realized is not None:
         fully_realized = fully_realized == "true"
