@@ -1,5 +1,4 @@
 """General utility functions"""
-import azure.functions as func
 
 
 def get_unique_items(items, key_to_filter):

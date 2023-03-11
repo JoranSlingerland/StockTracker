@@ -85,7 +85,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def new_result_object(datatype):
+def new_result_object(datatype: str) -> dict or None:
     """Generate result object"""
     if datatype == "invested_and_value":
         return {
