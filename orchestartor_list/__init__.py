@@ -1,6 +1,7 @@
 """List all orchestrations"""
 
 import logging
+import ast
 from datetime import datetime, timedelta
 import json
 import azure.functions as func
@@ -15,14 +16,15 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     client = df.DurableOrchestrationClient(starter)
 
     output = []
-    days = req.route_params["days"]
+    days = req.form["days"]
+    userid = req.form["userId"]
     end_date = datetime.today()
 
     tasks = []
     for i in range(int(days)):
         start_date = end_date - timedelta(days=i + 1)
         end_date = end_date - timedelta(days=i)
-        tasks.append(get_orchestrations(start_date, end_date, client))
+        tasks.append(get_orchestrations(start_date, end_date, client, userid))
 
     output = await aio_helper.gather_with_concurrency(10, *tasks)
     output = [item for sublist in output for item in sublist]
@@ -34,7 +36,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     )
 
 
-async def get_orchestrations(start_date, end_date, client):
+async def get_orchestrations(start_date, end_date, client, userid):
     """Get orchestrations"""
     instances = await client.get_status_by(
         created_time_from=start_date, created_time_to=end_date
@@ -42,7 +44,21 @@ async def get_orchestrations(start_date, end_date, client):
     output = []
     for instance in instances:
         instance = instance.to_json()
-        if instance["name"] == "stocktracker_orchestrator":
+        instance_input_userid = (
+            instance["input"]
+            .replace("'", "")
+            .replace('"', "")
+            .replace(" ", "")
+            .replace("[", "")
+            .replace("]", "")
+            .split(",")[1]
+        )
+
+        # log type
+        if (
+            instance["name"] == "stocktracker_orchestrator"
+            and instance_input_userid == userid
+        ):
             instance["createdTime"] = instance["createdTime"].replace("T", " ")
             instance["lastUpdatedTime"] = instance["lastUpdatedTime"].replace("T", " ")
             instance["createdTime"] = instance["createdTime"].replace(".000000Z", "")
@@ -53,5 +69,6 @@ async def get_orchestrations(start_date, end_date, client):
             instance.pop("customStatus", None)
             instance.pop("history", None)
             instance.pop("name", None)
+            instance.pop("input", None)
             output.append(instance)
     return output

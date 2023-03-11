@@ -5,7 +5,6 @@ import logging
 
 import azure.functions as func
 import azure.durable_functions as df
-from shared_code import utils
 
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
@@ -13,8 +12,8 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     client = df.DurableOrchestrationClient(starter)
 
     userid = req.form.get("userId", None)
-    functionname = req.route_params["functionName"]
-    days_to_update = req.route_params["days_to_update"]
+    functionname = req.form.get("functionName", None)
+    days_to_update = req.form.get("daysToUpdate", None)
 
     # check if userid is a string
     if not isinstance(userid, str):

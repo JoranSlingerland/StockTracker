@@ -6,8 +6,8 @@
       "name": "req",
       "type": "httpTrigger",
       "direction": "in",
-      "route": "orchestartor_purge/{instanceId}",
-      "methods": ["get"]
+      "route": "orchestartors/purge",
+      "methods": ["post"]
     },
     {
       "name": "$return",

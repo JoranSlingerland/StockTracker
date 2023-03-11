@@ -10,7 +10,8 @@ import azure.durable_functions as df
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Purge orchestration"""
     client = df.DurableOrchestrationClient(starter)
-    instance_id = req.route_params["instanceId"]
+    instance_id = req.form.get("instanceId", None)
+    userid = req.form.get("userId", None)
 
     logging.info(f"Purging orchestration with ID {instance_id}")
 
@@ -21,6 +22,23 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"status": "Instance not found"}),
             status_code=404,
+            mimetype="application/json",
+        )
+
+    status_input_userid = (
+        status["input"]
+        .replace("'", "")
+        .replace('"', "")
+        .replace(" ", "")
+        .replace("[", "")
+        .replace("]", "")
+        .split(",")[1]
+    )
+
+    if status_input_userid != userid:
+        return func.HttpResponse(
+            json.dumps({"status": "Not authorized to purge this instance"}),
+            status_code=401,
             mimetype="application/json",
         )
 
