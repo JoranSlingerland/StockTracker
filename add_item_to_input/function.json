@@ -7,7 +7,7 @@
       "direction": "in",
       "methods": ["POST"],
       "authLevel": "anonymous",
-      "route": "add_item_to_input"
+      "route": "add/add_item_to_input"
     },
     {
       "type": "http",

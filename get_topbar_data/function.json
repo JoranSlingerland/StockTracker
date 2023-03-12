@@ -7,7 +7,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["post"],
-      "route": "get_topbar_data"
+      "route": "data/get_topbar_data"
     },
     {
       "type": "http",

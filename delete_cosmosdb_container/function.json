@@ -5,9 +5,9 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": [ "get" ],
+      "methods": ["post"],
       "authLevel": "anonymous",
-      "route": "delete_cosmosdb_container/{containers_to_delete}"
+      "route": "priveleged/delete_cosmosdb_container"
     },
     {
       "type": "http",

@@ -14,7 +14,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Creating sql tables")
 
     # get config
-    containers_to_delete = req.route_params.get("containers_to_delete")
+    containers_to_delete = req.form.get("containersToDelete")
     containers = (get_config.get_containers())["containers"]
 
     if not containers_to_delete:

@@ -6,7 +6,7 @@
       "name": "req",
       "type": "httpTrigger",
       "direction": "in",
-      "route": "orchestartors/terminate",
+      "route": "orchestrator/terminate",
       "methods": ["post"]
     },
     {

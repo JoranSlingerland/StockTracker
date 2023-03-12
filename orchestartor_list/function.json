@@ -7,7 +7,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "methods": ["post"],
-      "route": "orchestartors/list"
+      "route": "orchestrator/list"
     },
     {
       "name": "$return",

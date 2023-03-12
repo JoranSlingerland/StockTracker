@@ -6,7 +6,7 @@
       "name": "req",
       "type": "httpTrigger",
       "direction": "in",
-      "route": "orchestartors/purge",
+      "route": "orchestrator/purge",
       "methods": ["post"]
     },
     {
