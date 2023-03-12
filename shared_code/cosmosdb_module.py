@@ -4,6 +4,7 @@
 
 import logging
 import random
+from typing import Callable
 import asyncio
 import azure.cosmos.cosmos_client as cosmos_client
 from azure.cosmos import errors
@@ -35,7 +36,7 @@ def cosmosdb_container(container_name: str):
 
 
 async def container_function_with_back_off(
-    function,
+    function: Callable,
     max_retries=10,
     delay=random.uniform(0.0, 0.2),
     max_delay=5,

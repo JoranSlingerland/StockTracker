@@ -1,9 +1,12 @@
 """Date and time Helper functions"""
 from datetime import date, timedelta
+from typing import Union
 import pandas
 
 
-def get_quarter_first_and_last_date(quarter):
+def get_quarter_first_and_last_date(
+    quarter: str,
+) -> Union[tuple[date, date], tuple[None, None]]:
     """Get first and last date of quarter"""
     quarter_and_year = quarter.split(" ")
     quarter = quarter_and_year[0]
@@ -27,7 +30,7 @@ def get_quarter_first_and_last_date(quarter):
     return None, None
 
 
-def datatogetswitch(datatoget):
+def datatogetswitch(datatoget: str) -> Union[tuple[str, str], tuple[None, None]]:
     """Home made match function"""
     end_date = date.today()
     if datatoget == "year":
@@ -38,7 +41,9 @@ def datatogetswitch(datatoget):
         start_date = end_date - timedelta(days=7)
     if datatoget == "ytd":
         start_date = date(end_date.year, 1, 1)
-
+    else:
+        return None, None
+    
     start_date = start_date.strftime("%Y-%m-%d")
     end_date = end_date.strftime("%Y-%m-%d")
 
@@ -46,7 +51,7 @@ def datatogetswitch(datatoget):
     return start_date, end_date
 
 
-def month_to_quarter(month):
+def month_to_quarter(month: str) -> Union[str, None]:
     """Convert month to quarter"""
     if month in ["January", "February", "March"]:
         return "Q1"
@@ -59,7 +64,7 @@ def month_to_quarter(month):
     return None
 
 
-def get_quarters(start_date, end_date):
+def get_quarters(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get quarters between start and end date"""
     quarters = (
         pandas.date_range(
@@ -79,7 +84,7 @@ def get_quarters(start_date, end_date):
     return output_quarters
 
 
-def get_months(start_date, end_date):
+def get_months(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get months between start and end date"""
     months = pandas.date_range(
         pandas.to_datetime(start_date),
@@ -89,7 +94,7 @@ def get_months(start_date, end_date):
     return months
 
 
-def get_weeks(start_date, end_date):
+def get_weeks(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get weeks between start and end date"""
     weeks = pandas.date_range(
         pandas.to_datetime(start_date),

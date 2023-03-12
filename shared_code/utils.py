@@ -1,7 +1,8 @@
 """General utility functions"""
+from azure.cosmos.container import ContainerProxy
 
 
-def get_unique_items(items, key_to_filter):
+def get_unique_items(items: list, key_to_filter: str) -> list:
     """Get unique items from list of dictionaries by key"""
     output_list = []
     for item in items:
@@ -14,7 +15,7 @@ def get_weighted_average(data: list, weight: list) -> float:
     return float(sum(a * b for a, b in zip(data, weight)) / sum(weight))
 
 
-def add_meta_data_to_stock_data(stock_data, container):
+def add_meta_data_to_stock_data(stock_data: list, container: ContainerProxy) -> list:
     """Add meta data to stock data"""
     meta_data = list(container.read_all_items())
     for stock in stock_data:
