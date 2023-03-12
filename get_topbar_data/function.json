@@ -6,11 +6,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "get",
-        "post"
-      ],
-      "route": "get_topbar_data/{datatoget}"
+      "methods": ["post"],
+      "route": "data/get_topbar_data"
     },
     {
       "type": "http",

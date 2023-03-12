@@ -2,7 +2,7 @@
 
 import logging
 import json
-from datetime import date, timedelta
+from datetime import date
 import azure.functions as func
 
 import pandas
@@ -14,10 +14,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    datatype = req.route_params.get("datatype")
-    datatoget = req.route_params.get("datatoget")
+    userid = req.form.get("userId", None)
+    datatype = req.form.get("dataType", None)
+    datatoget = req.form.get("dataToGet", None)
 
-    if not datatype or not datatoget:
+    if not datatype or not datatoget or not userid:
         logging.error("No datatype provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -28,7 +29,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     container = cosmosdb_module.cosmosdb_container("totals")
     if datatoget == "max":
-        items = list(container.read_all_items())
+        items = list(
+            container.query_items(
+                query="select * from c where c.userid = @userid",
+                parameters=[{"name": "@userid", "value": userid}],
+                enable_cross_partition_query=True,
+            )
+        )
         items = sorted(items, key=lambda k: k["date"])
         start_date = items[0]["date"]
         end_date = date.today().strftime("%Y-%m-%d")
@@ -78,7 +85,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def new_result_object(datatype):
+def new_result_object(datatype: str) -> dict or None:
     """Generate result object"""
     if datatype == "invested_and_value":
         return {

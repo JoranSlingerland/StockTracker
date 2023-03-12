@@ -10,6 +10,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 0: get the input
     logging.info("Step 0: Getting input")
     days_to_update = context.get_input()[0]
+    userid = context.get_input()[1]
     if days_to_update != "all":
         if isinstance(days_to_update, str):
             try:
@@ -25,7 +26,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 1 - Get the input from the sql database
     logging.info("Step 1: Getting transactions")
-    transactions = yield context.call_activity("get_transactions", "Go")
+    transactions = yield context.call_activity("get_transactions", [userid])
 
     # Step 2 - Get api data
     logging.info("Step 2.1: Getting api data")
@@ -40,7 +41,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 3 recreate containers / remove items
     logging.info("Step 3: Delete cosmosdb items")
-    result = yield context.call_activity("delete_cosmosdb_items", days_to_update)
+    result = yield context.call_activity(
+        "delete_cosmosdb_items", [days_to_update, userid]
+    )
 
     # step 4 - output meta data to cosmosdb
     logging.info("Step 4: Output meta data to cosmosdb")
@@ -68,6 +71,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             api_data["forex_data"],
             transactions,
             days_to_update,
+            userid,
         ],
     )
 
@@ -79,7 +83,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "calculate_totals",
-        [data, day_by_day["invested"], transactions, days_to_update],
+        [data, day_by_day["invested"], transactions, days_to_update, userid],
     )
 
     # step 8.1 - output single_day_data to cosmosdb

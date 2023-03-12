@@ -22,12 +22,13 @@ def main(payload: str) -> str:
     symbols = payload[3]["symbols"]
     daterange = payload[3]["daterange"]
     days_to_update = payload[4]
+    userid = payload[5]
 
     stocks = merge_realized_unrealized(
         stocks_held_realized, stocks_held_unrealized, symbols, daterange
     )
     stocks = pop_keys(stocks, ["date", "symbol", "currency"])
-    stocks = add_stock_data(symbols, stocks, stock_data, forex_data)
+    stocks = add_stock_data(symbols, stocks, stock_data, forex_data, userid)
     stocks = filter_output(stocks, days_to_update)
 
     return None, None, stocks
@@ -47,7 +48,7 @@ def filter_output(output: list, days_to_update: Union[int, str]) -> list:
 
 
 def add_stock_data(
-    symbols: list, stocks_held, stock_data: dict, forex_data: dict
+    symbols: list, stocks_held, stock_data: dict, forex_data: dict, userid: str
 ) -> list:
     """Update unrealized stock data"""
     output = []
@@ -63,6 +64,7 @@ def add_stock_data(
         # add id
         stock.update(
             {
+                "userid": userid,
                 "id": str(uuid.uuid4()),
             }
         )

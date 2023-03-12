@@ -6,7 +6,29 @@
       "command": "host start",
       "problemMatcher": "$func-python-watch",
       "isBackground": true,
-      "dependsOn": "pip install (functions)"
+      "dependsOn": ["pip install (functions)", "azurite"]
+    },
+    {
+      "label": "azurite",
+      "type": "shell",
+      "command": "azurite --location ./.azurite",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "azurite",
+        "pattern": [
+          {
+            "regexp": "Azurite Blob service is successfully listening at http://[0-9.]+:10000",
+            "file": 1,
+            "line": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Azurite Blob service is starting",
+          "endsPattern": "Azurite Blob service is successfully listening"
+        }
+      }
     },
     {
       "label": "pip install (functions)",

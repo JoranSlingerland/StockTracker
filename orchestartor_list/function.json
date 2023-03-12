@@ -6,8 +6,8 @@
       "name": "req",
       "type": "httpTrigger",
       "direction": "in",
-      "methods": ["get"],
-      "route": "orchestartor_list/{days}"
+      "methods": ["post"],
+      "route": "orchestrator/list"
     },
     {
       "name": "$return",

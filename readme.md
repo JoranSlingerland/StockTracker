@@ -54,6 +54,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 ### local development environment
 
 - Install the [azure cosmosDB emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/local-emulator?tabs=ssl-netstd21)
+- Install [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=github#install-azurite)
 - Setup a .env file in the stocktracker root with the values below
 
 | Name                      | Notes                          | Example                                          |
@@ -65,73 +66,184 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 | COSMOSDB_DATABASE         | < CosmosDB Database name>      | stocktracker                                     |
 | COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Thoughput >         | 1000                                             |
 
-- Startup the API by pressing `f5` in vscode while in a python file.
+- Startup the API running the task `func host start`
 - run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
 - Go to the website [http://localhost:4280/](http://localhost:4280/) and Login to the website. make sure you give yourself the admin role.
 
 ## Usage
 
-- Go to /authenticated/settings
-- Go to your CosmosDB and insert data in input_invested and input_transactions table. Follow the below json format.
-- input_invested:
-
-```json
-[
-  {
-    "id": "2460ebe2-5610-4e02-8f54-ac5b79fae125",
-    "date": "2019-01-21",
-    "transaction_type": "Deposit",
-    "amount": 100,
-    "_rid": "i5Q5AJKVpVMBAAAAAAAAAA==",
-    "_self": "dbs/i5Q5AA==/colls/i5Q5AJKVpVM=/docs/i5Q5AJKVpVMBAAAAAAAAAA==/",
-    "_etag": "\"0600172c-0000-0700-0000-626876130000\"",
-    "_attachments": "attachments/",
-    "_ts": 1651013139
-  }
-]
-```
-
-- input_transactions:
-
-```json
-[
-  {
-    "id": "ec82b0bc-84b1-4bf9-824e-b704b523e652",
-    "symbol": "AMD",
-    "date": "2020-06-25",
-    "cost": 233.9,
-    "quantity": 3,
-    "transaction_type": "Buy",
-    "transaction_cost": 0.52,
-    "currency": "USD",
-    "domain": "amd.com",
-    "_rid": "+qI9APgIXhYHAAAAAAAAAA==",
-    "_self": "dbs/+qI9AA==/colls/+qI9APgIXhY=/docs/+qI9APgIXhYHAAAAAAAAAA==/",
-    "_etag": "\"00000000-0000-0000-58e9-43ae657901d8\"",
-    "_attachments": "attachments/",
-    "_ts": 1650921189
-  }
-]
-```
-
-- Go back to /authenticated/settings and click the refresh data button.
-- After it has finished running check the data by going to the website
+- Go to /authenticated/settings admin page and create the containers.
+- Add data in /authenticated/actions
+- Refresh the data by going to /authenticated/settings and clicking the refresh data button.
+- After it has finished you can view the data
 
 ## Azure Functions
 
 All Azure functions availible in the api.
 
-| Function                         | Usage                                                      | Link and options                                      |
-| -------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------- |
-| create_cosmosdb_db_and_container | Function will create the CosmosDB database and containers. | /api/create_cosmosdb_db_and_container                 |
-| delete_cosmosdb_container        | Function will delete the cosmosDB database and containers. | /api/delete_cosmosdb_container/{containers_to_delete} |
-| get_barchart_data                | Function will get data for barcharts.                      | /api/get_barchart_data/{datatype}/{datatoget}         |
-| get_linechart_data               | Function will get data for linecharts.                     | /api/get_linechart_data/{datatype}/{datatoget}        |
-| get_pie_data                     | Function will get data for piecharts.                      | /api/get_pie_data/{datatype}                          |
-| get_table_data_basic             | Function will get data used by tables.                     | /api/get_table_data_basic/{containername}             |
-| get_table_data_performance       | Function will get data used by tables.                     | /api/get_table_data_performance/{datatoget}           |
-| get_topbar_data                  | Function will get data used by the topbar                  | /api/get_topbar_data/{datatoget}                      |
-| add_item_to_input                | Function will add an item to the input table               | /api/add_item_to_input/ (Settings in body)            |
+### get_barchart_data
+
+| Method | URL                                 | content-type | Usage                                |
+| ------ | ----------------------------------- | ------------ | ------------------------------------ |
+| POST   | {{base_url}}/data/get_barchart_data | form-data    | Function will get data for barcharts |
+
+Body
+
+| Param     | value      | Type | Allowed values                      | Required |
+| --------- | ---------- | ---- | ----------------------------------- | -------- |
+| userId    | {{userId}} | text | `string`                            | true     |
+| dataType  |            | text | dividend \| transaction_cost        | true     |
+| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+
+### get_table_data_basic
+
+| Method | URL                                    | content-type | Usage                                 |
+| ------ | -------------------------------------- | ------------ | ------------------------------------- |
+| POST   | {{base_url}}/data/get_table_data_basic | form-data    | Function will get data used by tables |
+
+Body
+
+| Param           | value      | Type | Allowed values                                | Required |
+| --------------- | ---------- | ---- | --------------------------------------------- | -------- |
+| userId          | {{userId}} | text | `string`                                      | true     |
+| containerName   |            | text | totals \| single_day_totals \| input_invested | true     |
+| andOr           |            | text | and \| or                                     | false    |
+| fullyRealized   |            | text | true \| false                                 | false    |
+| partialRealized |            | text | true \| false                                 | false    |
+
+### get_linechart_data
+
+| Method | URL                                  | content-type | Usage                                 |
+| ------ | ------------------------------------ | ------------ | ------------------------------------- |
+| POST   | {{base_url}}/data/get_linechart_data | form-data    | Function will get data for linecharts |
+
+Body
+
+| Param     | value      | Type | Allowed values                      | Required |
+| --------- | ---------- | ---- | ----------------------------------- | -------- |
+| userId    | {{userId}} | text | `string`                            | true     |
+| dataType  |            | text | invested_and_value \| total_gains   | true     |
+| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+
+### get_pie_data
+
+| Method | URL                            | content-type | Usage                                |
+| ------ | ------------------------------ | ------------ | ------------------------------------ |
+| POST   | {{base_url}}/data/get_pie_data | form-data    | Function will get data for piecharts |
+
+Body
+
+| Param    | value      | Type | Allowed values                          | Required |
+| -------- | ---------- | ---- | --------------------------------------- | -------- |
+| userId   | {{userId}} | text | `string`                                | true     |
+| dataType | stocks     | text | stocks \| currency \| country \| sector | true     |
+
+### get_table_data_performance
+
+| Method | URL                                          | content-type | Usage                                 |
+| ------ | -------------------------------------------- | ------------ | ------------------------------------- |
+| POST   | {{base_url}}/data/get_table_data_performance | form-data    | Function will get data used by tables |
+
+Body
+
+| Param     | value      | Type | Allowed values                      | Required |
+| --------- | ---------- | ---- | ----------------------------------- | -------- |
+| userId    | {{userId}} | text | `string`                            | true     |
+| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+
+### get_topbar_data
+
+| Method | URL                               | content-type | Usage                             |
+| ------ | --------------------------------- | ------------ | --------------------------------- |
+| POST   | {{base_url}}/data/get_topbar_data | form-data    | Function will get data for topbar |
+
+Body
+
+| Param     | value      | Type | Allowed values                      | Required |
+| --------- | ---------- | ---- | ----------------------------------- | -------- |
+| userId    | {{userId}} | text | `string`                            | true     |
+| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+
+### orchestrator_start
+
+| Method | URL                             | content-type | Usage                               |
+| ------ | ------------------------------- | ------------ | ----------------------------------- |
+| POST   | {{base_url}}/orchestrator/start | form-data    | Function will start an orchestrator |
+
+Body
+
+| Param        | value      | Type | Allowed values            | Required |
+| ------------ | ---------- | ---- | ------------------------- | -------- |
+| userId       | {{userId}} | text | `string`                  | true     |
+| functionName |            | text | stocktracker_orchestrator | true     |
+| daysToUpdate |            | text | all \| `int`              | true     |
+
+### orchestrator_list
+
+| Method | URL                            | content-type | Usage                            |
+| ------ | ------------------------------ | ------------ | -------------------------------- |
+| POST   | {{base_url}}/orchestrator/list | form-data    | Function will list orchestrators |
+
+Body
+
+| Param  | value      | Type | Allowed values | Required |
+| ------ | ---------- | ---- | -------------- | -------- |
+| userId | {{userId}} | text | `string`       | true     |
+| days   |            | text | `int`          | true     |
+
+### orchestrator_purge
+
+| Method | URL                             | content-type | Usage                            |
+| ------ | ------------------------------- | ------------ | -------------------------------- |
+| POST   | {{base_url}}/orchestrator/purge | form-data    | Function will purge orchestrator |
+
+Body
+
+| Param      | value      | Type | Allowed values | Required |
+| ---------- | ---------- | ---- | -------------- | -------- |
+| userId     | {{userId}} | text | `string`       | true     |
+| instanceId |            | text | `string`       | true     |
+
+### orchestrator_terminate
+
+| Method | URL                                 | content-type | Usage                                |
+| ------ | ----------------------------------- | ------------ | ------------------------------------ |
+| POST   | {{base_url}}/orchestrator/terminate | form-data    | Function will terminate orchestrator |
+
+Body
+
+| Param      | value      | Type | Allowed values | Required |
+| ---------- | ---------- | ---- | -------------- | -------- |
+| userId     | {{userId}} | text | `string`       | true     |
+| instanceId |            | text | `string`       | true     |
+
+### create_cosmosdb_and_container
+
+| Method | URL                                                   | content-type | Usage                                         |
+| ------ | ----------------------------------------------------- | ------------ | --------------------------------------------- |
+| GET    | {{base_url}}/priveleged/create_cosmosdb_and_container | form-data    | Function will create a cosmosdb and container |
+
+### delete_cosmosdb_container
+
+| Method | URL                                               | content-type | Usage                                     |
+| ------ | ------------------------------------------------- | ------------ | ----------------------------------------- |
+| POST   | {{base_url}}/priveleged/delete_cosmosdb_container | form-data    | Function will delete a cosmosdb container |
+
+Body
+
+| Param              | value       | Type | Allowed values     | Required |
+| ------------------ | ----------- | ---- | ------------------ | -------- |
+| containersToDelete | output_only | text | all \| output_only | true     |
+
+### add_item_to_input
+
+| Method | URL                                | content-type | Usage                           |
+| ------ | ---------------------------------- | ------------ | ------------------------------- |
+| POST   | {{base_url}}/add/add_item_to_input | json         | Function will add item to input |
+
+Body
+
+Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
 
 ### Main stocktracker function
 
@@ -139,7 +251,7 @@ All Azure functions availible in the api.
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | stocktracker_orchestrator | Function will get all the data from the input tables and use this to create the ouput data. This will then be outputted to the CosmosDB. | /api/orchestrators/stocktracker_orchestrator/{days_to_update} |
 
-Function will get all the data from the input tables and use this to create the ouput data. This will then be outputted to the CosmosDB.
+Function will get all the data from the input tables and use this to create the ouput data. This will then be outputed to the CosmosDB.
 
 ### functions diagram
 

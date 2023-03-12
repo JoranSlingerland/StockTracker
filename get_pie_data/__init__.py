@@ -10,6 +10,55 @@ from colorhash import ColorHash
 from shared_code import cosmosdb_module, utils
 
 
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    """main function"""
+    logging.info("Getting table data")
+
+    datatype = req.form.get("dataType", None)
+    userid = req.form.get("userId", None)
+
+    if not datatype or not userid:
+        logging.error("No datatype provided")
+        return func.HttpResponse(
+            body='{"status": "Please pass a name on the query string or in the request body"}',
+            mimetype="application/json",
+            status_code=400,
+        )
+    datatype = datatype.lower()
+
+    logging.info(f"Getting data for {datatype}")
+    container = cosmosdb_module.cosmosdb_container("single_day")
+    results = list(
+        container.query_items(
+            query="select * from c where c.fully_realized = false and c.userid = @userid",
+            parameters=[{"name": "@userid", "value": userid}],
+            enable_cross_partition_query=True,
+        )
+    )
+    container = cosmosdb_module.cosmosdb_container("meta_data")
+    result = utils.add_meta_data_to_stock_data(results, container)
+
+    result_list = []
+    for result in results:
+        temp_object = inputoptions(datatype, result)
+        result_list.append(temp_object)
+
+    result = remove_duplicates(datatype, result_list)
+    # sort by key value
+    result = sorted(result, key=lambda k: k["value"], reverse=True)
+    result = convert_pie_object_to_chartjs_output(result)
+
+    if not result:
+        return func.HttpResponse(
+            body='{"status": Please pass a valid name on the query string or in the request body"}',
+            mimetype="application/json",
+            status_code=400,
+        )
+    return func.HttpResponse(
+        body=json.dumps(result), mimetype="application/json", status_code=200
+    )
+
+
 def inputoptions(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
@@ -90,56 +139,11 @@ def remove_duplicates(datatype, input_list):
     return None
 
 
-def convert_pie_object_to_chartjs_output(input_object):
+def convert_pie_object_to_chartjs_output(data):
     """Converts the pie object to a chartjs compatible object"""
-    output_object = {"labels": [], "data": [], "color": []}
-    for data in input_object:
-        output_object["labels"].append(data["type"])
-        output_object["data"].append(data["value"])
-        output_object["color"].append(ColorHash(data).hex)
-    return output_object
-
-
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    """main function"""
-    logging.info("Getting table data")
-
-    datatype = req.route_params.get("datatype")
-
-    if not datatype:
-        logging.error("No datatype provided")
-        return func.HttpResponse(
-            body='{"status": "Please pass a name on the query string or in the request body"}',
-            mimetype="application/json",
-            status_code=400,
-        )
-    logging.info(f"Getting data for {datatype}")
-    container = cosmosdb_module.cosmosdb_container("single_day")
-    results = list(
-        container.query_items(
-            query="select * from c where c.fully_realized = false",
-            enable_cross_partition_query=True,
-        )
-    )
-    container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(results, container)
-
-    result_list = []
-    for result in results:
-        temp_object = inputoptions(datatype, result)
-        result_list.append(temp_object)
-
-    result = remove_duplicates(datatype, result_list)
-    # sort by key value
-    result = sorted(result, key=lambda k: k["value"], reverse=True)
-    result = convert_pie_object_to_chartjs_output(result)
-
-    if not result:
-        return func.HttpResponse(
-            body='{"status": Please pass a valid name on the query string or in the request body"}',
-            mimetype="application/json",
-            status_code=400,
-        )
-    return func.HttpResponse(
-        body=json.dumps(result), mimetype="application/json", status_code=200
-    )
+    output = {"labels": [], "data": [], "color": []}
+    for item in data:
+        output["labels"].append(item["type"])
+        output["data"].append(item["value"])
+        output["color"].append(ColorHash(item).hex)
+    return output

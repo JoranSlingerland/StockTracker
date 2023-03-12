@@ -5,8 +5,9 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": [ "get" ],
-      "authLevel": "anonymous"
+      "methods": ["get"],
+      "authLevel": "anonymous",
+      "route": "priveleged/create_cosmosdb_and_container"
     },
     {
       "type": "http",

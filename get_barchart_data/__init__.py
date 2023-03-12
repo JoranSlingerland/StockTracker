@@ -15,50 +15,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    datatype = req.route_params.get("datatype")
-    datatoget = req.route_params.get("datatoget")
+    datatype = req.form.get("dataType", None)
+    datatoget = req.form.get("dataToGet", None)
+    userid = req.form.get("userId", None)
 
-    if not datatype or not datatoget:
+    if not datatype or not datatoget or not userid:
         logging.error("No datatype provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
             mimetype="application/json",
             status_code=400,
         )
-    logging.info(f"Getting data for {datatype}")
-    if datatype == "dividend":
-        container = cosmosdb_module.cosmosdb_container("stocks_held")
-        if datatoget == "max":
-            items = list(container.read_all_items())
-        else:
-            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
-            items = list(
-                container.query_items(
-                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
-                    parameters=[
-                        {"name": "@start_date", "value": start_date},
-                        {"name": "@end_date", "value": end_date},
-                    ],
-                    enable_cross_partition_query=True,
-                )
-            )
+    datatype = datatype.lower()
+    datatoget = datatoget.lower()
 
-    if datatype == "transaction_cost":
-        container = cosmosdb_module.cosmosdb_container("input_transactions")
-        if datatoget == "max":
-            items = list(container.read_all_items())
-        else:
-            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
-            items = list(
-                container.query_items(
-                    query="SELECT * FROM c WHERE c.date >= @start_date AND c.date <= @end_date",
-                    parameters=[
-                        {"name": "@start_date", "value": start_date},
-                        {"name": "@end_date", "value": end_date},
-                    ],
-                    enable_cross_partition_query=True,
-                )
-            )
+    logging.info(f"Getting data for {datatype}")
+    items, start_date, end_date = get_query_parameters(datatype, datatoget, userid)
 
     result = []
     if datatoget == "max":
@@ -70,7 +42,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result = get_max_data(items, start_date, end_date, datatype)
     if datatoget in ["year", "ytd"]:
         result = get_year_ytd_data(items, start_date, end_date, datatype)
-
     if datatoget in ["month", "week"]:
         result = get_month_week_data(items, start_date, end_date, datatype)
 
@@ -83,6 +54,51 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
+
+
+def get_query_parameters(datatype, datatoget, userid):
+    """Get query parameters"""
+    start_date = None
+    end_date = None
+
+    if datatype == "dividend":
+        container = cosmosdb_module.cosmosdb_container("stocks_held")
+        if datatoget == "max":
+            query = "SELECT * FROM c WHERE c.userid = @userid"
+            parameters = [{"name": "@userid", "value": userid}]
+
+        else:
+            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
+            query = "SELECT * FROM c WHERE c.userid = @userid AND c.date >= @start_date AND c.date <= @end_date"
+            parameters = [
+                {"name": "@userid", "value": userid},
+                {"name": "@start_date", "value": start_date},
+                {"name": "@end_date", "value": end_date},
+            ]
+
+    if datatype == "transaction_cost":
+        container = cosmosdb_module.cosmosdb_container("input_transactions")
+        if datatoget == "max":
+            query = "SELECT * FROM c WHERE c.userid = @userid"
+            parameters = [{"name": "@userid", "value": userid}]
+        else:
+            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
+            query = "SELECT * FROM c WHERE c.userid = @userid AND c.date >= @start_date AND c.date <= @end_date"
+            parameters = [
+                {"name": "@userid", "value": userid},
+                {"name": "@start_date", "value": start_date},
+                {"name": "@end_date", "value": end_date},
+            ]
+
+    items = list(
+        container.query_items(
+            query=query,
+            parameters=parameters,
+            enable_cross_partition_query=True,
+        )
+    )
+
+    return items, start_date, end_date
 
 
 def get_max_data(items, start_date, end_date, datatype):
@@ -123,9 +139,7 @@ def get_max_data(items, start_date, end_date, datatype):
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": quarter,
-                    "value": sum(
-                        d["transaction_cost"] for d in single_stock_data
-                    ),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -180,9 +194,7 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": month.strftime("%Y %B"),
-                    "value": sum(
-                        d["transaction_cost"] for d in single_stock_data
-                    ),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:
@@ -238,9 +250,7 @@ def get_month_week_data(items, start_date, end_date, datatype):
             elif symbol in symbols and datatype == "transaction_cost":
                 temp_object = {
                     "date": week.strftime("%Y %U"),
-                    "value": sum(
-                        d["transaction_cost"] for d in single_stock_data
-                    ),
+                    "value": sum(d["transaction_cost"] for d in single_stock_data),
                     "category": symbol,
                 }
             else:

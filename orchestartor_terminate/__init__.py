@@ -10,7 +10,8 @@ import azure.durable_functions as df
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Terminate orchestration"""
     client = df.DurableOrchestrationClient(starter)
-    instance_id = req.route_params["instanceId"]
+    instance_id = req.form.get("instanceId", None)
+    userid = req.form.get("userId", None)
 
     logging.info(f"Terminating orchestration with ID {instance_id}")
 
@@ -23,16 +24,33 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             status_code=404,
             mimetype="application/json",
         )
+
+    status_input_userid = (
+        status["input"]
+        .replace("'", "")
+        .replace('"', "")
+        .replace(" ", "")
+        .replace("[", "")
+        .replace("]", "")
+        .split(",")[1]
+    )
+
+    if status_input_userid != userid:
+        return func.HttpResponse(
+            json.dumps({"status": "Not authorized to terminate this instance"}),
+            status_code=401,
+            mimetype="application/json",
+        )
+
     if status["runtimeStatus"] in ["Completed", "Failed", "Terminated"]:
         return func.HttpResponse(
             json.dumps({"status": "Instance already terminated"}),
             status_code=200,
             mimetype="application/json",
         )
-    reason = "Killed by user"
 
     try:
-        await client.terminate(instance_id, reason)
+        await client.terminate(instance_id, "Killed by user")
     except Exception:
         return func.HttpResponse(
             json.dumps({"status": "Error terminating instance"}),

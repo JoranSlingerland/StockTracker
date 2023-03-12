@@ -14,10 +14,11 @@ from shared_code import cosmosdb_module, date_time_helper, utils
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """main fucntion"""
     logging.info("Getting container data")
-    datatoget = req.route_params.get("datatoget")
+    userid = req.form.get("userId", None)
+    datatoget = req.form.get("dataToGet", None)
     result = []
 
-    if not datatoget:
+    if not datatoget or not userid:
         logging.error("No datatoget provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -26,12 +27,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     logging.info(f"Getting data for {datatoget}")
 
+    datatoget = datatoget.lower()
+
     # get data for max
     if datatoget == "max":
         container = cosmosdb_module.cosmosdb_container("single_day")
         result = list(
             container.query_items(
-                query="SELECT * FROM c WHERE c.fully_realized = false",
+                query="SELECT * FROM c WHERE c.fully_realized = false and c.userid = @userid",
+                parameters=[{"name": "@userid", "value": userid}],
                 enable_cross_partition_query=True,
             )
         )
@@ -44,9 +48,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         start_date, end_date = date_time_helper.datatogetswitch(datatoget)
         start_data = list(
             container.query_items(
-                query="SELECT * FROM c WHERE c.date = @start_date and c.fully_realized = false",
+                query="SELECT * FROM c WHERE c.date = @start_date and c.fully_realized = false and c.userid = @userid",
                 parameters=[
                     {"name": "@start_date", "value": start_date},
+                    {"name": "@userid", "value": userid},
                 ],
                 enable_cross_partition_query=True,
             )
@@ -56,9 +61,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         while not end_data:
             end_data = list(
                 container.query_items(
-                    query="SELECT * FROM c WHERE c.date = @end_date and c.fully_realized = false",
+                    query="SELECT * FROM c WHERE c.date = @end_date and c.fully_realized = false and c.userid = @userid",
                     parameters=[
                         {"name": "@end_date", "value": end_date},
+                        {"name": "@userid", "value": userid},
                     ],
                     enable_cross_partition_query=True,
                 )
