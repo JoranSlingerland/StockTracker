@@ -1,13 +1,11 @@
 """CosmosDB Helper Functions"""
 # pylint: disable=unused-argument
-# pylint: disable=consider-using-from-import
 
 import logging
 import random
 from typing import Callable
 import asyncio
-import azure.cosmos.cosmos_client as cosmos_client
-from azure.cosmos import errors
+from azure.cosmos import errors, cosmos_client
 from shared_code import get_config
 
 
