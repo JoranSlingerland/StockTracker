@@ -6,7 +6,7 @@ from unittest import mock
 import asyncio
 import datetime
 import os
-from azure.cosmos import DatabaseProxy, errors, cosmos_client
+from azure.cosmos import errors
 
 from shared_code import (
     aio_helper,
@@ -43,12 +43,12 @@ class TestCosmosdbModule(unittest.TestCase):
             "key": "test_key",
         },
     )
-    def test_cosmosdb_client(self):
+    @mock.patch("shared_code.cosmosdb_module.cosmos_client.CosmosClient")
+    def test_cosmosdb_client(self, mock_cosmos_client):
         """Test cosmosdb client"""
-
-        cosmosdb_client = cosmosdb_module.cosmosdb_client()
-        # check if type cosmos_client.CosmosClient
-        self.assertIsInstance(cosmosdb_client, cosmos_client.CosmosClient)
+        mock_cosmos_client.return_value = "mock client"
+        result = cosmosdb_module.cosmosdb_client()
+        self.assertEqual(result, "mock client")
 
     @mock.patch.dict(
         get_config.get_cosmosdb(),
@@ -59,11 +59,19 @@ class TestCosmosdbModule(unittest.TestCase):
             "offer_throughput": "test_offer_throughput",
         },
     )
-    def test_cosmosdb_database(self):
+    @mock.patch("shared_code.cosmosdb_module.cosmosdb_client")
+    @mock.patch("shared_code.cosmosdb_module.get_config.get_cosmosdb")
+    def test_cosmosdb_database(self, mock_get_cosmosdb, mock_cosmosdb_client):
         """Test cosmosdb database"""
+        mock_get_cosmosdb.return_value = {"database": "mock database"}
+        mock_client = mock_cosmosdb_client.return_value
+        mock_database_client = mock_client.get_database_client.return_value
+        mock_database_client.return_value = "mock database client"
 
-        cosmosdb_database = cosmosdb_module.cosmosdb_database()
-        self.assertIsInstance(cosmosdb_database, DatabaseProxy)
+        result = cosmosdb_module.cosmosdb_database()
+
+        # Assert that the result is as expected
+        self.assertEqual(result, mock_database_client)
 
     @mock.patch.dict(
         get_config.get_cosmosdb(),
@@ -75,9 +83,14 @@ class TestCosmosdbModule(unittest.TestCase):
             "container": "test_container",
         },
     )
-    def test_cosmosdb_container(self):
+    @mock.patch("shared_code.cosmosdb_module.cosmosdb_database")
+    def test_cosmosdb_container(self, mock_cosmosdb_database):
         """Test cosmosdb container"""
-        pass
+        mock_database = mock_cosmosdb_database.return_value
+        mock_container_client = mock_database.get_container_client.return_value
+        result = cosmosdb_module.cosmosdb_container("mock container name")
+
+        self.assertEqual(result, mock_container_client)
 
     async def test_container_function_with_back_off(self):
         """Test container function with back off"""
