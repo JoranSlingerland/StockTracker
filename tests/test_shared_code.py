@@ -191,7 +191,6 @@ class TestDateTimeHelper(unittest.TestCase):
 
     def test_datatogetswitch(self):
         """Test data to get switch"""
-        pass
 
     def test_month_to_quarter(self):
         """Test month to quarter"""
@@ -287,7 +286,6 @@ class TestDateTimeHelper(unittest.TestCase):
 
     def test_get_weeks(self):
         """test get weeks"""
-        pass
 
 
 class TestSchemas(unittest.TestCase):
