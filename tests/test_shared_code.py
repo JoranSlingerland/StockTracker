@@ -6,7 +6,7 @@ from unittest import mock
 import asyncio
 import datetime
 import os
-from azure.cosmos import errors, cosmos_client
+from azure.cosmos import errors
 
 from shared_code import (
     aio_helper,

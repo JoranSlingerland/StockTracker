@@ -1,4 +1,4 @@
-name: Python Unit Tests
+name: Unit Test
 
 on: [push]
 
@@ -8,6 +8,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      issues: read
+      actions: read
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -20,4 +26,9 @@ jobs:
           pip install -r requirements.txt
       - name: Run unit tests
         run: |
-          python -m unittest discover -s tests -p 'test_*'
+          python -m xmlrunner discover -s tests -p 'test_*' -o test-reports
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: test-reports/*.xml
