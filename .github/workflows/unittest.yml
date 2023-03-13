@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m xmlrunner discover -s tests -p 'test_*' -o test-reports
       - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: test-reports/*.xml
