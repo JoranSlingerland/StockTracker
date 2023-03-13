@@ -33,77 +33,77 @@ class TestAioHelper(unittest.TestCase):
         self.assertEqual(result, [0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
 
 
-# class TestCosmosdbModule(unittest.TestCase):
-#     """Test cosmosdb module"""
+class TestCosmosdbModule(unittest.TestCase):
+    """Test cosmosdb module"""
 
-#     @mock.patch.dict(
-#         get_config.get_cosmosdb(),
-#         {
-#             "COSMOSDB_ENDPOINT": "test_endpoint",
-#             "COSMOSDB_KEY": "test_key",
-#             "COSMOSDB_DATABASE": "test_database",
-#             "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
-#         },
-#     )
-#     @mock.patch("shared_code.cosmosdb_module.cosmos_client.CosmosClient")
-#     def test_cosmosdb_client(self, mock_cosmos_client):
-#         """Test cosmosdb client"""
-#         mock_cosmos_client.return_value = "mock client"
-#         result = cosmosdb_module.cosmosdb_client()
-#         self.assertEqual(result, "mock client")
+    # @mock.patch.dict(
+    #     get_config.get_cosmosdb(),
+    #     {
+    #         "COSMOSDB_ENDPOINT": "test_endpoint",
+    #         "COSMOSDB_KEY": "test_key",
+    #         "COSMOSDB_DATABASE": "test_database",
+    #         "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
+    #     },
+    # )
+    # @mock.patch("shared_code.cosmosdb_module.cosmos_client.CosmosClient")
+    # def test_cosmosdb_client(self, mock_cosmos_client):
+    #     """Test cosmosdb client"""
+    #     mock_cosmos_client.return_value = "mock client"
+    #     result = cosmosdb_module.cosmosdb_client()
+    #     self.assertEqual(result, "mock client")
 
-#     @mock.patch("shared_code.cosmosdb_module.cosmosdb_client")
-#     @mock.patch("shared_code.cosmosdb_module.get_config.get_cosmosdb")
-#     def test_cosmosdb_database(self, mock_get_cosmosdb, mock_cosmosdb_client):
-#         """Test cosmosdb database"""
-#         mock_get_cosmosdb.return_value = {"database": "mock database"}
-#         mock_client = mock_cosmosdb_client.return_value
-#         mock_database_client = mock_client.get_database_client.return_value
-#         mock_database_client.return_value = "mock database client"
+    @mock.patch("shared_code.cosmosdb_module.cosmosdb_client")
+    @mock.patch("shared_code.cosmosdb_module.get_config.get_cosmosdb")
+    def test_cosmosdb_database(self, mock_get_cosmosdb, mock_cosmosdb_client):
+        """Test cosmosdb database"""
+        mock_get_cosmosdb.return_value = {"database": "mock database"}
+        mock_client = mock_cosmosdb_client.return_value
+        mock_database_client = mock_client.get_database_client.return_value
+        mock_database_client.return_value = "mock database client"
 
-#         result = cosmosdb_module.cosmosdb_database()
+        result = cosmosdb_module.cosmosdb_database()
 
-#         # Assert that the result is as expected
-#         self.assertEqual(result, mock_database_client)
+        # Assert that the result is as expected
+        self.assertEqual(result, mock_database_client)
 
-#     @mock.patch("shared_code.cosmosdb_module.cosmosdb_database")
-#     def test_cosmosdb_container(self, mock_cosmosdb_database):
-#         """Test cosmosdb container"""
-#         # mock_get_config = mock_get_config.return_value
-#         mock_database = mock_cosmosdb_database.return_value
-#         mock_container_client = mock_database.get_container_client.return_value
-#         result = cosmosdb_module.cosmosdb_container("mock container name")
-#         self.assertEqual(result, mock_container_client)
+    @mock.patch("shared_code.cosmosdb_module.cosmosdb_database")
+    def test_cosmosdb_container(self, mock_cosmosdb_database):
+        """Test cosmosdb container"""
+        # mock_get_config = mock_get_config.return_value
+        mock_database = mock_cosmosdb_database.return_value
+        mock_container_client = mock_database.get_container_client.return_value
+        result = cosmosdb_module.cosmosdb_container("mock container name")
+        self.assertEqual(result, mock_container_client)
 
-#     async def test_container_function_with_back_off(self):
-#         """Test container function with back off"""
-#         function = mock.MagicMock()
-#         await cosmosdb_module.container_function_with_back_off(function)
-#         function.assert_called_once()
+    async def test_container_function_with_back_off(self):
+        """Test container function with back off"""
+        function = mock.MagicMock()
+        await cosmosdb_module.container_function_with_back_off(function)
+        function.assert_called_once()
 
-#         function.reset_mock()
-#         function.side_effect = Exception(errors.CosmosResourceExistsError)
-#         try:
-#             await cosmosdb_module.container_function_with_back_off(function)
-#         except Exception as err:
-#             self.assertIsInstance(err, errors.CosmosResourceExistsError)
-#         function.assert_called_once()
+        function.reset_mock()
+        function.side_effect = Exception(errors.CosmosResourceExistsError)
+        try:
+            await cosmosdb_module.container_function_with_back_off(function)
+        except Exception as err:
+            self.assertIsInstance(err, errors.CosmosResourceExistsError)
+        function.assert_called_once()
 
-#         function.reset_mock()
-#         function.side_effect = Exception(errors.CosmosHttpResponseError)
-#         try:
-#             await cosmosdb_module.container_function_with_back_off(function)
-#         except Exception as err:
-#             self.assertIsInstance(err, errors.CosmosHttpResponseError)
-#         function.assert_called_once()
+        function.reset_mock()
+        function.side_effect = Exception(errors.CosmosHttpResponseError)
+        try:
+            await cosmosdb_module.container_function_with_back_off(function)
+        except Exception as err:
+            self.assertIsInstance(err, errors.CosmosHttpResponseError)
+        function.assert_called_once()
 
-#         function.reset_mock()
-#         function.side_effect = Exception(Exception)
-#         try:
-#             await cosmosdb_module.container_function_with_back_off(function)
-#         except Exception as err:
-#             self.assertIsInstance(err, Exception)
-#             self.assertEqual(function.call_count, 10)
+        function.reset_mock()
+        function.side_effect = Exception(Exception)
+        try:
+            await cosmosdb_module.container_function_with_back_off(function)
+        except Exception as err:
+            self.assertIsInstance(err, Exception)
+            self.assertEqual(function.call_count, 10)
 
 
 class TestGetConfig(unittest.TestCase):
