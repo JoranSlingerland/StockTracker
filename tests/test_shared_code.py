@@ -6,7 +6,7 @@ from unittest import mock
 import asyncio
 import datetime
 import os
-from azure.cosmos import errors
+from azure.cosmos import errors, cosmos_client
 
 from shared_code import (
     aio_helper,
@@ -36,21 +36,24 @@ class TestAioHelper(unittest.TestCase):
 class TestCosmosdbModule(unittest.TestCase):
     """Test cosmosdb module"""
 
-    # @mock.patch.dict(
-    #     get_config.get_cosmosdb(),
-    #     {
-    #         "COSMOSDB_ENDPOINT": "test_endpoint",
-    #         "COSMOSDB_KEY": "test_key",
-    #         "COSMOSDB_DATABASE": "test_database",
-    #         "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
-    #     },
-    # )
-    # @mock.patch("shared_code.cosmosdb_module.cosmos_client.CosmosClient")
-    # def test_cosmosdb_client(self, mock_cosmos_client):
-    #     """Test cosmosdb client"""
-    #     mock_cosmos_client.return_value = "mock client"
-    #     result = cosmosdb_module.cosmosdb_client()
-    #     self.assertEqual(result, "mock client")
+    @mock.patch("shared_code.get_config.get_cosmosdb")
+    @mock.patch("azure.cosmos.cosmos_client.CosmosClient")
+    def test_cosmosdb_client(self, mock_cosmos_client, mock_get_cosmosdb):
+        """Test cosmosdb client with mocked config and client"""
+        mock_config = mock.MagicMock()
+        mock_config.__getitem__.side_effect = lambda key: {
+            "endpoint": "mock_endpoint",
+            "key": "mock_key",
+        }[key]
+        mock_get_cosmosdb.return_value = mock_config
+
+        mock_client = mock.MagicMock()
+        mock_cosmos_client.return_value = mock_client
+
+        client = cosmosdb_module.cosmosdb_client()
+
+        mock_cosmos_client.assert_called_once_with("mock_endpoint", "mock_key")
+        self.assertEqual(client, mock_client)
 
     @mock.patch("shared_code.cosmosdb_module.cosmosdb_client")
     @mock.patch("shared_code.cosmosdb_module.get_config.get_cosmosdb")
