@@ -39,8 +39,10 @@ class TestCosmosdbModule(unittest.TestCase):
     @mock.patch.dict(
         get_config.get_cosmosdb(),
         {
-            "endpoint": "test_endpoint",
-            "key": "test_key",
+            "COSMOSDB_ENDPOINT": "test_endpoint",
+            "COSMOSDB_KEY": "test_key",
+            "COSMOSDB_DATABASE": "test_database",
+            "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
         },
     )
     @mock.patch("shared_code.cosmosdb_module.cosmos_client.CosmosClient")
@@ -53,10 +55,10 @@ class TestCosmosdbModule(unittest.TestCase):
     @mock.patch.dict(
         get_config.get_cosmosdb(),
         {
-            "endpoint": "test_endpoint",
-            "key": "test_key",
-            "database": "test_database",
-            "offer_throughput": "test_offer_throughput",
+            "COSMOSDB_ENDPOINT": "test_endpoint",
+            "COSMOSDB_KEY": "test_key",
+            "COSMOSDB_DATABASE": "test_database",
+            "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
         },
     )
     @mock.patch("shared_code.cosmosdb_module.cosmosdb_client")
@@ -76,11 +78,10 @@ class TestCosmosdbModule(unittest.TestCase):
     @mock.patch.dict(
         get_config.get_cosmosdb(),
         {
-            "endpoint": "test_endpoint",
-            "key": "test_key",
-            "database": "test_database",
-            "offer_throughput": "test_offer_throughput",
-            "container": "test_container",
+            "COSMOSDB_ENDPOINT": "test_endpoint",
+            "COSMOSDB_KEY": "test_key",
+            "COSMOSDB_DATABASE": "test_database",
+            "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
         },
     )
     @mock.patch("shared_code.cosmosdb_module.cosmosdb_database")
