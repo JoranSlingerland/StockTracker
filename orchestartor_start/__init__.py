@@ -26,7 +26,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             '{"status": "Please pass a valid function name in the route parameters"}',
             status_code=400,
         )
-    if not isinstance(days_to_update, str):
+    if days_to_update != "all" and not days_to_update.isdigit():
         return func.HttpResponse(
             '{"status": "Please pass a valid number of days to update or pass all in the route parameters"}',
             status_code=400,
