@@ -1,7 +1,7 @@
 """Schema for the input data"""
 
 
-def stock_input():
+def stock_input() -> dict:
     """Schema for the input data"""
     return {
         "type": "array",
@@ -38,7 +38,7 @@ def stock_input():
     }
 
 
-def transaction_input():
+def transaction_input() -> dict:
     """Schema for the input data"""
     return {
         "type": "array",

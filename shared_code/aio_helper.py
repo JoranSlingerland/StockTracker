@@ -2,7 +2,8 @@
 
 import asyncio
 
-async def gather_with_concurrency(concurrency, *tasks):
+
+async def gather_with_concurrency(concurrency: int, *tasks):
     """async gather with max concurrency"""
     semaphore = asyncio.Semaphore(concurrency)
 

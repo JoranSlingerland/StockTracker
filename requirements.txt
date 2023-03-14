@@ -9,3 +9,6 @@ azure-cosmos == 4.3.1
 colorhash == 1.2.1
 jsonschema == 4.17.3
 python-dateutil == 2.8.2
+pytest == 7.2.2
+pytest-asyncio== 0.20.3
+pytest-cov == 4.0.0
