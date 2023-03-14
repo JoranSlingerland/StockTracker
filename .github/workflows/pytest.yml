@@ -1,4 +1,4 @@
-name: Unit Test
+name: Pytest
 
 on: [push]
 
@@ -26,9 +26,21 @@ jobs:
           pip install -r requirements.txt
       - name: Run unit tests
         run: |
-          python -m xmlrunner discover -s tests -p 'test_*' -o test-reports
+          pytest --junitxml=test-reports/junit.xml
+      - name: Run coverage
+        run: |
+          pytest --cov=. --cov-report=xml:test-reports/coverage.xml
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: test-reports/*.xml
+          files: test-reports/*.xml | test-reports/htmlcov/*.html
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./test-reports/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
