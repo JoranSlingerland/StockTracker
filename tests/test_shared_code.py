@@ -4,7 +4,7 @@ from unittest import mock
 import asyncio
 import datetime
 import os
-from azure.cosmos import errors
+from azure.cosmos import exceptions
 import pytest
 
 from shared_code import (
@@ -30,7 +30,7 @@ async def test_gather_with_concurrency():
     assert result == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
 
 
-class TestCosmosdbModule():
+class TestCosmosdbModule:
     """Test cosmosdb module"""
 
     @mock.patch("shared_code.get_config.get_cosmosdb")
@@ -75,35 +75,47 @@ class TestCosmosdbModule():
         result = cosmosdb_module.cosmosdb_container("mock container name")
         assert result == mock_container_client
 
+    @pytest.mark.asyncio
     async def test_container_function_with_back_off(self):
         """Test container function with back off"""
-        function = mock.MagicMock()
-        await cosmosdb_module.container_function_with_back_off(function)
+        function = mock.AsyncMock()
+        max_retries = 2
+        delay = 0.1
+        max_delay = 1
+        await cosmosdb_module.container_function_with_back_off(
+            function, max_retries, delay, max_delay
+        )
         function.assert_called_once()
 
         function.reset_mock()
-        function.side_effect = Exception(errors.CosmosResourceExistsError)
+        function.side_effect = exceptions.CosmosResourceExistsError
         try:
-            await cosmosdb_module.container_function_with_back_off(function)
+            await cosmosdb_module.container_function_with_back_off(
+                function, max_retries, delay, max_delay
+            )
         except Exception as err:
-            assert isinstance(err, errors.CosmosResourceExistsError)
+            assert isinstance(err, exceptions.CosmosResourceExistsError)
         function.assert_called_once()
 
         function.reset_mock()
-        function.side_effect = Exception(errors.CosmosHttpResponseError)
+        function.side_effect = exceptions.CosmosHttpResponseError(status_code=404)
         try:
-            await cosmosdb_module.container_function_with_back_off(function)
+            await cosmosdb_module.container_function_with_back_off(
+                function, max_retries, delay, max_delay
+            )
         except Exception as err:
-            assert isinstance(err, errors.CosmosHttpResponseError)
+            assert isinstance(err, exceptions.CosmosHttpResponseError)
         function.assert_called_once()
 
         function.reset_mock()
-        function.side_effect = Exception(Exception)
+        function.side_effect = Exception("test exception")
         try:
-            await cosmosdb_module.container_function_with_back_off(function)
+            await cosmosdb_module.container_function_with_back_off(
+                function, max_retries, delay, max_delay
+            )
         except Exception as err:
             assert isinstance(err, Exception)
-            assert function.call_count == 10
+            assert function.call_count == 3
 
 
 class TestGetConfig:
@@ -308,7 +320,7 @@ class TestUtils:
         weighted_average = utils.get_weighted_average(data, weight)
         assert weighted_average == 3.0
 
-    def test_add_meta_data_to_stock_data2(self):
+    def test_add_meta_data_to_stock_data(self):
         """Test add meta data to stock data"""
         stock_data = [{"symbol": "ABC"}, {"symbol": "XYZ"}]
         meta_data = [
