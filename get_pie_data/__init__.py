@@ -44,9 +44,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result_list.append(temp_object)
 
     result = remove_duplicates(datatype, result_list)
-    # sort by key value
-    result = sorted(result, key=lambda k: k["value"], reverse=True)
-    result = convert_pie_object_to_chartjs_output(result)
 
     if not result:
         return func.HttpResponse(
@@ -54,6 +51,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+
+    result = sorted(result, key=lambda k: k["value"], reverse=True)
+    result = convert_pie_object_to_chartjs_output(result)
+
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
