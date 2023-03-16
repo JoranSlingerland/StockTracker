@@ -36,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     )
     container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(results, container)
+    results = utils.add_meta_data_to_stock_data(results, container)
 
     result_list = []
     for result in results:
