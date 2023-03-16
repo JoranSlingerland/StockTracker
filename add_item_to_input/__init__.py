@@ -62,7 +62,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         tasks.append(insert_item(container, item))
 
     # wait for all tasks to complete
-    await aio_helper.gather_with_concurrency(10, *tasks)
+    aio_helper.gather_with_concurrency(10, *tasks)
     await client.close()
 
     return func.HttpResponse(
