@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 from copy import deepcopy
 import json
 from urllib3 import encode_multipart_formdata
-import pytest
 import azure.functions as func
 from get_pie_data import main
 
@@ -318,3 +317,34 @@ def test_datatype_sector():
         assert result.status_code == 200
         assert body["labels"] == expected_body["labels"]
         assert body["data"] == expected_body["data"]
+
+
+def test_no_data_in_cosmosdb():
+    """Test no data in cosmosdb"""
+
+    body, header = encode_multipart_formdata(
+        {
+            "userId": "123",
+            "dataType": "sector",
+        }
+    )
+    header = {"Content-Type": header}
+
+    mock_request = func.HttpRequest(
+        method="POST",
+        body=body,
+        url="http://localhost:7071/api/data/get_pie_data",
+        headers=header,
+    )
+
+    mock_container = Mock()
+    mock_container.query_items.return_value = []
+
+    with patch(
+        "shared_code.cosmosdb_module.cosmosdb_container", return_value=mock_container
+    ), patch(
+        "shared_code.utils.add_meta_data_to_stock_data",
+        return_value=[],
+    ):
+        result = main(mock_request)
+        assert result.status_code == 400
