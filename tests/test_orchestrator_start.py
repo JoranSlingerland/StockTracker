@@ -23,7 +23,7 @@ async def test_valid_data():
         }
     )
     header = {"Content-Type": header}
-    # starter = mock.MagicMock()
+
     mock_request = func.HttpRequest(
         method="POST",
         body=body,
