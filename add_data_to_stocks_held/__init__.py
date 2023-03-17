@@ -1,17 +1,14 @@
 """Function to add stock data to stocks held"""
-# pylint: disable=line-too-long
-# pylint: disable=too-many-locals
 
-from typing import Union
-import logging
-from datetime import datetime, timedelta, date
 import copy
+import logging
 import uuid
-from shared_code import utils
+from datetime import date, datetime, timedelta
+from typing import Union
 
 
 def main(payload: str) -> str:
-    """add data to stocks held"""
+    """Add data to stocks held"""
     logging.info("Adding stock data to stocks held")
 
     # get data

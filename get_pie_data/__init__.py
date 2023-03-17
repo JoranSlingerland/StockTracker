@@ -1,17 +1,17 @@
 """Function to query sql server for pie data"""
-# pylint: disable=too-many-return-statements
-# pylint: disable=inconsistent-return-statements
 
-import logging
+
 import json
+import logging
 
 import azure.functions as func
 from colorhash import ColorHash
+
 from shared_code import cosmosdb_module, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """main function"""
+    """Main function"""
     logging.info("Getting table data")
 
     datatype = req.form.get("dataType", None)
@@ -36,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     )
     container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(results, container)
+    results = utils.add_meta_data_to_stock_data(results, container)
 
     result_list = []
     for result in results:
@@ -44,9 +44,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result_list.append(temp_object)
 
     result = remove_duplicates(datatype, result_list)
-    # sort by key value
-    result = sorted(result, key=lambda k: k["value"], reverse=True)
-    result = convert_pie_object_to_chartjs_output(result)
 
     if not result:
         return func.HttpResponse(
@@ -54,6 +51,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+
+    result = sorted(result, key=lambda k: k["value"], reverse=True)
+    result = convert_pie_object_to_chartjs_output(result)
+
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )

@@ -1,12 +1,11 @@
 """Create sql tables"""
-# pylint: disable=unused-argument
-# pylint: disable=consider-using-from-import
 
 import logging
+
 import azure.functions as func
-import azure.cosmos.cosmos_client as cosmos_client
-import azure.cosmos.exceptions as exceptions
+from azure.cosmos import cosmos_client
 from azure.cosmos.partition_key import PartitionKey
+
 from shared_code import get_config
 
 

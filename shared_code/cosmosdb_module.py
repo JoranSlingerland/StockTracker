@@ -1,11 +1,13 @@
 """CosmosDB Helper Functions"""
-# pylint: disable=unused-argument
 
+
+import asyncio
 import logging
 import random
 from typing import Callable
-import asyncio
-from azure.cosmos import errors, cosmos_client
+
+from azure.cosmos import cosmos_client, errors
+
 from shared_code import get_config
 
 
@@ -39,7 +41,7 @@ async def container_function_with_back_off(
     delay=random.uniform(0.0, 0.2),
     max_delay=5,
 ):
-    """async fill with backoff"""
+    """Async fill with backoff"""
     retry_count = 0
     while True:
         try:

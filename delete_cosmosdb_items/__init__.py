@@ -1,11 +1,10 @@
-"""Function to output data to CosmosDB"""
-# pylint: disable=consider-using-from-import
-# pylint: disable=line-too-long
+"""Function to delete CosmosDB items"""
 
 import logging
-from functools import partial
 from datetime import date, timedelta
-from shared_code import get_config, cosmosdb_module, aio_helper
+from functools import partial
+
+from shared_code import aio_helper, cosmosdb_module, get_config
 
 
 async def main(payload: str) -> str:

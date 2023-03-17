@@ -1,6 +1,4 @@
 """Function to query sql server for container data"""
-# pylint: disable=too-many-return-statements
-# pylint: disable=line-too-long
 
 import json
 import logging
@@ -11,7 +9,7 @@ from shared_code import cosmosdb_module, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """main fucntion"""
+    """Main fucntion"""
     logging.info("Getting container data")
     containername = req.form.get("containerName", None)
     userid = req.form.get("userId", None)
@@ -57,7 +55,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def get_items(containername, andor, fully_realized, partial_realized, userid):
-    """get items from container"""
+    """Get items from container"""
     logging.info(f"Getting data for container {containername}")
     if containername not in ("input_invested", "input_transactions", "single_day"):
         logging.error("Invalid container name provided")
@@ -96,7 +94,7 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
 
 
 def construct_query(andor, fully_realized, partial_realized):
-    """construct query"""
+    """Construct query"""
     query = None
     if fully_realized is not None:
         query = "select * from c where c.fully_realized = @fully_realized and c.userid = @userid"

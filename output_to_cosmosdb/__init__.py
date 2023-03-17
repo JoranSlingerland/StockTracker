@@ -1,10 +1,12 @@
 """Function to output data to CosmosDB"""
-# pylint: disable=broad-except
+
 
 import logging
 from functools import partial
+
 from azure.cosmos.aio import CosmosClient
-from shared_code import get_config, aio_helper, cosmosdb_module
+
+from shared_code import aio_helper, cosmosdb_module, get_config
 
 
 async def main(payload: str) -> str:

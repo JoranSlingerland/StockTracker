@@ -1,10 +1,10 @@
 """Purge orchestration"""
-# pylint: disable=unused-argument
 
-import logging
 import json
-import azure.functions as func
+import logging
+
 import azure.durable_functions as df
+import azure.functions as func
 
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:

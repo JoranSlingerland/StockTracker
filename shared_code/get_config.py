@@ -2,7 +2,9 @@
 
 # Imports
 import os
+
 from dotenv import load_dotenv
+
 
 # functions
 def get_api_key() -> str:

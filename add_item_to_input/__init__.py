@@ -1,16 +1,15 @@
 """Add stock API."""
-# pylint: disable=broad-except
-
-import logging
 
 import json
-from datetime import datetime
+import logging
 import uuid
-from jsonschema import validate
+
 import azure.functions as func
 from azure.cosmos.aio import CosmosClient
 from dateutil import parser
-from shared_code import schemas, get_config, aio_helper
+from jsonschema import validate
+
+from shared_code import aio_helper, get_config, schemas
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -62,7 +61,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         tasks.append(insert_item(container, item))
 
     # wait for all tasks to complete
-    await aio_helper.gather_with_concurrency(10, *tasks)
+    aio_helper.gather_with_concurrency(10, *tasks)
     await client.close()
 
     return func.HttpResponse(
@@ -73,7 +72,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 async def insert_item(container, item):
-    """async fill"""
+    """Async fill"""
 
     await container.create_item(item)
 

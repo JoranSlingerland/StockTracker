@@ -1,18 +1,17 @@
 """Function to query sql server for container data"""
-# pylint: disable=too-many-return-statements
-# pylint: disable=line-too-long
-# pylint: disable=too-many-locals
 
-import logging
+
 import json
+import logging
+from datetime import datetime, timedelta
 
-from datetime import timedelta, datetime
 import azure.functions as func
+
 from shared_code import cosmosdb_module, date_time_helper, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """main fucntion"""
+    """Main fucntion"""
     logging.info("Getting container data")
     userid = req.form.get("userId", None)
     datatoget = req.form.get("dataToGet", None)

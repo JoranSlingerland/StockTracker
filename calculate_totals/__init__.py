@@ -1,9 +1,10 @@
 """"Function to calulate totals"""
 
 import logging
-from datetime import timedelta, date
 import uuid
-import pandas
+from datetime import date, timedelta
+
+import pandas as pd
 
 
 def main(payload: str) -> str:
@@ -22,7 +23,7 @@ def main(payload: str) -> str:
         start_date = transactions["transactions"][0]["date"]
     else:
         start_date = end_date - timedelta(days=days_to_update)
-    daterange = pandas.date_range(start_date, end_date)
+    daterange = pd.date_range(start_date, end_date)
 
     output = []
     # loop through dates

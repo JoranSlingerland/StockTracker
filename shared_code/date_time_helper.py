@@ -1,7 +1,8 @@
 """Date and time Helper functions"""
 from datetime import date, timedelta
 from typing import Union
-import pandas
+
+import pandas as pd
 
 
 def get_quarter_first_and_last_date(
@@ -65,9 +66,9 @@ def month_to_quarter(month: str) -> Union[str, None]:
 def get_quarters(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get quarters between start and end date"""
     quarters = (
-        pandas.date_range(
-            pandas.to_datetime(start_date),
-            pandas.to_datetime(end_date) + pandas.offsets.QuarterBegin(startingMonth=1),
+        pd.date_range(
+            pd.to_datetime(start_date),
+            pd.to_datetime(end_date) + pd.offsets.QuarterBegin(startingMonth=1),
             freq="Q",
         )
         .strftime("%B %Y")
@@ -84,9 +85,9 @@ def get_quarters(start_date: Union[str, date], end_date: Union[str, date]) -> li
 
 def get_months(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get months between start and end date"""
-    months = pandas.date_range(
-        pandas.to_datetime(start_date),
-        pandas.to_datetime(end_date) + pandas.offsets.MonthBegin(1),
+    months = pd.date_range(
+        pd.to_datetime(start_date),
+        pd.to_datetime(end_date) + pd.offsets.MonthBegin(1),
         freq="M",
     ).tolist()
     return months
@@ -94,9 +95,9 @@ def get_months(start_date: Union[str, date], end_date: Union[str, date]) -> list
 
 def get_weeks(start_date: Union[str, date], end_date: Union[str, date]) -> list:
     """Get weeks between start and end date"""
-    weeks = pandas.date_range(
-        pandas.to_datetime(start_date),
-        pandas.to_datetime(end_date) + pandas.offsets.Week(1),
+    weeks = pd.date_range(
+        pd.to_datetime(start_date),
+        pd.to_datetime(end_date) + pd.offsets.Week(1),
         freq="W",
     ).tolist()
     return weeks

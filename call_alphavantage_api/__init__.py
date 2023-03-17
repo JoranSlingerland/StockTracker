@@ -2,7 +2,9 @@
 
 import logging
 import time
+
 import requests
+
 from shared_code import get_config
 
 
@@ -30,7 +32,7 @@ def main(payload: str) -> str:
 
         key = "Note"
         keys = data.json()
-        if key in keys.keys():
+        if key in keys:
             logging.warning("To many api calls, Waiting for 60 seconds")
             time.sleep(60)
             errorcounter += 1

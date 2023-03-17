@@ -1,11 +1,9 @@
 """Function will rebuild the transactions object"""
-# pylint: disable=inconsistent-return-statements
-
-import logging
-import json
 import copy
+import logging
 import uuid
 from datetime import datetime, timedelta
+
 from shared_code import utils
 
 
@@ -324,7 +322,7 @@ def create_buys_and_sells_object(
 
 
 def calculate_deposits_and_withdrawals(invested, daterange):
-    """calculate depoisits and withdrawals"""
+    """Calculate depoisits and withdrawals"""
     logging.info("Calculating deposits and withdrawals")
 
     output_list = []
@@ -359,7 +357,7 @@ def calculate_deposits_and_withdrawals(invested, daterange):
 
 
 def merge_deposits_and_withdrawals(invested, daterange):
-    """merge deposits and withdrawals"""
+    """Merge deposits and withdrawals"""
     logging.info("Merging deposits and withdrawals")
 
     output_list = []
