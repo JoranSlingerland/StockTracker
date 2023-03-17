@@ -1,6 +1,6 @@
 # StockTracker Project - API
 
-![Pylint](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pylint.yml/badge.svg) ![CodeQL](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg)  ![Pytest](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pytest.yml/badge.svg)
+[![Ruff linting](https://github.com/JoranSlingerland/StockTracker/actions/workflows/ruff.yml/badge.svg)](https://github.com/JoranSlingerland/StockTracker/actions/workflows/ruff.yml) ![CodeQL](https://github.com/JoranSlingerland/StockTracker/actions/workflows/codeql-analysis.yml/badge.svg) ![Pytest](https://github.com/JoranSlingerland/StockTracker/actions/workflows/pytest.yml/badge.svg)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/joranslingerland/stocktracker/badge)](https://www.codefactor.io/repository/github/joranslingerland/stocktracker) [![codecov](https://codecov.io/gh/JoranSlingerland/StockTracker/branch/main/graph/badge.svg?token=D3RHOGNOL6)](https://codecov.io/gh/JoranSlingerland/StockTracker)
 
