@@ -121,3 +121,33 @@ async def test_main(cosmos_client_mock, get_cosmosdb_mock):
     assert response.status_code == 200
     assert response.mimetype == "application/json"
     assert response.get_body().decode() == '{"result": "done"}'
+
+
+@pytest.mark.asyncio
+async def test_invalid_type():
+    """test add_item_to_input with invalid type"""
+    body = {
+        "type": "invalid",
+        "items": [
+            {
+                "symbol": "AMD",
+                "date": "2023-03-16T21:41:18.901Z",
+                "cost": 100,
+                "quantity": 1,
+                "transaction_type": "Buy",
+                "transaction_cost": 0.5,
+                "currency": "USD",
+                "domain": "amd.com",
+            }
+        ],
+    }
+
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/add_item_to_input",
+    )
+
+    response = await main(req)
+    assert response.status_code == 400
+    assert response.get_body() == b'{"result": "Invalid input type"}'

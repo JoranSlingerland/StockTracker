@@ -1,4 +1,6 @@
 """Test get_pie_data.py"""
+#pylint: disable=line-too-long
+
 from unittest.mock import Mock, patch
 from copy import deepcopy
 import json
