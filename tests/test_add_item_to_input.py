@@ -1,12 +1,14 @@
 """Test add_item_to_input.py"""
-from unittest.mock import MagicMock, patch
 import json
-import pytest
+from unittest.mock import MagicMock, patch
+
 import azure.functions as func
+import pytest
+
 from add_item_to_input import main
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_add_invalid_json_body():
     """Test add_item_to_input with invalid json body"""
     req = func.HttpRequest(
@@ -19,9 +21,9 @@ async def test_add_invalid_json_body():
     assert response.get_body() == b'{"result": "Invalid json body"}'
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_transaction():
-    """test add transaction"""
+    """Test add transaction"""
     body = {
         "type": "transaction",
         "items": [
@@ -44,9 +46,9 @@ async def test_invalid_transaction():
     assert response.get_body() == b'{"result": "Schema validation failed"}'
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_stock():
-    """test add stock"""
+    """Test add stock"""
     body = {
         "type": "stock",
         "items": [
@@ -75,11 +77,11 @@ async def test_invalid_stock():
     assert body == b'{"result": "Schema validation failed"}'
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 @patch("shared_code.get_config.get_cosmosdb")
 @patch("azure.cosmos.aio.CosmosClient")
 async def test_main(cosmos_client_mock, get_cosmosdb_mock):
-    """test add_item_to_input"""
+    """Test add_item_to_input"""
     body = {
         "type": "stock",
         "items": [
@@ -123,9 +125,9 @@ async def test_main(cosmos_client_mock, get_cosmosdb_mock):
     assert response.get_body().decode() == '{"result": "done"}'
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_type():
-    """test add_item_to_input with invalid type"""
+    """Test add_item_to_input with invalid type"""
     body = {
         "type": "invalid",
         "items": [

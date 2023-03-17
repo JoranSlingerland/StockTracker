@@ -1,15 +1,15 @@
-"Get Transactions data"
-# pylint: disable=unused-argument
-# pylint: disable=expression-not-assigned
+"""Get Transactions data"""
 
 import logging
 from datetime import date
-import pandas
+
+import pandas as pd
+
 from shared_code import cosmosdb_module, utils
 
 
 def main(payload: str) -> str:
-    "Get Transactions data"
+    """Get Transactions data"""
     logging.info("Getting transactions data")
 
     userid = payload[0]
@@ -25,9 +25,7 @@ def main(payload: str) -> str:
 
     end_date = date.today()
     start_date = transactions[0]["date"]
-    daterange = [
-        d.strftime("%Y-%m-%d") for d in pandas.date_range(start_date, end_date)
-    ]
+    daterange = [d.strftime("%Y-%m-%d") for d in pd.date_range(start_date, end_date)]
     symbols = utils.get_unique_items(transactions, "symbol")
 
     return {
@@ -39,7 +37,7 @@ def main(payload: str) -> str:
 
 
 def get_cosmosdb_items(query, parameters, container_name, keys_to_pop):
-    "Get CosmosDB items"
+    """Get CosmosDB items"""
     container_client = cosmosdb_module.cosmosdb_container(container_name)
     items = list(
         container_client.query_items(

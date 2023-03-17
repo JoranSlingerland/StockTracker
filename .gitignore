@@ -137,3 +137,6 @@ __azurite_db*__.json
 
 # Persistent data
 /.temp
+
+# Ruff
+.ruff_cache

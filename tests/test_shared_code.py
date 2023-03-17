@@ -1,11 +1,12 @@
 """Test get_config.py"""
 
-from unittest import mock
 import asyncio
 import datetime
 import os
-from azure.cosmos import exceptions
+from unittest import mock
+
 import pytest
+from azure.cosmos import exceptions
 
 from shared_code import (
     aio_helper,
@@ -17,7 +18,7 @@ from shared_code import (
 )
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_gather_with_concurrency():
     """Test gather with concurrency"""
 
@@ -75,47 +76,42 @@ class TestCosmosdbModule:
         result = cosmosdb_module.cosmosdb_container("mock container name")
         assert result == mock_container_client
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_container_function_with_back_off(self):
         """Test container function with back off"""
         function = mock.AsyncMock()
         max_retries = 2
         delay = 0.1
         max_delay = 1
+
         await cosmosdb_module.container_function_with_back_off(
             function, max_retries, delay, max_delay
         )
         function.assert_called_once()
 
         function.reset_mock()
-        function.side_effect = exceptions.CosmosResourceExistsError
-        try:
-            await cosmosdb_module.container_function_with_back_off(
-                function, max_retries, delay, max_delay
-            )
-        except Exception as err:
-            assert isinstance(err, exceptions.CosmosResourceExistsError)
+        function.side_effect = exceptions.CosmosResourceExistsError()
+        await cosmosdb_module.container_function_with_back_off(
+            function, max_retries, delay, max_delay
+        )
         function.assert_called_once()
 
         function.reset_mock()
         function.side_effect = exceptions.CosmosHttpResponseError(status_code=404)
-        try:
-            await cosmosdb_module.container_function_with_back_off(
-                function, max_retries, delay, max_delay
-            )
-        except Exception as err:
-            assert isinstance(err, exceptions.CosmosHttpResponseError)
+        await cosmosdb_module.container_function_with_back_off(
+            function, max_retries, delay, max_delay
+        )
         function.assert_called_once()
 
         function.reset_mock()
         function.side_effect = Exception("test exception")
-        try:
+
+        # should raise an exception exception("test exception")
+        with pytest.raises(Exception, match="test exception"):
             await cosmosdb_module.container_function_with_back_off(
                 function, max_retries, delay, max_delay
             )
-        except Exception as err:
-            assert isinstance(err, Exception)
-            assert function.call_count == 3
+        assert function.call_count == max_retries + 1
 
 
 class TestGetConfig:
@@ -124,14 +120,12 @@ class TestGetConfig:
     @mock.patch.dict(os.environ, {"API_KEY": "test_api_key"})
     def test_get_api_key(self):
         """Test get api key"""
-
         api_key = get_config.get_api_key()
         assert api_key == "test_api_key"
 
     @mock.patch.dict(os.environ, {"CLEARBIT_API_KEY": "test_clearbit_api_key"})
     def test_get_clearbit_api_key(self):
         """Test get clearbit api key"""
-
         clearbit_api_key = get_config.get_clearbit_api_key()
         assert clearbit_api_key == "test_clearbit_api_key"
 
@@ -146,7 +140,6 @@ class TestGetConfig:
     )
     def test_get_cosmosdb(self):
         """Test get cosmosdb"""
-
         cosmosdb = get_config.get_cosmosdb()
         assert cosmosdb["endpoint"] == "test_endpoint"
         assert cosmosdb["key"] == "test_key"
@@ -242,7 +235,7 @@ class TestDateTimeHelper:
         assert quarter is None
 
     def test_get_quarter(self):
-        """test get quarter"""
+        """Test get quarter"""
         start_date = datetime.date(2021, 1, 1)
         end_date = datetime.date(2021, 3, 31)
         quarters = date_time_helper.get_quarters(start_date, end_date)
@@ -259,7 +252,7 @@ class TestDateTimeHelper:
         assert not quarters
 
     def test_get_months(self):
-        """test get months"""
+        """Test get months"""
         start_date = datetime.date(2021, 1, 1)
         end_date = datetime.date(2021, 3, 31)
         months = date_time_helper.get_months(start_date, end_date)
@@ -275,7 +268,7 @@ class TestDateTimeHelper:
         assert months == []
 
     def test_get_weeks(self):
-        """test get weeks"""
+        """Test get weeks"""
 
 
 class TestSchemas:

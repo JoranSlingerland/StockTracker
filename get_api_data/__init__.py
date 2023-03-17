@@ -1,18 +1,18 @@
 """"Get Stock data orchestrator function"""
-# pylint: disable=line-too-long
 
 
 import logging
-from datetime import datetime, timedelta
 import uuid
-import requests
+from datetime import datetime, timedelta
+
 import azure.durable_functions as df
-import azure.functions as func
+import requests
+
 from shared_code import get_config, utils
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
-    """get data for all stocks from api"""
+    """Get data for all stocks from api"""
     logging.info("Getting stock data")
 
     # initialize variables
@@ -83,7 +83,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
 
 def filter_stock_data(data: dict, transactions: list, symbol: str) -> dict:
-    """filter data to only include dates that have transactions"""
+    """Filter data to only include dates that have transactions"""
     transactions = [d for d in transactions if d["symbol"] == symbol]
     transactions.sort(key=lambda x: x["date"])
     oldest_date = datetime.strftime(
@@ -98,7 +98,7 @@ def filter_stock_data(data: dict, transactions: list, symbol: str) -> dict:
 
 
 def filter_forex_data(data: dict, transactions: list, currency: str) -> dict:
-    """filter data to only include dates that have transactions"""
+    """Filter data to only include dates that have transactions"""
     transactions = [d for d in transactions if d["currency"] == currency]
     transactions.sort(key=lambda x: x["date"])
     oldest_date = datetime.strftime(

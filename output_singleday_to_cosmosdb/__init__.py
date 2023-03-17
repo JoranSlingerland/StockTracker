@@ -2,6 +2,7 @@
 
 import logging
 from datetime import date
+
 from shared_code import cosmosdb_module
 
 

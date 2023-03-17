@@ -1,11 +1,12 @@
 """Test get_pie_data.py"""
-#pylint: disable=line-too-long
 
-from unittest.mock import Mock, patch
-from copy import deepcopy
 import json
-from urllib3 import encode_multipart_formdata
+from copy import deepcopy
+from unittest.mock import Mock, patch
+
 import azure.functions as func
+from urllib3 import encode_multipart_formdata
+
 from get_pie_data import main
 
 
@@ -348,5 +349,7 @@ def test_no_data_in_cosmosdb():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=[],
     ):
+        result = main(mock_request)
+        assert result.status_code == 400
         result = main(mock_request)
         assert result.status_code == 400

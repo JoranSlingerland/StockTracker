@@ -1,18 +1,15 @@
 {
-    "python.linting.pylintEnabled": true,
-    "python.formatting.provider": "black",
-    "python.linting.enabled": true,
-    "python.linting.pylintArgs": [],
-    "python.terminal.activateEnvironment": true,
-    "azureFunctions.deploySubpath": ".",
-    "azureFunctions.scmDoBuildDuringDeployment": true,
-    "azureFunctions.pythonVenv": ".venv",
-    "azureFunctions.projectLanguage": "Python",
-    "azureFunctions.projectRuntime": "~4",
-    "python.analysis.typeCheckingMode": "off",
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
+  "python.formatting.provider": "black",
+  "python.linting.enabled": true,
+  "python.terminal.activateEnvironment": true,
+  "azureFunctions.deploySubpath": ".",
+  "azureFunctions.scmDoBuildDuringDeployment": true,
+  "azureFunctions.pythonVenv": ".venv",
+  "azureFunctions.projectLanguage": "Python",
+  "azureFunctions.projectRuntime": "~4",
+  "python.analysis.typeCheckingMode": "off",
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.linting.pylintEnabled": false
 }

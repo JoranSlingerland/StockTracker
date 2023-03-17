@@ -1,12 +1,11 @@
 """Create sql tables"""
-# pylint: disable=unused-argument
-# pylint: disable=line-too-long
-# pylint: disable=consider-using-from-import
 
 import logging
+
 import azure.functions as func
-import azure.cosmos.exceptions as exceptions
-from shared_code import get_config, cosmosdb_module
+from azure.cosmos import exceptions
+
+from shared_code import cosmosdb_module, get_config
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:

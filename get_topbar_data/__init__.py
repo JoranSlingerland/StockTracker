@@ -1,7 +1,8 @@
 """Get topbar data from Azure cosmos DB"""
 
-import logging
 import json
+import logging
+
 import azure.functions as func
 
 from shared_code import cosmosdb_module, date_time_helper

@@ -1,18 +1,18 @@
 """Test Durable Functions Http Start."""
-# pylint: disable=line-too-long
 
 from unittest import mock
-import azure.functions as func
+
 import azure.durable_functions as df
-from urllib3 import encode_multipart_formdata
+import azure.functions as func
 import pytest
+from urllib3 import encode_multipart_formdata
 
 from orchestartor_start import main
 
 starter = mock.MagicMock()
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_valid_data():
     """Test Durable Functions Http Start."""
     body, header = encode_multipart_formdata(
@@ -46,7 +46,7 @@ async def test_valid_data():
         assert response == mock_response
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_userid():
     """Test Durable Functions Http Start."""
     body, header = encode_multipart_formdata(
@@ -78,9 +78,9 @@ async def test_invalid_userid():
         assert response.get_body() == excpected_response.get_body()
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_function_name():
-    """check invalid function name"""
+    """Check invalid function name"""
     body, header = encode_multipart_formdata(
         {
             "userId": "123",
@@ -111,9 +111,9 @@ async def test_invalid_function_name():
         assert response.get_body() == excpected_response.get_body()
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_invalid_days_to_update():
-    """check invalid days to update"""
+    """Check invalid days to update"""
     body, header = encode_multipart_formdata(
         {
             "userId": "123",

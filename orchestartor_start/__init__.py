@@ -1,10 +1,9 @@
 """Http start function"""
-# pylint: disable=line-too-long
 
 import logging
 
-import azure.functions as func
 import azure.durable_functions as df
+import azure.functions as func
 
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:

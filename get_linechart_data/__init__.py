@@ -1,11 +1,11 @@
 """Module to get line chart data"""
 
-import logging
 import json
+import logging
 from datetime import date
-import azure.functions as func
 
-import pandas
+import azure.functions as func
+import pandas as pd
 
 from shared_code import cosmosdb_module, date_time_helper
 
@@ -53,7 +53,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     result = new_result_object(datatype)
-    daterange = pandas.date_range(start_date, end_date)
+    daterange = pd.date_range(start_date, end_date)
 
     for single_date in daterange:
         single_date = single_date.strftime("%Y-%m-%d")

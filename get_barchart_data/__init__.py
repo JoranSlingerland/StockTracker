@@ -1,12 +1,12 @@
 """Module to get line chart data"""
-# pylint: disable=too-many-locals
-# pylint: disable=line-too-long
 
-import logging
+
 import json
+import logging
 from datetime import date, timedelta
+
 import azure.functions as func
-import pandas
+import pandas as pd
 
 from shared_code import cosmosdb_module, date_time_helper, utils
 
@@ -118,7 +118,7 @@ def get_max_data(items, start_date, end_date, datatype):
             quarter_start_date,
             quarter_end_date,
         ) = date_time_helper.get_quarter_first_and_last_date(quarter)
-        daterange = pandas.date_range(
+        daterange = pd.date_range(
             quarter_start_date,
             quarter_end_date,
         )
@@ -175,7 +175,7 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
         month_start_date = month.replace(day=1)
         month_start_date = month_start_date.strftime("%Y-%m-%d")
         month_end_date = month.strftime("%Y-%m-%d")
-        daterange = pandas.date_range(
+        daterange = pd.date_range(
             month_start_date,
             month_end_date,
         )
@@ -231,7 +231,7 @@ def get_month_week_data(items, start_date, end_date, datatype):
         week_start_date = week - timedelta(days=week.weekday())
         week_start_date = week_start_date.strftime("%Y-%m-%d")
         week_end_date = week.strftime("%Y-%m-%d")
-        daterange = pandas.date_range(
+        daterange = pd.date_range(
             week_start_date,
             week_end_date,
         )

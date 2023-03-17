@@ -1,10 +1,11 @@
 """Test add_item_to_input.py"""
-from unittest.mock import MagicMock, patch
 import json
+from unittest.mock import MagicMock, patch
+
 import azure.functions as func
 from urllib3 import encode_multipart_formdata
-from get_barchart_data import main
 
+from get_barchart_data import main
 
 mock_data_container_input_transactions = [
     {

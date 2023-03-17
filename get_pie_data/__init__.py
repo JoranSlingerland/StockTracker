@@ -1,17 +1,17 @@
 """Function to query sql server for pie data"""
-# pylint: disable=too-many-return-statements
-# pylint: disable=inconsistent-return-statements
 
-import logging
+
 import json
+import logging
 
 import azure.functions as func
 from colorhash import ColorHash
+
 from shared_code import cosmosdb_module, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """main function"""
+    """Main function"""
     logging.info("Getting table data")
 
     datatype = req.form.get("dataType", None)
