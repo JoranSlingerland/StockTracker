@@ -60,6 +60,9 @@ def get_query_parameters(datatype, datatoget, userid):
     """Get query parameters"""
     start_date = None
     end_date = None
+    container = None
+    query = None
+    parameters = None
 
     if datatype == "dividend":
         container = cosmosdb_module.cosmosdb_container("stocks_held")
@@ -89,6 +92,9 @@ def get_query_parameters(datatype, datatoget, userid):
                 {"name": "@start_date", "value": start_date},
                 {"name": "@end_date", "value": end_date},
             ]
+
+    if not container or not query or not parameters:
+        return [], None, None
 
     items = list(
         container.query_items(
