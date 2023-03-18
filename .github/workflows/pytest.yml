@@ -26,10 +26,10 @@ jobs:
           pip install -r requirements/dev.txt
       - name: Run unit tests
         run: |
-          pytest --junitxml=test-reports/junit.xml
+          pytest --junitxml=test-reports/junit.xml -v
       - name: Run coverage
         run: |
-          pytest --cov=. --cov-report=xml:test-reports/coverage.xml
+          pytest --cov=. --cov-report=xml:test-reports/coverage.xml -v
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()

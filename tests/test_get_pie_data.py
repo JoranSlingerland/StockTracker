@@ -353,3 +353,37 @@ def test_no_data_in_cosmosdb():
         assert result.status_code == 400
         result = main(mock_request)
         assert result.status_code == 400
+
+
+def test_invalid_datatype():
+    """Test invalid datatype"""
+    body, header = encode_multipart_formdata(
+        {
+            "userId": "123",
+            "dataType": "invalid",
+        }
+    )
+    header = {"Content-Type": header}
+
+    mock_request = func.HttpRequest(
+        method="POST",
+        body=body,
+        url="http://localhost:7071/api/data/get_pie_data",
+        headers=header,
+    )
+
+    mock_container = Mock()
+    mock_container.query_items.return_value = mock_container_response
+
+    with patch(
+        "shared_code.cosmosdb_module.cosmosdb_container", return_value=mock_container
+    ), patch(
+        "shared_code.utils.add_meta_data_to_stock_data",
+        return_value=mock_add_meta_data_response,
+    ):
+        result = main(mock_request)
+        assert result.status_code == 400
+        assert (
+            result.get_body()
+            == b'{"status": Please pass a valid name on the query string or in the request body"}'
+        )
