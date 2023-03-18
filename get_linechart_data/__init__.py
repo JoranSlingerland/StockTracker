@@ -37,6 +37,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             )
         )
         items = sorted(items, key=lambda k: k["date"])
+        if len(items) == 0:
+            return func.HttpResponse(
+                body='{"status": No data found in database for this timeframe"}',
+                mimetype="application/json",
+                status_code=500,
+            )
         start_date = items[0]["date"]
         end_date = date.today().strftime("%Y-%m-%d")
     else:
@@ -51,8 +57,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 enable_cross_partition_query=True,
             )
         )
+        if len(items) == 0:
+            return func.HttpResponse(
+                body='{"status": No data found in database for this timeframe"}',
+                mimetype="application/json",
+                status_code=500,
+            )
 
     result = new_result_object(datatype)
+
+    if not result:
+        return func.HttpResponse(
+            body='{"status": Invalid datatype provided"}',
+            mimetype="application/json",
+            status_code=400,
+        )
+
     daterange = pd.date_range(start_date, end_date)
 
     for single_date in daterange:
@@ -68,18 +88,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             if datatype == "total_gains":
                 result["datasets"][0]["data"].append(single_date_item["total_pl"])
 
-    if not items:
-        return func.HttpResponse(
-            body='{"status": No data found in database for this timeframe"}',
-            mimetype="application/json",
-            status_code=500,
-        )
-    if not result:
-        return func.HttpResponse(
-            body='{"status": Something went wrong"}',
-            mimetype="application/json",
-            status_code=500,
-        )
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
