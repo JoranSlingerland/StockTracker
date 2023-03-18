@@ -3,7 +3,8 @@
 ignore = ["E501", "D400", "D415", "D202", "D203", "D210", "D212", "D401", "S101", "PLR2004", "PLW2901"]
 select = ["E", "F", "D", "I", "N", "S", "C4", "ICN", "PIE", "T20", "PT", "Q", "SIM", "PL"]
 
-unfixable = []
+fixable = ["E", "F", "D", "I", "N", "S", "C4", "ICN", "PIE", "T20", "PT", "Q", "SIM", "PL"]
+unfixable = ["F841", "F401"]
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
