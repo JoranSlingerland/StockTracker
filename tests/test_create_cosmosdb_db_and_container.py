@@ -27,7 +27,6 @@ def test_create_db_and_table(
                 "container_name": "test_container",
                 "partition_key": "/test_partition_key",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             }
