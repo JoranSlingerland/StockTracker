@@ -21,6 +21,11 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     userid = req.form["userId"]
     end_date = datetime.today()
 
+    if not days or not userid:
+        return func.HttpResponse(
+            json.dumps({"error": "Missing days or userId"}), status_code=400
+        )
+
     tasks = []
     for i in range(int(days)):
         start_date = end_date - timedelta(days=i + 1)
@@ -45,20 +50,10 @@ async def get_orchestrations(start_date, end_date, client, userid):
     output = []
     for instance in instances:
         instance = instance.to_json()
-        instance_input_userid = (
-            instance["input"]
-            .replace("'", "")
-            .replace('"', "")
-            .replace(" ", "")
-            .replace("[", "")
-            .replace("]", "")
-            .split(",")[1]
-        )
-
         # log type
         if (
             instance["name"] == "stocktracker_orchestrator"
-            and instance_input_userid == userid
+            and userid in instance["input"]
         ):
             instance["createdTime"] = instance["createdTime"].replace("T", " ")
             instance["lastUpdatedTime"] = instance["lastUpdatedTime"].replace("T", " ")

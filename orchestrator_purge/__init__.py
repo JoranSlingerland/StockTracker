@@ -25,17 +25,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    status_input_userid = (
-        status["input"]
-        .replace("'", "")
-        .replace('"', "")
-        .replace(" ", "")
-        .replace("[", "")
-        .replace("]", "")
-        .split(",")[1]
-    )
-
-    if status_input_userid != userid:
+    if userid not in status["input"]:
         return func.HttpResponse(
             json.dumps({"status": "Not authorized to purge this instance"}),
             status_code=401,

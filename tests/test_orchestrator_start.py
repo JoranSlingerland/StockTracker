@@ -6,7 +6,7 @@ import azure.durable_functions as df
 import azure.functions as func
 import pytest
 
-from orchestartor_start import main
+from orchestrator_start import main
 from shared_code.utils import create_form_func_request
 
 starter = mock.MagicMock()
