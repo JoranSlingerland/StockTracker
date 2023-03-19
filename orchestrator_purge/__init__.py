@@ -30,7 +30,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    if userid not in status["input"]:
+    if userid not in status.get("input", ""):
         return func.HttpResponse(
             json.dumps({"status": "Not authorized to purge this instance"}),
             status_code=401,
