@@ -1,5 +1,7 @@
 """General utility functions"""
+import azure.functions as func
 from azure.cosmos.container import ContainerProxy
+from urllib3 import encode_multipart_formdata
 
 
 def get_unique_items(items: list, key_to_filter: str) -> list:
@@ -25,3 +27,17 @@ def add_meta_data_to_stock_data(stock_data: list, container: ContainerProxy) -> 
         else:
             stock["meta"] = {}
     return stock_data
+
+
+def create_form_func_request(body: dict, url: str) -> func.HttpRequest:
+    """Create func.HttpRequest"""
+    body, header = encode_multipart_formdata(body)
+    header = {"Content-Type": header}
+
+    req = func.HttpRequest(
+        method="POST",
+        url=url,
+        headers=header,
+        body=body,
+    )
+    return req

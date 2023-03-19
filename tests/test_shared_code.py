@@ -5,6 +5,7 @@ import datetime
 import os
 from unittest import mock
 
+import azure.functions as func
 import pytest
 from azure.cosmos import exceptions
 
@@ -371,3 +372,16 @@ class TestUtils:
             {"symbol": "ABC", "meta": {}},
             {"symbol": "XYZ", "meta": {}},
         ]
+
+    def test_create_form_func_request(self):
+        """Test create form func request"""
+        body = {"symbol": "ABC"}
+        url = "http://localhost:5000/stocks"
+
+        request = utils.create_form_func_request(body, url)
+
+        assert request.method == "POST"
+        assert request.url == url
+        assert isinstance(request, func.HttpRequest)
+        assert 'form-data; name="symbol"' in request.get_body().decode("utf-8")
+        assert "ABC" in request.get_body().decode("utf-8")

@@ -4,10 +4,8 @@ import datetime
 import json
 from unittest.mock import MagicMock, patch
 
-import azure.functions as func
-from urllib3 import encode_multipart_formdata
-
 from get_linechart_data import main
+from shared_code.utils import create_form_func_request
 
 mock_data_container_totals = [
     {
@@ -49,14 +47,8 @@ mock_data_container_totals = [
 
 def test_empty_body():
     """Test empty body"""
-    body, header = encode_multipart_formdata({})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+    req = create_form_func_request(
+        {}, "http://localhost:7071/api/data/get_linechart_data"
     )
 
     response = main(req)
@@ -70,20 +62,13 @@ def test_empty_body():
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_empty_container_max(mock_cosmosdb_container):
     """Test empty container"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "invested_and_value",
             "dataToGet": "max",
-        }
-    )
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+        },
+        "http://localhost:7071/api/data/get_linechart_data",
     )
 
     mock_cosmosdb_container.return_value = MagicMock()
@@ -100,20 +85,13 @@ def test_empty_container_max(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_empty_container_year(mock_cosmosdb_container):
     """Test empty container"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "invested_and_value",
             "dataToGet": "year",
-        }
-    )
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+        },
+        "http://localhost:7071/api/data/get_linechart_data",
     )
 
     mock_cosmosdb_container.return_value = MagicMock()
@@ -130,20 +108,13 @@ def test_empty_container_year(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_invalid_datatype(mock_cosmosdb_container):
     """Test invalid datatype"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "invalid",
             "dataToGet": "max",
-        }
-    )
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+        },
+        "http://localhost:7071/api/data/get_linechart_data",
     )
 
     mock_cosmosdb_container.return_value = MagicMock()
@@ -159,20 +130,13 @@ def test_invalid_datatype(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_total_gains(mock_cosmosdb_container):
     """Test total gains"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "total_gains",
             "dataToGet": "max",
-        }
-    )
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+        },
+        "http://localhost:7071/api/data/get_linechart_data",
     )
 
     mock_cosmosdb_container.return_value = MagicMock()
@@ -206,20 +170,13 @@ def test_total_gains(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_invested_and_value(mock_cosmosdb_container):
     """Test invested and value"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "invested_and_value",
             "dataToGet": "max",
-        }
-    )
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/data/get_linechart_data",
-        headers=header,
-        body=body,
+        },
+        "http://localhost:7071/api/data/get_linechart_data",
     )
 
     mock_cosmosdb_container.return_value = MagicMock()

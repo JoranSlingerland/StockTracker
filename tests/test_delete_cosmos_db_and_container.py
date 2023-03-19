@@ -2,11 +2,10 @@
 
 from unittest.mock import MagicMock, patch
 
-import azure.functions as func
 from azure.cosmos import exceptions
-from urllib3 import encode_multipart_formdata
 
 from delete_cosmosdb_container import main
+from shared_code import utils
 
 containers = {
     "containers": [
@@ -30,14 +29,8 @@ containers = {
 
 def test_no_containers_to_delete():
     """Test no containers to delete"""
-    body, header = encode_multipart_formdata({})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {}, "http://localhost:7071/api/priveleged/delete_cosmosdb_container"
     )
 
     response = main(req)
@@ -51,14 +44,9 @@ def test_no_containers_to_delete():
 @patch("shared_code.cosmosdb_module.cosmosdb_database")
 def test_invalid_containers_to_delete(mock_cosmosdb_database: MagicMock):
     """Test invalid containers to delete"""
-    body, header = encode_multipart_formdata({"containersToDelete": "invalid"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {"containersToDelete": "invalid"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
     )
 
     response = main(req)
@@ -76,14 +64,9 @@ def test_all_containers_to_delete(
     mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
 ):
     """Test all containers to delete"""
-    body, header = encode_multipart_formdata({"containersToDelete": "all"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {"containersToDelete": "all"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
     )
 
     delete_container = MagicMock()
@@ -104,14 +87,9 @@ def test_output_only_containers_to_delete(
     mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
 ):
     """Test output_only containers to delete"""
-    body, header = encode_multipart_formdata({"containersToDelete": "output_only"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {"containersToDelete": "output_only"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
     )
 
     delete_container = MagicMock()
@@ -132,14 +110,9 @@ def test_all_containers_to_delete_with_exception(
     mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
 ):
     """Test all containers to delete invalid"""
-    body, header = encode_multipart_formdata({"containersToDelete": "all"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {"containersToDelete": "all"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
     )
 
     delete_container = MagicMock()
@@ -162,14 +135,9 @@ def test_output_only_containers_to_delete_with_exception(
     mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
 ):
     """Test output_only containers to delete invalid"""
-    body, header = encode_multipart_formdata({"containersToDelete": "output_only"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        url="http://localhost:7071/api/priveleged/delete_cosmosdb_container",
-        headers=header,
-        body=body,
+    req = utils.create_form_func_request(
+        {"containersToDelete": "output_only"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
     )
 
     delete_container = MagicMock()
