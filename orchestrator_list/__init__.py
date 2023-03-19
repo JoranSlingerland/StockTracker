@@ -17,8 +17,8 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     client = df.DurableOrchestrationClient(starter)
 
     output = []
-    days = req.form["days"]
-    userid = req.form["userId"]
+    days = req.form.get("days", None)
+    userid = req.form.get("userId", None)
     end_date = datetime.today()
 
     if not days or not userid:
@@ -50,7 +50,6 @@ async def get_orchestrations(start_date, end_date, client, userid):
     output = []
     for instance in instances:
         instance = instance.to_json()
-        # log type
         if (
             instance["name"] == "stocktracker_orchestrator"
             and userid in instance["input"]
