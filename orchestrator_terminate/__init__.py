@@ -13,6 +13,10 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     instance_id = req.form.get("instanceId", None)
     userid = req.form.get("userId", None)
 
+    if not instance_id or not userid:
+        return func.HttpResponse(
+            json.dumps({"error": "Missing instanceId or userId"}), status_code=400
+        )
     logging.info(f"Terminating orchestration with ID {instance_id}")
 
     status = await client.get_status(instance_id)
@@ -25,17 +29,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    status_input_userid = (
-        status["input"]
-        .replace("'", "")
-        .replace('"', "")
-        .replace(" ", "")
-        .replace("[", "")
-        .replace("]", "")
-        .split(",")[1]
-    )
-
-    if status_input_userid != userid:
+    if userid not in status.get("input", ""):
         return func.HttpResponse(
             json.dumps({"status": "Not authorized to terminate this instance"}),
             status_code=401,

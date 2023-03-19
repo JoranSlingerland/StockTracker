@@ -13,6 +13,11 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     instance_id = req.form.get("instanceId", None)
     userid = req.form.get("userId", None)
 
+    if not instance_id or not userid:
+        return func.HttpResponse(
+            json.dumps({"error": "Missing instanceId or userId"}), status_code=400
+        )
+
     logging.info(f"Purging orchestration with ID {instance_id}")
 
     status = await client.get_status(instance_id)
