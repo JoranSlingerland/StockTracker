@@ -1,4 +1,5 @@
 """Test add_item_to_input.py"""
+import datetime
 import json
 from unittest.mock import MagicMock, patch
 
@@ -222,6 +223,8 @@ mock_data_container_stocks_held = [
     },
 ]
 
+end_date = datetime.datetime(2023, 3, 17)
+
 
 def test_invalid_input():
     """ "Test get_barchart_data with invalid input"""
@@ -274,8 +277,9 @@ def test_input_transactions_max(mock_cosmosdb_container):
     )
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_input_transactions_year(mock_cosmosdb_container):
+def test_input_transactions_year(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
     body, header = encode_multipart_formdata(
         {
@@ -290,6 +294,8 @@ def test_input_transactions_year(mock_cosmosdb_container):
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_input_transactions
     )
+    start_date = end_date - datetime.timedelta(days=365)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     req = func.HttpRequest(
         method="POST",
@@ -320,8 +326,9 @@ def test_input_transactions_year(mock_cosmosdb_container):
     assert response.get_body() == json.dumps(response_body).encode()
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_input_transactions_month(mock_cosmosdb_container):
+def test_input_transactions_month(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
     body, header = encode_multipart_formdata(
         {
@@ -336,6 +343,8 @@ def test_input_transactions_month(mock_cosmosdb_container):
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_input_transactions
     )
+    start_date = end_date - datetime.timedelta(days=30)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     req = func.HttpRequest(
         method="POST",
@@ -418,8 +427,9 @@ def test_dividend_max(mock_cosmosdb_container):
     assert json.loads(response.get_body().decode("utf-8")) == response_body
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_dividend_week(mock_cosmosdb_container):
+def test_dividend_week(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
     body, header = encode_multipart_formdata(
         {
@@ -434,6 +444,8 @@ def test_dividend_week(mock_cosmosdb_container):
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_stocks_held
     )
+    start_date = end_date - datetime.timedelta(days=7)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     req = func.HttpRequest(
         method="POST",

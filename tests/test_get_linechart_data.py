@@ -1,5 +1,6 @@
 """Test get_linechart_data.py"""
 
+import datetime
 import json
 from unittest.mock import MagicMock, patch
 
@@ -179,8 +180,15 @@ def test_total_gains(mock_cosmosdb_container):
         mock_data_container_totals
     )
 
+    start_date = datetime.datetime(2023, 3, 17)
+    end_date = datetime.datetime.now()
+    dates = [
+        start_date + datetime.timedelta(days=x)
+        for x in range((end_date - start_date).days + 1)
+    ]
+
     expected_body = {
-        "labels": ["2023-03-17", "2023-03-18"],
+        "labels": [date.strftime("%Y-%m-%d") for date in dates],
         "datasets": [
             {
                 "label": "Gains",
@@ -219,8 +227,15 @@ def test_invested_and_value(mock_cosmosdb_container):
         mock_data_container_totals
     )
 
+    start_date = datetime.datetime(2023, 3, 17)
+    end_date = datetime.datetime.now()
+    dates = [
+        start_date + datetime.timedelta(days=x)
+        for x in range((end_date - start_date).days + 1)
+    ]
+
     expected_body = {
-        "labels": ["2023-03-17", "2023-03-18"],
+        "labels": [date.strftime("%Y-%m-%d") for date in dates],
         "datasets": [
             {
                 "label": "Value",
