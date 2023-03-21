@@ -21,7 +21,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if fully_realized is not None:
         fully_realized = fully_realized == "true"
 
-    if not containername and userid:
+    if not containername or not userid:
         logging.error("No container name provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # sort result by transaction_date
         result = sorted(result, key=lambda k: k["date"], reverse=True)
 
-    if containername == "input_transactions":
+    if containername == "input_transactions" or containername == "single_day":
         container = cosmosdb_module.cosmosdb_container("meta_data")
         result = utils.add_meta_data_to_stock_data(result, container)
 
@@ -68,8 +68,6 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
     container = cosmosdb_module.cosmosdb_container(containername)
 
     if containername in [
-        "totals",
-        "single_day_totals",
         "input_transactions",
         "input_invested",
     ]:
@@ -87,8 +85,6 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
             enable_cross_partition_query=True,
         )
     )
-    container = cosmosdb_module.cosmosdb_container("meta_data")
-    result = utils.add_meta_data_to_stock_data(result, container)
 
     return result
 
