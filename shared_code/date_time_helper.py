@@ -36,12 +36,14 @@ def datatogetswitch(datatoget: str) -> Union[tuple[str, str], tuple[None, None]]
     end_date = date.today()
     if datatoget == "year":
         start_date = end_date - timedelta(days=365)
-    if datatoget == "month":
+    elif datatoget == "month":
         start_date = end_date - timedelta(days=30)
-    if datatoget == "week":
+    elif datatoget == "week":
         start_date = end_date - timedelta(days=7)
-    if datatoget == "ytd":
+    elif datatoget == "ytd":
         start_date = date(end_date.year, 1, 1)
+    else:
+        return None, None
 
     start_date = start_date.strftime("%Y-%m-%d")
     end_date = end_date.strftime("%Y-%m-%d")

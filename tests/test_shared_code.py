@@ -5,6 +5,7 @@ import datetime
 import os
 from unittest import mock
 
+import azure.functions as func
 import pytest
 from azure.cosmos import exceptions
 
@@ -146,6 +147,14 @@ class TestGetConfig:
         assert cosmosdb["database"] == "test_database"
         assert cosmosdb["offer_throughput"] == "test_offer_throughput"
 
+    def test_get_containers(self):
+        """Test get containers"""
+        containers = get_config.get_containers()
+        assert isinstance(containers, dict)
+        assert "containers" in containers
+        assert isinstance(containers["containers"], list)
+        assert len(containers["containers"]) > 0
+
 
 class TestDateTimeHelper:
     """Test date time helper"""
@@ -179,6 +188,33 @@ class TestDateTimeHelper:
 
     def test_datatogetswitch(self):
         """Test data to get switch"""
+
+        today = datetime.date.today()
+
+        data_to_get = "test"
+        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
+        assert None is start_data
+        assert None is end_date
+
+        data_to_get = "year"
+        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
+        assert start_data == (today - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+        assert end_date == today.strftime("%Y-%m-%d")
+
+        data_to_get = "month"
+        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
+        assert start_data == (today - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+        assert end_date == today.strftime("%Y-%m-%d")
+
+        data_to_get = "week"
+        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
+        assert start_data == (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+        assert end_date == today.strftime("%Y-%m-%d")
+
+        data_to_get = "ytd"
+        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
+        assert start_data == datetime.date(today.year, 1, 1).strftime("%Y-%m-%d")
+        assert end_date == today.strftime("%Y-%m-%d")
 
     def test_month_to_quarter(self):
         """Test month to quarter"""
@@ -336,3 +372,16 @@ class TestUtils:
             {"symbol": "ABC", "meta": {}},
             {"symbol": "XYZ", "meta": {}},
         ]
+
+    def test_create_form_func_request(self):
+        """Test create form func request"""
+        body = {"symbol": "ABC"}
+        url = "http://localhost:5000/stocks"
+
+        request = utils.create_form_func_request(body, url)
+
+        assert request.method == "POST"
+        assert request.url == url
+        assert isinstance(request, func.HttpRequest)
+        assert 'form-data; name="symbol"' in request.get_body().decode("utf-8")
+        assert "ABC" in request.get_body().decode("utf-8")

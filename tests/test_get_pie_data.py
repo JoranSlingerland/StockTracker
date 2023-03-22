@@ -4,34 +4,8 @@ import json
 from copy import deepcopy
 from unittest.mock import Mock, patch
 
-import azure.functions as func
-from urllib3 import encode_multipart_formdata
-
 from get_pie_data import main
-
-
-def test_invalid_input():
-    """Test invalid input"""
-    body, header = encode_multipart_formdata({})
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
-    )
-
-    excepected_response = func.HttpResponse(
-        body='{"status": "Please pass a name on the query string or in the request body"}',
-        mimetype="application/json",
-        status_code=400,
-    )
-
-    result = main(mock_request)
-    assert result.status_code == excepected_response.status_code
-    assert result.get_body() == excepected_response.get_body()
-
+from shared_code.utils import create_form_func_request
 
 mock_container_response = [
     {
@@ -170,23 +144,27 @@ mock_add_meta_data_response[1].update(
 )
 
 
+def test_invalid_input():
+    """Test invalid input"""
+    req = create_form_func_request({}, "http://localhost:7071/api/data/get_pie_data")
+
+    result = main(req)
+    assert result.status_code == 400
+    assert (
+        result.get_body()
+        == b'{"status": "Please pass a name on the query string or in the request body"}'
+    )
+
+
 def test_datatype_stocks():
     """Test datatype of stocks"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "dataType": "stocks",
-        }
+        },
+        "http://localhost:7071/api/data/get_pie_data",
     )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
-    )
-
     expected_body = {
         "labels": ["AMD", "AAPL"],
         "data": [50, 50],
@@ -201,7 +179,7 @@ def test_datatype_stocks():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=mock_add_meta_data_response,
     ):
-        result = main(mock_request)
+        result = main(req)
         body = json.loads(result.get_body().decode("utf-8"))
         assert result.status_code == 200
         assert body["labels"] == expected_body["labels"]
@@ -210,19 +188,12 @@ def test_datatype_stocks():
 
 def test_datatype_currency():
     """Test datatype of currency"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "dataType": "currency",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
+        },
+        "http://localhost:7071/api/data/get_pie_data",
     )
 
     expected_body = {
@@ -239,7 +210,7 @@ def test_datatype_currency():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=mock_add_meta_data_response,
     ):
-        result = main(mock_request)
+        result = main(req)
         body = json.loads(result.get_body().decode("utf-8"))
         assert result.status_code == 200
         assert body["labels"] == expected_body["labels"]
@@ -248,19 +219,12 @@ def test_datatype_currency():
 
 def test_datatype_country():
     """Test datatype of country"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "dataType": "country",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
+        },
+        "http://localhost:7071/api/data/get_pie_data",
     )
 
     expected_body = {
@@ -277,7 +241,7 @@ def test_datatype_country():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=mock_add_meta_data_response,
     ):
-        result = main(mock_request)
+        result = main(req)
         body = json.loads(result.get_body().decode("utf-8"))
         assert result.status_code == 200
         assert body["labels"] == expected_body["labels"]
@@ -286,19 +250,12 @@ def test_datatype_country():
 
 def test_datatype_sector():
     """Test datatype of sector"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "dataType": "sector",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
+        },
+        "http://localhost:7071/api/data/get_pie_data",
     )
 
     expected_body = {
@@ -315,7 +272,7 @@ def test_datatype_sector():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=mock_add_meta_data_response,
     ):
-        result = main(mock_request)
+        result = main(req)
         body = json.loads(result.get_body().decode("utf-8"))
         assert result.status_code == 200
         assert body["labels"] == expected_body["labels"]
@@ -324,20 +281,12 @@ def test_datatype_sector():
 
 def test_no_data_in_cosmosdb():
     """Test no data in cosmosdb"""
-
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "dataType": "sector",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/data/get_pie_data",
-        headers=header,
+        },
+        "http://localhost:7071/api/data/get_pie_data",
     )
 
     mock_container = Mock()
@@ -349,7 +298,36 @@ def test_no_data_in_cosmosdb():
         "shared_code.utils.add_meta_data_to_stock_data",
         return_value=[],
     ):
-        result = main(mock_request)
+        result = main(req)
         assert result.status_code == 400
-        result = main(mock_request)
+        assert (
+            result.get_body()
+            == b'{"status": Please pass a valid name on the query string or in the request body"}'
+        )
+
+
+def test_invalid_datatype():
+    """Test invalid datatype"""
+    req = create_form_func_request(
+        {
+            "userId": "123",
+            "dataType": "invalid",
+        },
+        "http://localhost:7071/api/data/get_pie_data",
+    )
+
+    mock_container = Mock()
+    mock_container.query_items.return_value = mock_container_response
+
+    with patch(
+        "shared_code.cosmosdb_module.cosmosdb_container", return_value=mock_container
+    ), patch(
+        "shared_code.utils.add_meta_data_to_stock_data",
+        return_value=mock_add_meta_data_response,
+    ):
+        result = main(req)
         assert result.status_code == 400
+        assert (
+            result.get_body()
+            == b'{"status": Please pass a valid name on the query string or in the request body"}'
+        )

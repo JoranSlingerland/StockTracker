@@ -5,9 +5,9 @@ from unittest import mock
 import azure.durable_functions as df
 import azure.functions as func
 import pytest
-from urllib3 import encode_multipart_formdata
 
-from orchestartor_start import main
+from orchestrator_start import main
+from shared_code.utils import create_form_func_request
 
 starter = mock.MagicMock()
 
@@ -15,20 +15,13 @@ starter = mock.MagicMock()
 @pytest.mark.asyncio()
 async def test_valid_data():
     """Test Durable Functions Http Start."""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "functionName": "stocktracker_orchestrator",
             "daysToUpdate": "all",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/orchestrator/start",
-        headers=header,
+        },
+        "http://localhost:7071/api/orchestrator/start",
     )
 
     mock_response = func.HttpResponse(
@@ -42,26 +35,19 @@ async def test_valid_data():
         a_mock.start_new = mock.AsyncMock()
         a_mock().start_new.return_value = "123"
         a_mock().create_check_status_response.return_value = mock_response
-        response = await main(mock_request, starter)
+        response = await main(req, starter)
         assert response == mock_response
 
 
 @pytest.mark.asyncio()
 async def test_invalid_userid():
     """Test Durable Functions Http Start."""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "functionName": "stocktracker_orchestrator",
             "daysToUpdate": "all",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/orchestrator/start",
-        headers=header,
+        },
+        "http://localhost:7071/api/orchestrator/start",
     )
 
     excpected_response = func.HttpResponse(
@@ -73,7 +59,7 @@ async def test_invalid_userid():
         "azure.durable_functions.DurableOrchestrationClient",
         spec=df.DurableOrchestrationClient,
     ):
-        response = await main(mock_request, starter)
+        response = await main(req, starter)
         assert response.status_code == excpected_response.status_code
         assert response.get_body() == excpected_response.get_body()
 
@@ -81,20 +67,13 @@ async def test_invalid_userid():
 @pytest.mark.asyncio()
 async def test_invalid_function_name():
     """Check invalid function name"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "functionName": "stocktracker_orchestrator1",
             "daysToUpdate": "all",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/orchestrator/start",
-        headers=header,
+        },
+        "http://localhost:7071/api/orchestrator/start",
     )
 
     excpected_response = func.HttpResponse(
@@ -106,7 +85,7 @@ async def test_invalid_function_name():
         "azure.durable_functions.DurableOrchestrationClient",
         spec=df.DurableOrchestrationClient,
     ):
-        response = await main(mock_request, starter)
+        response = await main(req, starter)
         assert response.status_code == excpected_response.status_code
         assert response.get_body() == excpected_response.get_body()
 
@@ -114,20 +93,13 @@ async def test_invalid_function_name():
 @pytest.mark.asyncio()
 async def test_invalid_days_to_update():
     """Check invalid days to update"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "123",
             "functionName": "stocktracker_orchestrator",
             "daysToUpdate": "all1",
-        }
-    )
-    header = {"Content-Type": header}
-
-    mock_request = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="http://localhost:7071/api/orchestrator/start",
-        headers=header,
+        },
+        "http://localhost:7071/api/orchestrator/start",
     )
 
     excpected_response = func.HttpResponse(
@@ -139,6 +111,6 @@ async def test_invalid_days_to_update():
         "azure.durable_functions.DurableOrchestrationClient",
         spec=df.DurableOrchestrationClient,
     ):
-        response = await main(mock_request, starter)
+        response = await main(req, starter)
         assert response.status_code == excpected_response.status_code
         assert response.get_body() == excpected_response.get_body()

@@ -12,9 +12,7 @@ def get_api_key() -> str:
 
     load_dotenv()
 
-    api_key = os.environ["API_KEY"]
-
-    return api_key
+    return os.environ["API_KEY"]
 
 
 def get_clearbit_api_key() -> str:
@@ -22,9 +20,7 @@ def get_clearbit_api_key() -> str:
 
     load_dotenv()
 
-    clearbit_api_key = os.environ["CLEARBIT_API_KEY"]
-
-    return clearbit_api_key
+    return os.environ["CLEARBIT_API_KEY"]
 
 
 def get_cosmosdb() -> dict:
@@ -32,27 +28,23 @@ def get_cosmosdb() -> dict:
 
     load_dotenv()
 
-    cosmosdb = {
+    return {
         "endpoint": os.environ["COSMOSDB_ENDPOINT"],
         "key": os.environ["COSMOSDB_KEY"],
         "database": os.environ["COSMOSDB_DATABASE"],
         "offer_throughput": os.environ["COSMOSDB_OFFER_THROUGHPUT"],
     }
-    return cosmosdb
 
 
 def get_containers() -> dict:
     """Get containers"""
 
-    load_dotenv()
-
-    containers = {
+    return {
         "containers": [
             {
                 "container_name": "stocks_held",
                 "partition_key": "/id",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             },
@@ -60,7 +52,6 @@ def get_containers() -> dict:
                 "container_name": "totals",
                 "partition_key": "/id",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             },
@@ -68,7 +59,6 @@ def get_containers() -> dict:
                 "container_name": "single_day",
                 "partition_key": "/id",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             },
@@ -76,7 +66,6 @@ def get_containers() -> dict:
                 "container_name": "single_day_totals",
                 "partition_key": "/id",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             },
@@ -84,7 +73,6 @@ def get_containers() -> dict:
                 "container_name": "input_transactions",
                 "partition_key": "/id",
                 "candelete": False,
-                "cantruncate": False,
                 "input_container": True,
                 "output_container": False,
             },
@@ -92,7 +80,6 @@ def get_containers() -> dict:
                 "container_name": "input_invested",
                 "partition_key": "/id",
                 "candelete": False,
-                "cantruncate": False,
                 "input_container": True,
                 "output_container": False,
             },
@@ -100,11 +87,8 @@ def get_containers() -> dict:
                 "container_name": "meta_data",
                 "partition_key": "/id",
                 "candelete": True,
-                "cantruncate": True,
                 "input_container": False,
                 "output_container": True,
             },
         ]
     }
-
-    return containers

@@ -1,11 +1,10 @@
 """Test add_item_to_input.py"""
+import datetime
 import json
 from unittest.mock import MagicMock, patch
 
-import azure.functions as func
-from urllib3 import encode_multipart_formdata
-
 from get_barchart_data import main
+from shared_code.utils import create_form_func_request
 
 mock_data_container_input_transactions = [
     {
@@ -222,17 +221,13 @@ mock_data_container_stocks_held = [
     },
 ]
 
+end_date = datetime.datetime(2023, 3, 17)
+
 
 def test_invalid_input():
     """ "Test get_barchart_data with invalid input"""
-    body, header = encode_multipart_formdata({"invalid": "input"})
-    header = {"Content-Type": header}
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
+    req = create_form_func_request(
+        {"invalid": "input"}, "http://localhost/api/data/get_barchart_data"
     )
 
     response = main(req)
@@ -246,25 +241,18 @@ def test_invalid_input():
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_input_transactions_max(mock_cosmosdb_container):
     """ "Test get_barchart_data with valid input"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "transaction_cost",
             "dataToGet": "max",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_input_transactions
-    )
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
     )
 
     response = main(req)
@@ -274,29 +262,25 @@ def test_input_transactions_max(mock_cosmosdb_container):
     )
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_input_transactions_year(mock_cosmosdb_container):
+def test_input_transactions_year(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "transaction_cost",
             "dataToGet": "year",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_input_transactions
     )
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
-    )
+    start_date = end_date - datetime.timedelta(days=365)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     response_body = [
         {"date": "2022 March", "value": 0.0, "category": "AMD"},
@@ -320,29 +304,25 @@ def test_input_transactions_year(mock_cosmosdb_container):
     assert response.get_body() == json.dumps(response_body).encode()
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_input_transactions_month(mock_cosmosdb_container):
+def test_input_transactions_month(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "transaction_cost",
             "dataToGet": "month",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_input_transactions
     )
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
-    )
+    start_date = end_date - datetime.timedelta(days=30)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     response_body = [
         {"date": "2023 08", "value": 0.0, "category": "AMD"},
@@ -360,24 +340,17 @@ def test_input_transactions_month(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_no_data(mock_cosmosdb_container):
     """Test get_barchart_data with no data"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "invalid",
             "dataToGet": "invalid",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = []
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
-    )
 
     response = main(req)
     assert response.status_code == 400
@@ -390,25 +363,18 @@ def test_no_data(mock_cosmosdb_container):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_dividend_max(mock_cosmosdb_container):
     """Test get_barchart_data with valid input"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "dividend",
             "dataToGet": "max",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_stocks_held
-    )
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
     )
 
     response_body = [{"date": "Q1 2023", "value": 0, "category": "AMD"}]
@@ -418,29 +384,25 @@ def test_dividend_max(mock_cosmosdb_container):
     assert json.loads(response.get_body().decode("utf-8")) == response_body
 
 
+@patch("shared_code.date_time_helper.datatogetswitch")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_dividend_week(mock_cosmosdb_container):
+def test_dividend_week(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
-    body, header = encode_multipart_formdata(
+    req = create_form_func_request(
         {
             "userId": "2e43b4a359f8d5bb81550495b114e9e3",
             "dataType": "dividend",
             "dataToGet": "week",
-        }
+        },
+        "http://localhost/api/data/get_barchart_data",
     )
-    header = {"Content-Type": header}
 
     mock_cosmosdb_container.return_value = MagicMock()
     mock_cosmosdb_container.return_value.query_items.return_value = (
         mock_data_container_stocks_held
     )
-
-    req = func.HttpRequest(
-        method="POST",
-        body=body,
-        url="/api/data/get_barchart_data",
-        headers=header,
-    )
+    start_date = end_date - datetime.timedelta(days=7)
+    mock_datatogetswitch.return_value = (start_date, end_date)
 
     response_body = [
         {"date": "2023 11", "value": 0.0, "category": "AMD"},
