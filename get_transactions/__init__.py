@@ -8,7 +8,7 @@ import pandas as pd
 from shared_code import cosmosdb_module, utils
 
 
-def main(payload: str) -> str:
+def main(payload: str) -> dict:
     """Get Transactions data"""
     logging.info("Getting transactions data")
 
@@ -36,7 +36,9 @@ def main(payload: str) -> str:
     }
 
 
-def get_cosmosdb_items(query, parameters, container_name, keys_to_pop):
+def get_cosmosdb_items(
+    query: str, parameters: list, container_name: str, keys_to_pop: list
+):
     """Get CosmosDB items"""
     container_client = cosmosdb_module.cosmosdb_container(container_name)
     items = list(
