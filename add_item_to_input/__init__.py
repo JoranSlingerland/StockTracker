@@ -3,13 +3,13 @@
 import json
 import logging
 import uuid
+from functools import partial
 
 import azure.functions as func
-from azure.cosmos.aio import CosmosClient
 from dateutil import parser
 from jsonschema import validate
 
-from shared_code import aio_helper, get_config, schemas
+from shared_code import aio_helper, cosmosdb_module, schemas
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -45,36 +45,27 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     if validate_error:
         return validate_error
 
-    # get cosmosdb config
-    cosmosdb_config = get_config.get_cosmosdb()
-    client = CosmosClient(
-        cosmosdb_config["endpoint"], credential=cosmosdb_config["key"]
-    )
-    database = client.get_database_client(cosmosdb_config["database"])
-
+    container = cosmosdb_module.cosmosdb_container(container_name)
     tasks = []
-    container = database.get_container_client(container_name)
+
     for item in items:
         date = parser.parse(item["date"])
         item["date"] = date.strftime("%Y-%m-%d")
         item["id"] = str(uuid.uuid4())
-        tasks.append(insert_item(container, item))
+        tasks.append(
+            cosmosdb_module.container_function_with_back_off(
+                partial(container.create_item, item)
+            )
+        )
 
     # wait for all tasks to complete
-    aio_helper.gather_with_concurrency(10, *tasks)
-    await client.close()
+    await aio_helper.gather_with_concurrency(10, *tasks)
 
     return func.HttpResponse(
         body='{"result": "done"}',
         mimetype="application/json",
         status_code=200,
     )
-
-
-async def insert_item(container, item):
-    """Async fill"""
-
-    await container.create_item(item)
 
 
 def validate_json(instance, schema):
