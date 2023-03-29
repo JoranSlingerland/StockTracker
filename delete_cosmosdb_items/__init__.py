@@ -11,6 +11,10 @@ async def main(payload: str) -> str:
     """Function to output data to CosmosDB"""
     logging.info("Delete CosmosDB items function started")
 
+    # suppress logger output
+    logger = logging.getLogger("azure")
+    logger.setLevel(logging.CRITICAL)
+
     days_to_update = payload[0]
     userid = payload[1]
 

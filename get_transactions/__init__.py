@@ -12,6 +12,10 @@ def main(payload: str) -> dict:
     """Get Transactions data"""
     logging.info("Getting transactions data")
 
+    # suppress logger output
+    logger = logging.getLogger("azure")
+    logger.setLevel(logging.CRITICAL)
+
     userid = payload[0]
 
     query = "SELECT * FROM c WHERE c.userid = @userid"
