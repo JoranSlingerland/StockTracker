@@ -2,9 +2,6 @@
 
 import logging
 import uuid
-from datetime import date, timedelta
-
-import pandas as pd
 
 
 def main(payload: str) -> str:
