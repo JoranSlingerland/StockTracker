@@ -1,5 +1,6 @@
 """Test add data to stocks held."""
 import json
+from pathlib import Path
 
 from add_data_to_stocks_held import main
 
@@ -439,16 +440,16 @@ expected_result = [
 
 def test_all():
     """Test with all input"""
-    with open("tests\\data\\transactions.json", "r") as f:
+    with open(Path(__file__).parent / "data" / "transactions.json", "r") as f:
         mock_transactions = json.load(f)
 
-    with open("tests\\data\\forex_data.json", "r") as f:
+    with open(Path(__file__).parent / "data" / "forex_data.json", "r") as f:
         mock_forex_data = json.load(f)
 
-    with open("tests\\data\\stock_data.json", "r") as f:
+    with open(Path(__file__).parent / "data" / "stock_data.json", "r") as f:
         mock_stock_data = json.load(f)
 
-    with open("tests\\data\\stocks_held_by_day.json", "r") as f:
+    with open(Path(__file__).parent / "data" / "stocks_held_by_day.json", "r") as f:
         mock_stocks_held = json.load(f)
 
     result = main(
