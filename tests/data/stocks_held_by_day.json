@@ -1,0 +1,171 @@
+{
+  "realized": [
+    {
+      "date": "2023-03-28",
+      "symbol": "GOOGL",
+      "cost_per_share_buy": 10.0,
+      "cost_per_share_sell": 20.0,
+      "buy_price": 50.0,
+      "sell_price": 100,
+      "average_buy_fx_rate": 0.929,
+      "average_sell_fx_rate": 0.929,
+      "quantity": 5,
+      "transaction_cost": 1.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-28",
+      "symbol": "aapl",
+      "cost_per_share_buy": 20.0,
+      "cost_per_share_sell": 33.333333333333336,
+      "buy_price": 60.0,
+      "sell_price": 100,
+      "average_buy_fx_rate": 0.929,
+      "average_sell_fx_rate": 0.929,
+      "quantity": 3,
+      "transaction_cost": 1.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "GOOGL",
+      "cost_per_share_buy": 10.0,
+      "cost_per_share_sell": 20.0,
+      "buy_price": 100,
+      "sell_price": 200,
+      "average_buy_fx_rate": 0.929,
+      "average_sell_fx_rate": 0.929,
+      "quantity": 10,
+      "transaction_cost": 1.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "aapl",
+      "cost_per_share_buy": 20.0,
+      "cost_per_share_sell": 33.333333333333336,
+      "buy_price": 60.0,
+      "sell_price": 100,
+      "average_buy_fx_rate": 0.929,
+      "average_sell_fx_rate": 0.929,
+      "quantity": 3,
+      "transaction_cost": 1.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "MSFT",
+      "cost_per_share_buy": 125.0,
+      "cost_per_share_sell": 270.0,
+      "buy_price": 125.0,
+      "sell_price": 270,
+      "average_buy_fx_rate": 0.929,
+      "average_sell_fx_rate": 0.929,
+      "quantity": 1,
+      "transaction_cost": 1.0,
+      "currency": "USD"
+    }
+  ],
+  "unrealized": [
+    {
+      "date": "2023-03-27",
+      "symbol": "GOOGL",
+      "cost_per_share": 10.0,
+      "total_cost": 100,
+      "average_fx_rate": 0.929,
+      "quantity": 10,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-27",
+      "symbol": "aapl",
+      "cost_per_share": 20.0,
+      "total_cost": 100,
+      "average_fx_rate": 0.929,
+      "quantity": 5,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-28",
+      "symbol": "GOOGL",
+      "cost_per_share": 10.0,
+      "total_cost": 50.0,
+      "average_fx_rate": 0.929,
+      "quantity": 5,
+      "transaction_cost": 0.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-28",
+      "symbol": "aapl",
+      "cost_per_share": 20.0,
+      "total_cost": 40.0,
+      "average_fx_rate": 0.929,
+      "quantity": 2,
+      "transaction_cost": 0.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-28",
+      "symbol": "MSFT",
+      "cost_per_share": 125.0,
+      "total_cost": 250,
+      "average_fx_rate": 0.929,
+      "quantity": 2,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-28",
+      "symbol": "AMD",
+      "cost_per_share": 100.0,
+      "total_cost": 100,
+      "average_fx_rate": 0.929,
+      "quantity": 1,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "aapl",
+      "cost_per_share": 35.0,
+      "total_cost": 140.0,
+      "average_fx_rate": 0.929,
+      "quantity": 4,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "MSFT",
+      "cost_per_share": 125.0,
+      "total_cost": 125.0,
+      "average_fx_rate": 0.929,
+      "quantity": 1,
+      "transaction_cost": 0.0,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "AMD",
+      "cost_per_share": 100.0,
+      "total_cost": 100,
+      "average_fx_rate": 0.929,
+      "quantity": 1,
+      "transaction_cost": 0.5,
+      "currency": "USD"
+    },
+    {
+      "date": "2023-03-29",
+      "symbol": "VWRL.AMS",
+      "cost_per_share": 50.0,
+      "total_cost": 100,
+      "average_fx_rate": 1.0,
+      "quantity": 2,
+      "transaction_cost": 0.5,
+      "currency": "EUR"
+    }
+  ]
+}
