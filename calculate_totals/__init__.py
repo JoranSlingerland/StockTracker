@@ -13,23 +13,12 @@ def main(payload: str) -> str:
 
     stocks_held = payload[0]
     invested = payload[1]
-    transactions = payload[2]
-    days_to_update = payload[3]
-    userid = payload[4]
-
-    # get dates
-    end_date = date.today()
-    if days_to_update == "all":
-        start_date = transactions["transactions"][0]["date"]
-    else:
-        start_date = end_date - timedelta(days=days_to_update)
-    daterange = pd.date_range(start_date, end_date)
+    daterange = payload[2]["daterange"]
+    userid = payload[3]
 
     output = []
     # loop through dates
     for single_date in daterange:
-        single_date = single_date.strftime("%Y-%m-%d")
-
         stocks_single_date = [
             d
             for d in stocks_held

@@ -84,7 +84,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "calculate_totals",
-        [data, day_by_day["invested"], transactions, days_to_update, userid],
+        [data, day_by_day["invested"], transactions, userid],
     )
 
     # step 8.1 - output single_day_data to cosmosdb
