@@ -1,0 +1,357 @@
+{
+  "GOOGL": {
+    "Meta Data": {
+      "1. Information": "Daily Time Series with Splits and Dividend Events",
+      "2. Symbol": "GOOGL",
+      "3. Last Refreshed": "2023-03-29",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2023-03-29": {
+        "1. open": "102.28",
+        "2. high": "102.49",
+        "3. low": "100.65",
+        "4. close": "101.39",
+        "5. adjusted close": "101.39",
+        "6. volume": "28779572",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-28": {
+        "1. open": "102.44",
+        "2. high": "102.45",
+        "3. low": "99.74",
+        "4. close": "101.03",
+        "5. adjusted close": "101.03",
+        "6. volume": "32057865",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-27": {
+        "1. open": "104.615",
+        "2. high": "104.76",
+        "3. low": "101.9273",
+        "4. close": "102.46",
+        "5. adjusted close": "102.46",
+        "6. volume": "31120864",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-24": {
+        "1. open": "104.99",
+        "2. high": "105.49",
+        "3. low": "103.84",
+        "4. close": "105.44",
+        "5. adjusted close": "105.44",
+        "6. volume": "30411043",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-23": {
+        "1. open": "105.06",
+        "2. high": "106.3",
+        "3. low": "104.46",
+        "4. close": "105.6",
+        "5. adjusted close": "105.6",
+        "6. volume": "40797769",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-22": {
+        "1. open": "104.27",
+        "2. high": "106.59",
+        "3. low": "103.33",
+        "4. close": "103.37",
+        "5. adjusted close": "103.37",
+        "6. volume": "43427419",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      }
+    }
+  },
+  "aapl": {
+    "Meta Data": {
+      "1. Information": "Daily Time Series with Splits and Dividend Events",
+      "2. Symbol": "aapl",
+      "3. Last Refreshed": "2023-03-29",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2023-03-29": {
+        "1. open": "159.37",
+        "2. high": "161.05",
+        "3. low": "159.35",
+        "4. close": "160.77",
+        "5. adjusted close": "160.77",
+        "6. volume": "51305691",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-28": {
+        "1. open": "157.97",
+        "2. high": "158.49",
+        "3. low": "155.98",
+        "4. close": "157.65",
+        "5. adjusted close": "157.65",
+        "6. volume": "45992152",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-27": {
+        "1. open": "159.94",
+        "2. high": "160.77",
+        "3. low": "157.87",
+        "4. close": "158.28",
+        "5. adjusted close": "158.28",
+        "6. volume": "52390266",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-24": {
+        "1. open": "158.86",
+        "2. high": "160.34",
+        "3. low": "157.85",
+        "4. close": "160.25",
+        "5. adjusted close": "160.25",
+        "6. volume": "59256343",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-23": {
+        "1. open": "158.83",
+        "2. high": "161.5501",
+        "3. low": "157.68",
+        "4. close": "158.93",
+        "5. adjusted close": "158.93",
+        "6. volume": "67622060",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-22": {
+        "1. open": "159.3",
+        "2. high": "162.14",
+        "3. low": "157.81",
+        "4. close": "157.83",
+        "5. adjusted close": "157.83",
+        "6. volume": "75701811",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      }
+    }
+  },
+  "MSFT": {
+    "Meta Data": {
+      "1. Information": "Daily Time Series with Splits and Dividend Events",
+      "2. Symbol": "MSFT",
+      "3. Last Refreshed": "2023-03-29",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2023-03-29": {
+        "1. open": "278.96",
+        "2. high": "281.1398",
+        "3. low": "278.41",
+        "4. close": "280.51",
+        "5. adjusted close": "280.51",
+        "6. volume": "25087032",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-28": {
+        "1. open": "275.79",
+        "2. high": "276.14",
+        "3. low": "272.0451",
+        "4. close": "275.23",
+        "5. adjusted close": "275.23",
+        "6. volume": "21878647",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-27": {
+        "1. open": "280.5",
+        "2. high": "281.4589",
+        "3. low": "275.52",
+        "4. close": "276.38",
+        "5. adjusted close": "276.38",
+        "6. volume": "26840212",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-24": {
+        "1. open": "277.24",
+        "2. high": "280.63",
+        "3. low": "275.28",
+        "4. close": "280.57",
+        "5. adjusted close": "280.57",
+        "6. volume": "28199962",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-23": {
+        "1. open": "277.94",
+        "2. high": "281.06",
+        "3. low": "275.2",
+        "4. close": "277.66",
+        "5. adjusted close": "277.66",
+        "6. volume": "36610879",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-22": {
+        "1. open": "273.4",
+        "2. high": "281.04",
+        "3. low": "272.18",
+        "4. close": "272.29",
+        "5. adjusted close": "272.29",
+        "6. volume": "34873330",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      }
+    }
+  },
+  "AMD": {
+    "Meta Data": {
+      "1. Information": "Daily Time Series with Splits and Dividend Events",
+      "2. Symbol": "AMD",
+      "3. Last Refreshed": "2023-03-29",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2023-03-29": {
+        "1. open": "96.07",
+        "2. high": "96.91",
+        "3. low": "94.87",
+        "4. close": "96.09",
+        "5. adjusted close": "96.09",
+        "6. volume": "55325974",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-28": {
+        "1. open": "96.77",
+        "2. high": "96.94",
+        "3. low": "92.87",
+        "4. close": "94.56",
+        "5. adjusted close": "94.56",
+        "6. volume": "59150100",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-27": {
+        "1. open": "98.02",
+        "2. high": "98.93",
+        "3. low": "95.425",
+        "4. close": "96.61",
+        "5. adjusted close": "96.61",
+        "6. volume": "57461354",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-24": {
+        "1. open": "99.18",
+        "2. high": "99.52",
+        "3. low": "96.74",
+        "4. close": "97.95",
+        "5. adjusted close": "97.95",
+        "6. volume": "64743698",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-23": {
+        "1. open": "100.05",
+        "2. high": "102.43",
+        "3. low": "98.671",
+        "4. close": "100.28",
+        "5. adjusted close": "100.28",
+        "6. volume": "84088899",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-22": {
+        "1. open": "95.65",
+        "2. high": "101.7",
+        "3. low": "95.64",
+        "4. close": "97.58",
+        "5. adjusted close": "97.58",
+        "6. volume": "110816317",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      }
+    }
+  },
+  "VWRL.AMS": {
+    "Meta Data": {
+      "1. Information": "Daily Time Series with Splits and Dividend Events",
+      "2. Symbol": "VWRL.AMS",
+      "3. Last Refreshed": "2023-03-29",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2023-03-29": {
+        "1. open": "95.77",
+        "2. high": "96.0",
+        "3. low": "95.59",
+        "4. close": "95.98",
+        "5. adjusted close": "95.98",
+        "6. volume": "29176",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-28": {
+        "1. open": "95.61",
+        "2. high": "95.76",
+        "3. low": "94.86",
+        "4. close": "95.03",
+        "5. adjusted close": "95.03",
+        "6. volume": "11606",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-27": {
+        "1. open": "95.78",
+        "2. high": "95.86",
+        "3. low": "95.22",
+        "4. close": "95.36",
+        "5. adjusted close": "95.36",
+        "6. volume": "22778",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-24": {
+        "1. open": "94.83",
+        "2. high": "95.03",
+        "3. low": "94.25",
+        "4. close": "94.79",
+        "5. adjusted close": "94.79",
+        "6. volume": "40375",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-23": {
+        "1. open": "94.5",
+        "2. high": "95.36",
+        "3. low": "94.24",
+        "4. close": "95.01",
+        "5. adjusted close": "95.01",
+        "6. volume": "37496",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      },
+      "2023-03-22": {
+        "1. open": "95.61",
+        "2. high": "95.95",
+        "3. low": "95.49",
+        "4. close": "95.55",
+        "5. adjusted close": "95.55",
+        "6. volume": "12101",
+        "7. dividend amount": "0.0000",
+        "8. split coefficient": "1.0"
+      }
+    }
+  }
+}

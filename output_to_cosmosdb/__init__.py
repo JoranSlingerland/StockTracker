@@ -4,9 +4,7 @@
 import logging
 from functools import partial
 
-from azure.cosmos.aio import CosmosClient
-
-from shared_code import aio_helper, cosmosdb_module, get_config
+from shared_code import aio_helper, cosmosdb_module
 
 
 async def main(payload: str) -> str:
@@ -22,16 +20,9 @@ async def main(payload: str) -> str:
 
     logging.info(f"Outputting to container {container_name}")
 
-    # get cosmosdb config
-    cosmosdb_config = get_config.get_cosmosdb()
-    url = cosmosdb_config["endpoint"]
-    key = cosmosdb_config["key"]
-    comosdb = cosmosdb_config["database"]
-    client = CosmosClient(url, credential=key)
-    database = client.get_database_client(comosdb)
-
     tasks = []
-    container = database.get_container_client(container_name)
+    container = cosmosdb_module.cosmosdb_container(container_name)
+
     for item in items:
         # fill event loop list
         tasks.append(
@@ -39,7 +30,7 @@ async def main(payload: str) -> str:
                 partial(container.create_item, item)
             )
         )
-    # wait for all tasks to complete
+
     await aio_helper.gather_with_concurrency(50, *tasks)
-    await client.close()
+
     return '{"status": "Done"}'

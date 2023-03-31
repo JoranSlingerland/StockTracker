@@ -1,9 +1,10 @@
 """Test add_item_to_input.py"""
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import azure.functions as func
 import pytest
+from azure.cosmos import ContainerProxy
 
 from add_item_to_input import main
 
@@ -78,9 +79,8 @@ async def test_invalid_stock():
 
 
 @pytest.mark.asyncio()
-@patch("shared_code.get_config.get_cosmosdb")
-@patch("azure.cosmos.aio.CosmosClient")
-async def test_main(cosmos_client_mock, get_cosmosdb_mock):
+@patch("shared_code.cosmosdb_module.cosmosdb_container")
+async def test_main(cosmosdb_container_mock):
     """Test add_item_to_input"""
     body = {
         "type": "stock",
@@ -105,18 +105,8 @@ async def test_main(cosmos_client_mock, get_cosmosdb_mock):
         url="/api/add_item_to_input",
     )
 
-    cosmosdb_config = {
-        "endpoint": "test-endpoint",
-        "key": "test-key",
-        "database": "test-db",
-    }
-    get_cosmosdb_mock.return_value = cosmosdb_config
-
-    cosmos_db_mock = MagicMock()
-    cosmos_client_mock.return_value = cosmos_db_mock
-
-    container_mock = MagicMock()
-    cosmos_db_mock.get_container_client.return_value = container_mock
+    cosmosdb_container_mock.return_value = MagicMock(spec=ContainerProxy)
+    cosmosdb_container_mock.return_value.create_item = AsyncMock()
 
     response = await main(req)
 

@@ -13,11 +13,11 @@ def main(payload: str) -> str:
 
     url = payload
     api_key = get_config.get_api_key()
+    url = f"{url}&apikey={api_key}"
 
     errorcounter = 0
     while True:
         logging.info(f"Calling API: {url}")
-        url = f"{url}&apikey={api_key}"
         data = requests.get(url, timeout=10)
 
         if data.status_code != 200:
@@ -28,6 +28,7 @@ def main(payload: str) -> str:
             if errorcounter > 3:
                 logging.error("Too many errors, exiting. Error: {data.status_code}")
                 raise Exception(f"Error: {data.status_code}")
+            logging.info("Retrying")
             continue
 
         key = "Note"
@@ -39,6 +40,7 @@ def main(payload: str) -> str:
             if errorcounter > 3:
                 logging.critical("Too many api calls, Exiting.")
                 raise Exception("Too many api calls, Exiting.")
+            logging.info("Retrying")
             continue
 
         return data.json()
