@@ -87,12 +87,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         [data, day_by_day["invested"], transactions, userid],
     )
 
-    # step 8.1 - output single_day_data to cosmosdb
-    logging.info("Step 8.1: Output single_day to cosmosdb")
-    result = yield context.call_activity("output_singleday_to_cosmosdb", data)
-
-    # step 8.2 - output everything else to cosmosdb
-    logging.info("Step 8.2: Output everything else to cosmosdb")
+    # step 8 - output to cosmosdb
+    logging.info("Step 8: Output to cosmosdb")
     provisioning_tasks = []
     id_ = 1
     child_id = f"{context.instance_id}:{id_}"

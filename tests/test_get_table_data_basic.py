@@ -120,7 +120,7 @@ def test_valid_input_transactions(add_meta_data_to_stock_data, cosmosdb_containe
 @freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
-def test_valid_input_single_day(add_meta_data_to_stock_data, cosmosdb_container):
+def test_valid_input_stocks_held(add_meta_data_to_stock_data, cosmosdb_container):
     """Test valid input single day"""
 
     cosmosdb_container.return_value.query_items.return_value = mock_data
@@ -163,7 +163,7 @@ def test_valid_input_single_day(add_meta_data_to_stock_data, cosmosdb_container)
 @freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
-def test_valid_input_single_day_fully_realized(
+def test_valid_input_stocks_held_fully_realized(
     add_meta_data_to_stock_data, cosmosdb_container
 ):
     """Test valid input single day"""
@@ -199,7 +199,7 @@ def test_valid_input_single_day_fully_realized(
 @freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
-def test_valid_input_single_day_partial_realized(
+def test_valid_input_stocks_held_partial_realized(
     add_meta_data_to_stock_data, cosmosdb_container
 ):
     """Test valid input single day"""
@@ -236,7 +236,7 @@ def test_valid_input_single_day_partial_realized(
 @freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
-def test_valid_input_single_day_or(add_meta_data_to_stock_data, cosmosdb_container):
+def test_valid_input_stocks_held_or(add_meta_data_to_stock_data, cosmosdb_container):
     """Test valid input single day"""
 
     cosmosdb_container.return_value.query_items.return_value = mock_data
@@ -280,7 +280,7 @@ def test_valid_input_single_day_or(add_meta_data_to_stock_data, cosmosdb_contain
 @freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
-def test_valid_input_single_day_and(add_meta_data_to_stock_data, cosmosdb_container):
+def test_valid_input_stocks_held_and(add_meta_data_to_stock_data, cosmosdb_container):
     """Test valid input single day"""
 
     cosmosdb_container.return_value.query_items.return_value = mock_data

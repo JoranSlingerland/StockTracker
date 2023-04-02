@@ -27,7 +27,7 @@ async def test_all(cosmosdb_container_mock):
     response = await main(payload)
 
     assert response == '{"status": "Done"}'
-    assert cosmosdb_container_mock.return_value.delete_item.await_count == 4
+    assert cosmosdb_container_mock.return_value.delete_item.await_count == 2
     cosmosdb_container_mock.return_value.delete_item.assert_called_with(
         mock_items[0], partition_key=mock_items[0]["id"]
     )
@@ -46,7 +46,7 @@ async def test_days(cosmosdb_container_mock):
     response = await main(payload)
 
     assert response == '{"status": "Done"}'
-    assert cosmosdb_container_mock.return_value.delete_item.await_count == 4
+    assert cosmosdb_container_mock.return_value.delete_item.await_count == 2
     cosmosdb_container_mock.return_value.delete_item.assert_called_with(
         mock_items[0], partition_key=mock_items[0]["id"]
     )
