@@ -2,7 +2,6 @@
 
 import json
 import logging
-from datetime import date, timedelta
 
 import azure.functions as func
 
@@ -26,72 +25,60 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     datatoget = datatoget.lower()
     logging.info(f"Getting data for {datatoget}")
 
-    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
-    end_date = date.today().strftime("%Y-%m-%d")
-
     container = cosmosdb_module.cosmosdb_container("totals")
-    end_date_totals = list(
+    items = list(
         container.query_items(
-            query="SELECT * FROM c WHERE c.userid = @userid and c.date >= @start_date and c.date <= @end_date",
+            query="SELECT * FROM c WHERE c.userid = @userid",
             parameters=[
                 {"name": "@userid", "value": userid},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
             ],
             enable_cross_partition_query=True,
         )
     )
-    if not end_date_totals:
+    if not items:
         return func.HttpResponse(
             body='{"status": "No data found"}',
             mimetype="application/json",
             status_code=500,
         )
 
-    end_date_totals = sorted(end_date_totals, key=lambda k: k["date"], reverse=True)
-    most_recent_date = end_date_totals[0]["date"]
-    end_date_totals = [
-        item for item in end_date_totals if item["date"] == most_recent_date
-    ]
+    items = sorted(items, key=lambda k: k["date"], reverse=True)
+    first_date = items[0]["date"]
+    last_date = items[-1]["date"]
+    end_date_totals = ([item for item in items if item["date"] == first_date])[0]
+    start_date_totals = ([item for item in items if item["date"] == last_date])[0]
 
     if datatoget == "max":
         output_object = {
-            "total_value_gain": end_date_totals[0]["total_value"],
+            "total_value_gain": end_date_totals["total_value"],
             "total_value_gain_percentage": 1,
-            "total_pl": end_date_totals[0]["total_pl"],
-            "total_pl_percentage": end_date_totals[0]["total_pl_percentage"],
-            "total_dividends": end_date_totals[0]["total_dividends"],
-            "transaction_cost": end_date_totals[0]["transaction_cost"],
+            "total_pl": end_date_totals["total_pl"],
+            "total_pl_percentage": end_date_totals["total_pl_percentage"],
+            "total_dividends": end_date_totals["total_dividends"],
+            "transaction_cost": end_date_totals["transaction_cost"],
         }
     else:
         start_date = (date_time_helper.datatogetswitch(datatoget))[0]
-        start_date_totals = list(
-            container.query_items(
-                query="SELECT * FROM c WHERE c.date = @start_date and c.userid = @userid",
-                parameters=[
-                    {"name": "@start_date", "value": start_date},
-                    {"name": "@userid", "value": userid},
-                ],
-                enable_cross_partition_query=True,
-            )
-        )
+        if last_date < start_date:
+            start_date_totals = (
+                [item for item in items if item["date"] == start_date]
+            )[0]
         output_object = {
-            "total_value_gain": end_date_totals[0]["total_value"]
-            - start_date_totals[0]["total_value"],
+            "total_value_gain": end_date_totals["total_value"]
+            - start_date_totals["total_value"],
             "total_value_gain_percentage": (
-                end_date_totals[0]["total_value"] - start_date_totals[0]["total_value"]
+                end_date_totals["total_value"] - start_date_totals["total_value"]
             )
-            / start_date_totals[0]["total_value"],
-            "total_pl": end_date_totals[0]["total_pl"]
-            - start_date_totals[0]["total_pl"],
+            / start_date_totals["total_value"],
+            "total_pl": end_date_totals["total_pl"] - start_date_totals["total_pl"],
             "total_pl_percentage": (
-                end_date_totals[0]["total_pl"] - start_date_totals[0]["total_pl"]
+                end_date_totals["total_pl"] - start_date_totals["total_pl"]
             )
-            / start_date_totals[0]["total_value"],
-            "total_dividends": end_date_totals[0]["total_dividends"]
-            - start_date_totals[0]["total_dividends"],
-            "transaction_cost": end_date_totals[0]["transaction_cost"]
-            - start_date_totals[0]["transaction_cost"],
+            / start_date_totals["total_value"],
+            "total_dividends": end_date_totals["total_dividends"]
+            - start_date_totals["total_dividends"],
+            "transaction_cost": end_date_totals["transaction_cost"]
+            - start_date_totals["transaction_cost"],
         }
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200
