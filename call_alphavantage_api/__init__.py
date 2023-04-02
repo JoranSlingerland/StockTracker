@@ -34,10 +34,10 @@ def main(payload: str) -> str:
         key = "Note"
         keys = data.json()
         if key in keys:
-            logging.warning("To many api calls, Waiting for 60 seconds")
-            time.sleep(60)
+            logging.warning("To many api calls, Waiting for 10 seconds")
+            time.sleep(10)
             errorcounter += 1
-            if errorcounter > 3:
+            if errorcounter > 18:
                 logging.critical("Too many api calls, Exiting.")
                 raise Exception("Too many api calls, Exiting.")
             logging.info("Retrying")
