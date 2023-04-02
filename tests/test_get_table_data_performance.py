@@ -3,6 +3,8 @@
 import json
 from unittest.mock import patch
 
+from freezegun import freeze_time
+
 from get_table_data_performance import main
 from shared_code.utils import create_form_func_request
 
@@ -138,6 +140,7 @@ def test_invalid_request():
     )
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_max(mock_add_meta_data_to_stock_data, mock_cosmosdb_container):
@@ -154,18 +157,8 @@ def test_max(mock_add_meta_data_to_stock_data, mock_cosmosdb_container):
 
     expected_body = [
         {
-            "id": "123",
-            "date": "2023-01-01",
-            "meta": {"test": "test", "logo": "https://example.com/logo.png"},
-        },
-        {
             "id": "456",
             "date": "2023-01-06",
-            "meta": {"test": "test", "logo": "https://example.com/logo.png"},
-        },
-        {
-            "id": "789",
-            "date": "2023-01-03",
             "meta": {"test": "test", "logo": "https://example.com/logo.png"},
         },
     ]
