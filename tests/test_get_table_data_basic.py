@@ -128,12 +128,7 @@ def test_valid_input_stocks_held(add_meta_data_to_stock_data, cosmosdb_container
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
     excepted_result = add_meta_data(
-        [
-            {
-                "id": "456",
-                "date": "2023-01-06",
-            }
-        ],
+        mock_result,
         "",
     )
 
