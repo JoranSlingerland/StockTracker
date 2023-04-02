@@ -2,6 +2,7 @@
 
 import json
 import logging
+from datetime import date, timedelta
 
 import azure.functions as func
 
@@ -25,14 +26,33 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     datatoget = datatoget.lower()
     logging.info(f"Getting data for {datatoget}")
 
-    container = cosmosdb_module.cosmosdb_container("single_day_totals")
+    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    end_date = date.today().strftime("%Y-%m-%d")
+
+    container = cosmosdb_module.cosmosdb_container("totals")
     end_date_totals = list(
         container.query_items(
-            query="SELECT * FROM c WHERE c.userid = @userid",
-            parameters=[{"name": "@userid", "value": userid}],
+            query="SELECT * FROM c WHERE c.userid = @userid and c.date >= @start_date and c.date <= @end_date",
+            parameters=[
+                {"name": "@userid", "value": userid},
+                {"name": "@start_date", "value": start_date},
+                {"name": "@end_date", "value": end_date},
+            ],
             enable_cross_partition_query=True,
         )
     )
+    if not end_date_totals:
+        return func.HttpResponse(
+            body='{"status": "No data found"}',
+            mimetype="application/json",
+            status_code=500,
+        )
+
+    end_date_totals = sorted(end_date_totals, key=lambda k: k["date"], reverse=True)
+    most_recent_date = end_date_totals[0]["date"]
+    end_date_totals = [
+        item for item in end_date_totals if item["date"] == most_recent_date
+    ]
 
     if datatoget == "max":
         output_object = {
@@ -45,7 +65,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         }
     else:
         start_date = (date_time_helper.datatogetswitch(datatoget))[0]
-        container = cosmosdb_module.cosmosdb_container("totals")
         start_date_totals = list(
             container.query_items(
                 query="SELECT * FROM c WHERE c.date = @start_date and c.userid = @userid",

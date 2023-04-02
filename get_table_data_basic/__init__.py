@@ -75,9 +75,8 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
         result = list(container.read_all_items())
         return result
     query = construct_query(andor, fully_realized, partial_realized)
-    end_date = date.today()
-    start_date = (end_date - timedelta(days=30)).strftime("%Y-%m-%d")
-    end_date = end_date.strftime("%Y-%m-%d")
+    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    end_date = date.today().strftime("%Y-%m-%d")
     result = list(
         container.query_items(
             query=query,

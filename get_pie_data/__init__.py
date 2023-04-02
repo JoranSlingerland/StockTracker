@@ -27,9 +27,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     datatype = datatype.lower()
 
-    end_date = date.today()
-    start_date = (end_date - timedelta(days=365)).strftime("%Y-%m-%d")
-    end_date = end_date.strftime("%Y-%m-%d")
+    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    end_date = date.today().strftime("%Y-%m-%d")
 
     logging.info(f"Getting data for {datatype}")
     container = cosmosdb_module.cosmosdb_container("stocks_held")
