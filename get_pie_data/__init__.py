@@ -3,6 +3,7 @@
 
 import json
 import logging
+from datetime import date, timedelta
 
 import azure.functions as func
 from colorhash import ColorHash
@@ -26,15 +27,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     datatype = datatype.lower()
 
+    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    end_date = date.today().strftime("%Y-%m-%d")
+
     logging.info(f"Getting data for {datatype}")
-    container = cosmosdb_module.cosmosdb_container("single_day")
+    container = cosmosdb_module.cosmosdb_container("stocks_held")
     results = list(
         container.query_items(
-            query="select * from c where c.fully_realized = false and c.userid = @userid",
-            parameters=[{"name": "@userid", "value": userid}],
+            query="select * from c where c.fully_realized = false and c.userid = @userid and c.date >= @start_date and c.date <= @end_date",
+            parameters=[
+                {"name": "@userid", "value": userid},
+                {"name": "@start_date", "value": start_date},
+                {"name": "@end_date", "value": end_date},
+            ],
             enable_cross_partition_query=True,
         )
     )
+
+    if results:
+        results = sorted(results, key=lambda k: k["date"], reverse=True)
+        most_recent_date = results[0]["date"]
+        results = [item for item in results if item["date"] == most_recent_date]
+
     container = cosmosdb_module.cosmosdb_container("meta_data")
     results = utils.add_meta_data_to_stock_data(results, container)
 

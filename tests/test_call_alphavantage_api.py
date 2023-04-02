@@ -64,6 +64,6 @@ def test_too_many_api_calls(mock_sleep, mock_get, mock_get_api_key):
     with pytest.raises(Exception, match="Too many api calls, Exiting."):
         main(url)
 
-    assert mock_get.call_count == 4
+    assert mock_get.call_count == 19
     assert mock_get_api_key.call_count == 1
     mock_get.assert_called_with("https://foo.bar&apikey=123", timeout=10)

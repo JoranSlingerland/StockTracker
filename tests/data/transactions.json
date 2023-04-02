@@ -9,7 +9,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "google.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-bd93-44f0-9e20-a061ce270f9b"
     },
     {
@@ -21,7 +21,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "apple.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7bca-bd93-4430-9e20-a061ce270fdd"
     },
     {
@@ -33,7 +33,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "microsoft.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "81364101-4055-4245-8f97-17d0820a7e70"
     },
     {
@@ -45,7 +45,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "amd.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-bd93-4430-9e20-a061ce270f9b"
     },
     {
@@ -57,7 +57,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "google.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-bd93-44z0-9e20-a061ce270f9b"
     },
     {
@@ -69,7 +69,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "apple.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-bd93-9e20-a061ce270fdd"
     },
     {
@@ -81,7 +81,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "microsoft.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "fddc9b9a-9b9a-4b9a-9b9a-9b9a9b9a9b9a"
     },
     {
@@ -93,7 +93,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "google.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-bd93-443x-9e20-a061ce270f9b"
     },
     {
@@ -105,7 +105,7 @@
       "transaction_cost": 0.5,
       "currency": "USD",
       "domain": "apple.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-b3-4430-9e20-a061ce270fdd"
     },
     {
@@ -117,7 +117,7 @@
       "transaction_cost": 0.5,
       "currency": "EUR",
       "domain": "vanguard.com",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "9a7b12ca-4430-9e20-a061ce270fdd"
     }
   ],
@@ -126,7 +126,7 @@
       "date": "2023-03-26",
       "amount": 1000,
       "transaction_type": "Deposit",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "b25aeb95-175c-48c3-96ef-39428fd16792"
     },
     {
@@ -140,7 +140,7 @@
       "date": "2023-03-28",
       "amount": 1000,
       "transaction_type": "Withdrawal",
-      "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+      "userid": "123",
       "id": "b25aeb95-175c-48c6ef-39428fd16792"
     }
   ],

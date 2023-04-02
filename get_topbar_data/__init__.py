@@ -25,54 +25,60 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     datatoget = datatoget.lower()
     logging.info(f"Getting data for {datatoget}")
 
-    container = cosmosdb_module.cosmosdb_container("single_day_totals")
-    end_date_totals = list(
+    container = cosmosdb_module.cosmosdb_container("totals")
+    items = list(
         container.query_items(
             query="SELECT * FROM c WHERE c.userid = @userid",
-            parameters=[{"name": "@userid", "value": userid}],
+            parameters=[
+                {"name": "@userid", "value": userid},
+            ],
             enable_cross_partition_query=True,
         )
     )
+    if not items:
+        return func.HttpResponse(
+            body='{"status": "No data found"}',
+            mimetype="application/json",
+            status_code=500,
+        )
+
+    items = sorted(items, key=lambda k: k["date"], reverse=True)
+    first_date = items[0]["date"]
+    last_date = items[-1]["date"]
+    end_date_totals = ([item for item in items if item["date"] == first_date])[0]
+    start_date_totals = ([item for item in items if item["date"] == last_date])[0]
 
     if datatoget == "max":
         output_object = {
-            "total_value_gain": end_date_totals[0]["total_value"],
+            "total_value_gain": end_date_totals["total_value"],
             "total_value_gain_percentage": 1,
-            "total_pl": end_date_totals[0]["total_pl"],
-            "total_pl_percentage": end_date_totals[0]["total_pl_percentage"],
-            "total_dividends": end_date_totals[0]["total_dividends"],
-            "transaction_cost": end_date_totals[0]["transaction_cost"],
+            "total_pl": end_date_totals["total_pl"],
+            "total_pl_percentage": end_date_totals["total_pl_percentage"],
+            "total_dividends": end_date_totals["total_dividends"],
+            "transaction_cost": end_date_totals["transaction_cost"],
         }
     else:
         start_date = (date_time_helper.datatogetswitch(datatoget))[0]
-        container = cosmosdb_module.cosmosdb_container("totals")
-        start_date_totals = list(
-            container.query_items(
-                query="SELECT * FROM c WHERE c.date = @start_date and c.userid = @userid",
-                parameters=[
-                    {"name": "@start_date", "value": start_date},
-                    {"name": "@userid", "value": userid},
-                ],
-                enable_cross_partition_query=True,
-            )
-        )
+        if last_date < start_date:
+            start_date_totals = (
+                [item for item in items if item["date"] == start_date]
+            )[0]
         output_object = {
-            "total_value_gain": end_date_totals[0]["total_value"]
-            - start_date_totals[0]["total_value"],
+            "total_value_gain": end_date_totals["total_value"]
+            - start_date_totals["total_value"],
             "total_value_gain_percentage": (
-                end_date_totals[0]["total_value"] - start_date_totals[0]["total_value"]
+                end_date_totals["total_value"] - start_date_totals["total_value"]
             )
-            / start_date_totals[0]["total_value"],
-            "total_pl": end_date_totals[0]["total_pl"]
-            - start_date_totals[0]["total_pl"],
+            / start_date_totals["total_value"],
+            "total_pl": end_date_totals["total_pl"] - start_date_totals["total_pl"],
             "total_pl_percentage": (
-                end_date_totals[0]["total_pl"] - start_date_totals[0]["total_pl"]
+                end_date_totals["total_pl"] - start_date_totals["total_pl"]
             )
-            / start_date_totals[0]["total_value"],
-            "total_dividends": end_date_totals[0]["total_dividends"]
-            - start_date_totals[0]["total_dividends"],
-            "transaction_cost": end_date_totals[0]["transaction_cost"]
-            - start_date_totals[0]["transaction_cost"],
+            / start_date_totals["total_value"],
+            "total_dividends": end_date_totals["total_dividends"]
+            - start_date_totals["total_dividends"],
+            "transaction_cost": end_date_totals["transaction_cost"]
+            - start_date_totals["transaction_cost"],
         }
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200

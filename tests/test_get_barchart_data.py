@@ -3,6 +3,8 @@ import datetime
 import json
 from unittest.mock import MagicMock, patch
 
+import time_machine
+
 from get_barchart_data import main
 from shared_code.utils import create_form_func_request
 
@@ -16,7 +18,7 @@ mock_data_container_input_transactions = [
         "transaction_cost": 0.5,
         "currency": "USD",
         "domain": "amd.com",
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "9fc598da-546e-4bfb-8953-74ffdee70d79",
         "_rid": "+qI9ALp3obACAAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9ALp3obA=/docs/+qI9ALp3obACAAAAAAAAAA==/",
@@ -33,7 +35,7 @@ mock_data_container_input_transactions = [
         "transaction_cost": 0.5,
         "currency": "USD",
         "domain": "amd.com",
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "9fc598da-546e-4bfb-8953-74ffdee70d79",
         "_rid": "+qI9ALp3obACAAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9ALp3obA=/docs/+qI9ALp3obACAAAAAAAAAA==/",
@@ -50,7 +52,7 @@ mock_data_container_input_transactions = [
         "transaction_cost": 0.5,
         "currency": "USD",
         "domain": "amd.com",
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "a4c175d3-0328-4c02-8358-91a88b9f3762",
         "_rid": "+qI9ALp3obADAAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9ALp3obA=/docs/+qI9ALp3obADAAAAAAAAAA==/",
@@ -67,7 +69,7 @@ mock_data_container_input_transactions = [
         "transaction_cost": 0.5,
         "currency": "USD",
         "domain": "amd.com",
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "17b81644-10f0-48cb-b1d9-1da46e4b5768",
         "_rid": "+qI9ALp3obAEAAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9ALp3obA=/docs/+qI9ALp3obAEAAAAAAAAAA==/",
@@ -117,7 +119,7 @@ mock_data_container_stocks_held = [
             "total_pl": 13.959439999999972,
             "total_pl_percentage": 0.03988411428571421,
         },
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "4ad41752-4d66-4fb7-a43f-42fa63f367e4",
         "_rid": "+qI9AMKjpVxtEQAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AMKjpVw=/docs/+qI9AMKjpVxtEQAAAAAAAA==/",
@@ -164,7 +166,7 @@ mock_data_container_stocks_held = [
             "total_pl": 34.73187200000001,
             "total_pl_percentage": 0.6946374400000002,
         },
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "4cf73224-b55e-401f-80c4-0b380181111b",
         "_rid": "+qI9AMKjpVxqEQAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AMKjpVw=/docs/+qI9AMKjpVxqEQAAAAAAAA==/",
@@ -211,7 +213,7 @@ mock_data_container_stocks_held = [
             "total_pl": 13.959439999999972,
             "total_pl_percentage": 0.03988411428571421,
         },
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "094d4f32-3677-425b-be76-47542671176b",
         "_rid": "+qI9AMKjpVxuEQAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AMKjpVw=/docs/+qI9AMKjpVxuEQAAAAAAAA==/",
@@ -238,12 +240,13 @@ def test_invalid_input():
     )
 
 
+@time_machine.travel("2023-03-17")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_input_transactions_max(mock_cosmosdb_container):
     """ "Test get_barchart_data with valid input"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "transaction_cost",
             "dataToGet": "max",
         },
@@ -268,7 +271,7 @@ def test_input_transactions_year(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "transaction_cost",
             "dataToGet": "year",
         },
@@ -310,7 +313,7 @@ def test_input_transactions_month(mock_cosmosdb_container, mock_datatogetswitch)
     """Test get_barchart_data with valid input"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "transaction_cost",
             "dataToGet": "month",
         },
@@ -342,7 +345,7 @@ def test_no_data(mock_cosmosdb_container):
     """Test get_barchart_data with no data"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "invalid",
             "dataToGet": "invalid",
         },
@@ -360,12 +363,13 @@ def test_no_data(mock_cosmosdb_container):
     )
 
 
+@time_machine.travel("2023-03-17")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_dividend_max(mock_cosmosdb_container):
     """Test get_barchart_data with valid input"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "dividend",
             "dataToGet": "max",
         },
@@ -390,7 +394,7 @@ def test_dividend_week(mock_cosmosdb_container, mock_datatogetswitch):
     """Test get_barchart_data with valid input"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "dividend",
             "dataToGet": "week",
         },

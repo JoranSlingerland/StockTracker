@@ -3,7 +3,7 @@
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import azure.functions as func
 
@@ -30,14 +30,25 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # get data for max
     if datatoget == "max":
-        container = cosmosdb_module.cosmosdb_container("single_day")
+        container = cosmosdb_module.cosmosdb_container("stocks_held")
+        start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+        end_date = date.today().strftime("%Y-%m-%d")
         result = list(
             container.query_items(
-                query="SELECT * FROM c WHERE c.fully_realized = false and c.userid = @userid",
-                parameters=[{"name": "@userid", "value": userid}],
+                query="SELECT * FROM c WHERE c.fully_realized = false and c.userid = @userid and c.date >= @start_date and c.date <= @end_date",
+                parameters=[
+                    {"name": "@userid", "value": userid},
+                    {"name": "@start_date", "value": start_date},
+                    {"name": "@end_date", "value": end_date},
+                ],
                 enable_cross_partition_query=True,
             )
         )
+        if result:
+            result = sorted(result, key=lambda k: k["date"], reverse=True)
+            most_recent_date = result[0]["date"]
+            result = [item for item in result if item["date"] == most_recent_date]
+
         container = cosmosdb_module.cosmosdb_container("meta_data")
         result = utils.add_meta_data_to_stock_data(result, container)
 
