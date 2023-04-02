@@ -3,7 +3,7 @@
 import json
 from unittest.mock import patch
 
-from freezegun import freeze_time
+import time_machine
 
 from get_topbar_data import main
 from shared_code.utils import create_form_func_request
@@ -33,7 +33,7 @@ mock_start_data = [
 ]
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_empty_request():
     """Test empty request."""
 
@@ -48,7 +48,7 @@ def test_empty_request():
     assert result.status_code == 400
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_max_request(mock_cosmosdb_container):
     """Test max request."""
@@ -74,7 +74,7 @@ def test_max_request(mock_cosmosdb_container):
     assert json.loads(result.get_body()) == expected_body
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_week_request(mock_cosmosdb_container):
     """Test week request."""

@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 from unittest.mock import Mock, patch
 
-from freezegun import freeze_time
+import time_machine
 
 from get_pie_data import main
 from shared_code.utils import create_form_func_request
@@ -146,7 +146,7 @@ mock_add_meta_data_response[1].update(
 )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_invalid_input():
     """Test invalid input"""
     req = create_form_func_request({}, "http://localhost:7071/api/data/get_pie_data")
@@ -159,7 +159,7 @@ def test_invalid_input():
     )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_datatype_stocks():
     """Test datatype of stocks"""
     req = create_form_func_request(
@@ -190,7 +190,7 @@ def test_datatype_stocks():
         assert body["data"] == expected_body["data"]
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_datatype_currency():
     """Test datatype of currency"""
     req = create_form_func_request(
@@ -222,7 +222,7 @@ def test_datatype_currency():
         assert body["data"] == expected_body["data"]
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_datatype_country():
     """Test datatype of country"""
     req = create_form_func_request(
@@ -254,7 +254,7 @@ def test_datatype_country():
         assert body["data"] == expected_body["data"]
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_datatype_sector():
     """Test datatype of sector"""
     req = create_form_func_request(
@@ -286,7 +286,7 @@ def test_datatype_sector():
         assert body["data"] == expected_body["data"]
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_no_data_in_cosmosdb():
     """Test no data in cosmosdb"""
     req = create_form_func_request(
@@ -314,7 +314,7 @@ def test_no_data_in_cosmosdb():
         )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 def test_invalid_datatype():
     """Test invalid datatype"""
     req = create_form_func_request(

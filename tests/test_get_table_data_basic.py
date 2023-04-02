@@ -3,7 +3,7 @@
 import json
 from unittest.mock import patch
 
-from freezegun import freeze_time
+import time_machine
 
 from get_table_data_basic import main
 from shared_code.utils import create_form_func_request
@@ -117,7 +117,7 @@ def test_valid_input_transactions(add_meta_data_to_stock_data, cosmosdb_containe
     cosmosdb_container.return_value.read_all_items.assert_called_once()
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_stocks_held(add_meta_data_to_stock_data, cosmosdb_container):
@@ -160,7 +160,7 @@ def test_valid_input_stocks_held(add_meta_data_to_stock_data, cosmosdb_container
     )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_stocks_held_fully_realized(
@@ -196,7 +196,7 @@ def test_valid_input_stocks_held_fully_realized(
     )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_stocks_held_partial_realized(
@@ -233,7 +233,7 @@ def test_valid_input_stocks_held_partial_realized(
     )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_stocks_held_or(add_meta_data_to_stock_data, cosmosdb_container):
@@ -277,7 +277,7 @@ def test_valid_input_stocks_held_or(add_meta_data_to_stock_data, cosmosdb_contai
     )
 
 
-@freeze_time("2023-04-02")
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_stocks_held_and(add_meta_data_to_stock_data, cosmosdb_container):

@@ -3,7 +3,7 @@ import datetime
 import json
 from unittest.mock import MagicMock, patch
 
-from freezegun import freeze_time
+import time_machine
 
 from get_barchart_data import main
 from shared_code.utils import create_form_func_request
@@ -240,7 +240,7 @@ def test_invalid_input():
     )
 
 
-@freeze_time("2023-03-17")
+@time_machine.travel("2023-03-17")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_input_transactions_max(mock_cosmosdb_container):
     """ "Test get_barchart_data with valid input"""
@@ -363,7 +363,7 @@ def test_no_data(mock_cosmosdb_container):
     )
 
 
-@freeze_time("2023-03-17")
+@time_machine.travel("2023-03-17")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_dividend_max(mock_cosmosdb_container):
     """Test get_barchart_data with valid input"""
