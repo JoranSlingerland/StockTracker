@@ -17,7 +17,7 @@ mock_data_container_totals = [
         "total_pl_percentage": 6.3740051200000005,
         "total_dividends": 0,
         "transaction_cost": 2,
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "907f8bda-bb92-4e40-b660-dce648268156",
         "_rid": "+qI9AMSGUAtbFAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AMSGUAs=/docs/+qI9AMSGUAtbFAAAAAAAAA==/",
@@ -34,7 +34,7 @@ mock_data_container_totals = [
         "total_pl_percentage": 6.3740051200000005,
         "total_dividends": 0,
         "transaction_cost": 2,
-        "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+        "userid": "123",
         "id": "d1ff60c2-f51f-40ec-93a6-8533124834cd",
         "_rid": "+qI9AMSGUAteFAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AMSGUAs=/docs/+qI9AMSGUAteFAAAAAAAAA==/",
@@ -64,7 +64,7 @@ def test_empty_container_max(mock_cosmosdb_container):
     """Test empty container"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "invested_and_value",
             "dataToGet": "max",
         },
@@ -87,7 +87,7 @@ def test_empty_container_year(mock_cosmosdb_container):
     """Test empty container"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "invested_and_value",
             "dataToGet": "year",
         },
@@ -110,7 +110,7 @@ def test_invalid_datatype(mock_cosmosdb_container):
     """Test invalid datatype"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "invalid",
             "dataToGet": "max",
         },
@@ -132,7 +132,7 @@ def test_total_gains(mock_cosmosdb_container):
     """Test total gains"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "total_gains",
             "dataToGet": "max",
         },
@@ -172,7 +172,7 @@ def test_invested_and_value(mock_cosmosdb_container):
     """Test invested and value"""
     req = create_form_func_request(
         {
-            "userId": "2e43b4a359f8d5bb81550495b114e9e3",
+            "userId": "123",
             "dataType": "invested_and_value",
             "dataToGet": "max",
         },

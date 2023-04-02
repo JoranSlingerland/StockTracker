@@ -31,7 +31,7 @@ async def test_invalid_transaction():
             {
                 "date": "2023-03-16T21:25:06.206Z",
                 "transaction_type": "Deposit",
-                "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+                "userid": "123",
             }
         ],
     }
@@ -61,7 +61,7 @@ async def test_invalid_stock():
                 "transaction_cost": 0.5,
                 "currency": "USD",
                 "domain": "amd.com",
-                "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+                "userid": "123",
             }
         ],
     }
@@ -94,7 +94,7 @@ async def test_main(cosmosdb_container_mock):
                 "transaction_cost": 0.5,
                 "currency": "USD",
                 "domain": "amd.com",
-                "userid": "2e43b4a359f8d5bb81550495b114e9e3",
+                "userid": "123",
             }
         ],
     }
