@@ -3,6 +3,8 @@
 import json
 from unittest.mock import patch
 
+import time_machine
+
 from get_topbar_data import main
 from shared_code.utils import create_form_func_request
 
@@ -28,6 +30,7 @@ mock_end_data = [
 ]
 
 
+@time_machine.travel("2023-04-02")
 def test_empty_request():
     """Test empty request."""
 
@@ -42,6 +45,7 @@ def test_empty_request():
     assert result.status_code == 400
 
 
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_max_request(mock_cosmosdb_container):
     """Test max request."""
@@ -67,6 +71,7 @@ def test_max_request(mock_cosmosdb_container):
     assert json.loads(result.get_body()) == expected_body
 
 
+@time_machine.travel("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_week_request(mock_cosmosdb_container):
     """Test week request."""
@@ -90,3 +95,69 @@ def test_week_request(mock_cosmosdb_container):
     result = main(req)
     assert result.status_code == 200
     assert json.loads(result.get_body()) == expected_body
+
+
+@time_machine.travel("2023-04-02")
+@patch("shared_code.cosmosdb_module.cosmosdb_container")
+def test_ytd_request(mock_cosmosdb_container):
+    """Test week request."""
+
+    req = create_form_func_request(
+        {"userId": "123", "dataToGet": "ytd"},
+        "https://localhost:7071/api/data/get_topbar_data",
+    )
+
+    mock_end_data.append(
+        {
+            "date": "2022-04-01",
+            "id": "123",
+            "total_value": 80,
+            "total_pl": 80,
+            "total_pl_percentage": 80,
+            "total_dividends": 80,
+            "transaction_cost": 80,
+        }
+    )
+    mock_end_data.append(
+        {
+            "date": "2023-01-01",
+            "id": "123",
+            "total_value": 80,
+            "total_pl": 80,
+            "total_pl_percentage": 80,
+            "total_dividends": 80,
+            "transaction_cost": 80,
+        }
+    )
+
+    mock_cosmosdb_container.return_value.query_items.return_value = mock_end_data
+
+    expected_body = {
+        "total_value_gain": 20,
+        "total_value_gain_percentage": 0.25,
+        "total_pl": 20,
+        "total_pl_percentage": 0.25,
+        "total_dividends": 20,
+        "transaction_cost": 20,
+    }
+
+    result = main(req)
+    assert result.status_code == 200
+    assert json.loads(result.get_body()) == expected_body
+
+
+@time_machine.travel("2023-04-02")
+@patch("shared_code.cosmosdb_module.cosmosdb_container")
+def test_empty_database(mock_cosmosdb_container):
+    """Test week request."""
+
+    req = create_form_func_request(
+        {"userId": "123", "dataToGet": "week"},
+        "https://localhost:7071/api/data/get_topbar_data",
+    )
+
+    mock_cosmosdb_container.return_value.query_items.return_value = []
+
+    result = main(req)
+    assert result.status_code == 500
+    assert result.get_body() == b'{"status": "No data found"}'
