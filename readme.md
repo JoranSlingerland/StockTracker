@@ -107,13 +107,13 @@ Body
 
 Body
 
-| Param           | value      | Type | Allowed values                                | Required |
-| --------------- | ---------- | ---- | --------------------------------------------- | -------- |
-| userId          | {{userId}} | text | `string`                                      | true     |
-| containerName   |            | text | totals \| single_day_totals \| input_invested | true     |
-| andOr           |            | text | and \| or                                     | false    |
-| fullyRealized   |            | text | true \| false                                 | false    |
-| partialRealized |            | text | true \| false                                 | false    |
+| Param           | value      | Type | Allowed values                          | Required |
+| --------------- | ---------- | ---- | --------------------------------------- | -------- |
+| userId          | {{userId}} | text | `string`                                | true     |
+| containerName   |            | text | totals \| stocks_held \| input_invested | true     |
+| andOr           |            | text | and \| or                               | false    |
+| fullyRealized   |            | text | true \| false                           | false    |
+| partialRealized |            | text | true \| false                           | false    |
 
 ### get_linechart_data
 

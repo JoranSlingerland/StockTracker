@@ -3,6 +3,8 @@
 import json
 from unittest.mock import patch
 
+from freezegun import freeze_time
+
 from get_table_data_basic import main
 from shared_code.utils import create_form_func_request
 
@@ -29,6 +31,13 @@ mock_data = [
         "id": "789",
         "date": "2023-01-03",
     },
+]
+
+mock_result = [
+    {
+        "id": "456",
+        "date": "2023-01-06",
+    }
 ]
 
 
@@ -108,6 +117,7 @@ def test_valid_input_transactions(add_meta_data_to_stock_data, cosmosdb_containe
     cosmosdb_container.return_value.read_all_items.assert_called_once()
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_single_day(add_meta_data_to_stock_data, cosmosdb_container):
@@ -117,10 +127,18 @@ def test_valid_input_single_day(add_meta_data_to_stock_data, cosmosdb_container)
     cosmosdb_container.return_value.read_all_items.return_value = []
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
-    excepted_result = add_meta_data(mock_data, "")
+    excepted_result = add_meta_data(
+        [
+            {
+                "id": "456",
+                "date": "2023-01-06",
+            }
+        ],
+        "",
+    )
 
     req = create_form_func_request(
-        {"containerName": "single_day", "userId": "123"},
+        {"containerName": "stocks_held", "userId": "123"},
         "http://localhost:7071/api/data/get_table_data_basic",
     )
 
@@ -130,16 +148,19 @@ def test_valid_input_single_day(add_meta_data_to_stock_data, cosmosdb_container)
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.userid = @userid",
+        query="select * from c where c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": None},
             {"name": "@partial_realized", "value": None},
+            {"name": "@start_date", "value": "2023-03-03"},
+            {"name": "@end_date", "value": "2023-04-02"},
         ],
         enable_cross_partition_query=True,
     )
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_single_day_fully_realized(
@@ -151,10 +172,9 @@ def test_valid_input_single_day_fully_realized(
     cosmosdb_container.return_value.read_all_items.return_value = []
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
-    excepted_result = add_meta_data(mock_data, "")
-
+    excepted_result = add_meta_data(mock_result, "")
     req = create_form_func_request(
-        {"containerName": "single_day", "userId": "123", "fullyRealized": "true"},
+        {"containerName": "stocks_held", "userId": "123", "fullyRealized": "true"},
         "http://localhost:7071/api/data/get_table_data_basic",
     )
 
@@ -164,16 +184,19 @@ def test_valid_input_single_day_fully_realized(
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.fully_realized = @fully_realized and c.userid = @userid",
+        query="select * from c where c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": True},
             {"name": "@partial_realized", "value": None},
+            {"name": "@start_date", "value": "2023-03-03"},
+            {"name": "@end_date", "value": "2023-04-02"},
         ],
         enable_cross_partition_query=True,
     )
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_single_day_partial_realized(
@@ -185,10 +208,10 @@ def test_valid_input_single_day_partial_realized(
     cosmosdb_container.return_value.read_all_items.return_value = []
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
-    excepted_result = add_meta_data(mock_data, "")
+    excepted_result = add_meta_data(mock_result, "")
 
     req = create_form_func_request(
-        {"containerName": "single_day", "userId": "123", "partialRealized": "true"},
+        {"containerName": "stocks_held", "userId": "123", "partialRealized": "true"},
         "http://localhost:7071/api/data/get_table_data_basic",
     )
 
@@ -198,16 +221,19 @@ def test_valid_input_single_day_partial_realized(
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.partial_realized = @partial_realized and c.userid = @userid",
+        query="select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": None},
             {"name": "@partial_realized", "value": "true"},
+            {"name": "@start_date", "value": "2023-03-03"},
+            {"name": "@end_date", "value": "2023-04-02"},
         ],
         enable_cross_partition_query=True,
     )
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_single_day_or(add_meta_data_to_stock_data, cosmosdb_container):
@@ -217,11 +243,14 @@ def test_valid_input_single_day_or(add_meta_data_to_stock_data, cosmosdb_contain
     cosmosdb_container.return_value.read_all_items.return_value = []
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
-    excepted_result = add_meta_data(mock_data, "")
+    excepted_result = add_meta_data(
+        mock_result,
+        "",
+    )
 
     req = create_form_func_request(
         {
-            "containerName": "single_day",
+            "containerName": "stocks_held",
             "userId": "123",
             "partialRealized": "true",
             "fullyRealized": "true",
@@ -236,16 +265,19 @@ def test_valid_input_single_day_or(add_meta_data_to_stock_data, cosmosdb_contain
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid",
+        query="select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": True},
             {"name": "@partial_realized", "value": "true"},
+            {"name": "@start_date", "value": "2023-03-03"},
+            {"name": "@end_date", "value": "2023-04-02"},
         ],
         enable_cross_partition_query=True,
     )
 
 
+@freeze_time("2023-04-02")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_single_day_and(add_meta_data_to_stock_data, cosmosdb_container):
@@ -255,11 +287,14 @@ def test_valid_input_single_day_and(add_meta_data_to_stock_data, cosmosdb_contai
     cosmosdb_container.return_value.read_all_items.return_value = []
     add_meta_data_to_stock_data.side_effect = add_meta_data
 
-    excepted_result = add_meta_data(mock_data, "")
+    excepted_result = add_meta_data(
+        mock_result,
+        "",
+    )
 
     req = create_form_func_request(
         {
-            "containerName": "single_day",
+            "containerName": "stocks_held",
             "userId": "123",
             "partialRealized": "true",
             "fullyRealized": "true",
@@ -274,11 +309,13 @@ def test_valid_input_single_day_and(add_meta_data_to_stock_data, cosmosdb_contai
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid",
+        query="select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": True},
             {"name": "@partial_realized", "value": "true"},
+            {"name": "@start_date", "value": "2023-03-03"},
+            {"name": "@end_date", "value": "2023-04-02"},
         ],
         enable_cross_partition_query=True,
     )
