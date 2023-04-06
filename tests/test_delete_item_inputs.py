@@ -1,36 +1,38 @@
 """Test delete_item_inputs"""
 
+import json
 from unittest.mock import patch
 
+import azure.functions as func
 from azure.cosmos import exceptions
 
 from delete_input_items import main
-from shared_code.utils import create_form_func_request
 
 
 def test_empty_request():
     """Test empty request"""
-    req = create_form_func_request(
-        {}, "http://localhost:7071/api/delete/delete/delete_input_items"
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps({}).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
     response = main(req)
     assert response.status_code == 400
-    assert (
-        response.get_body()
-        == b'{"status": "Please pass a valid name on the query string or in the request body"}'
-    )
+    assert response.get_body() == b'{"result": "Invalid json body"}'
 
 
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_valid_request(cosmosdb_container_mock):
     """Test valid request"""
-    req = create_form_func_request(
-        {
-            "itemIds": '["123"]',
-            "container": "input_invested",
-            "userId": "123",
-        },
-        "http://localhost:7071/api/delete/delete_input_items",
+    body = {
+        "itemIds": ["123"],
+        "container": "input_invested",
+        "userId": "123",
+    }
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
 
     cosmosdb_container_mock.return_value.query_items.return_value = [
@@ -58,14 +60,15 @@ def test_valid_request(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
     """Test CosmosResourceNotFoundError"""
-
-    req = create_form_func_request(
-        {
-            "itemIds": '["123"]',
-            "container": "input_invested",
-            "userId": "123",
-        },
-        "http://localhost:7071/api/delete/delete_input_items",
+    body = {
+        "itemIds": ["123"],
+        "container": "input_invested",
+        "userId": "123",
+    }
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
 
     cosmosdb_container_mock.return_value.query_items.return_value = [
@@ -86,14 +89,16 @@ def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_cosmos_http_response_error(cosmosdb_container_mock):
     """Test CosmosHttpResponseError"""
+    body = {
+        "itemIds": ["123"],
+        "container": "input_invested",
+        "userId": "123",
+    }
 
-    req = create_form_func_request(
-        {
-            "itemIds": '["123"]',
-            "container": "input_invested",
-            "userId": "123",
-        },
-        "http://localhost:7071/api/delete/delete_input_items",
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
 
     cosmosdb_container_mock.return_value.query_items.return_value = [
@@ -114,14 +119,16 @@ def test_cosmos_http_response_error(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_no_cosmosdb_date(cosmosdb_container_mock):
     """Test no cosmosdb date"""
+    body = {
+        "itemIds": ["123"],
+        "container": "input_invested",
+        "userId": "123",
+    }
 
-    req = create_form_func_request(
-        {
-            "itemIds": '["123"]',
-            "container": "input_invested",
-            "userId": "123",
-        },
-        "http://localhost:7071/api/delete/delete_input_items",
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
 
     cosmosdb_container_mock.return_value.query_items.return_value = []
@@ -138,13 +145,16 @@ def test_no_cosmosdb_date(cosmosdb_container_mock):
 def test_partial_error(cosmosdb_container_mock):
     """Test partial error"""
 
-    req = create_form_func_request(
-        {
-            "itemIds": '["123", "456"]',
-            "container": "input_invested",
-            "userId": "123",
-        },
-        "http://localhost:7071/api/delete/delete_input_items",
+    body = {
+        "itemIds": ["123", "456"],
+        "container": "input_invested",
+        "userId": "123",
+    }
+
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(body).encode("utf-8"),
+        url="/api/delete/delete_input_items",
     )
 
     cosmosdb_container_mock.return_value.query_items.side_effect = [

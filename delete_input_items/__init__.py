@@ -6,34 +6,32 @@ import logging
 
 import azure.functions as func
 from azure.cosmos import exceptions
+from jsonschema import validate
 
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, schemas
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    itemids = req.form.get("itemIds", None)
-    container = req.form.get("container", None)
-    userid = req.form.get("userId", None)
-
-    if (
-        not itemids
-        or not userid
-        or container not in ["input_invested", "input_transactions"]
-    ):
-        logging.error("No datatype provided")
+    try:
+        body = json.loads(req.get_body().decode("utf-8"))
+        validate(instance=body, schema=schemas.delete_item())
+    except Exception as ex:
+        logging.error(ex)
         return func.HttpResponse(
-            body='{"status": "Please pass a valid name on the query string or in the request body"}',
+            body='{"result": "Invalid json body"}',
             mimetype="application/json",
             status_code=400,
         )
 
+    itemids = body.get("itemIds", None)
+    container = body.get("container", None)
+    userid = body.get("userId", None)
+
     container = cosmosdb_module.cosmosdb_container(container)
     errors = []
-
-    itemids = json.loads(itemids)
 
     for itemid in itemids:
         item = container.query_items(

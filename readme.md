@@ -250,15 +250,11 @@ Body
 
 | Method | URL                                    | content-type | Usage                                                        |
 | ------ | -------------------------------------- | ------------ | ------------------------------------------------------------ |
-| POST   | {{base_url}}/delete/delete_input_items | form-data    | Function will delete a list of items in the input containers |
+| POST   | {{base_url}}/delete/delete_input_items | json         | Function will delete a list of items in the input containers |
 
 Body
 
-| Param     | value            | Type | Allowed values                       | Required |
-| --------- | ---------------- | ---- | ------------------------------------ | -------- |
-| itemIds   | '["123", "456"]' | text | `string`                             | true     |
-| container | input_invested   | text | input_invested \| input_transactions | true     |
-| userId    | {{userId}}       | text | `string`                             | true     |
+Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
 
 ### add_item_to_input
 
