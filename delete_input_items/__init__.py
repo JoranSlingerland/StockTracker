@@ -34,17 +34,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     errors = []
 
     for itemid in itemids:
-        item = container.query_items(
-            query="SELECT * FROM c WHERE c.id = @id and c.userId = @userid",
-            parameters=[
-                {"name": "@id", "value": itemid},
-                {"name": "@userid", "value": userid},
-            ],
-            enable_cross_partition_query=True,
+        item = list(
+            container.query_items(
+                query="SELECT * FROM c WHERE c.id = @id and c.userid = @userid",
+                parameters=[
+                    {"name": "@id", "value": itemid},
+                    {"name": "@userid", "value": userid},
+                ],
+                enable_cross_partition_query=True,
+            )
         )
+
+        item = item[0] if len(item) == 1 else None
         if item:
             try:
-                container.delete_item(item=item)
+                container.delete_item(item=item, partition_key=itemid)
             except exceptions.CosmosResourceNotFoundError as e:
                 errors.append(
                     {
