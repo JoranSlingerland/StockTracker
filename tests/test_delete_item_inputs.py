@@ -45,7 +45,7 @@ def test_valid_request(cosmosdb_container_mock):
     assert response.get_body() == b'{"Status": "Success"}'
     cosmosdb_container_mock.assert_called_once_with("input_invested")
     cosmosdb_container_mock.return_value.query_items.assert_called_once_with(
-        query="SELECT * FROM c WHERE c.id = @id and c.userId = @userid",
+        query="SELECT * FROM c WHERE c.id = @id and c.userid = @userid",
         parameters=[
             {"name": "@id", "value": "123"},
             {"name": "@userid", "value": "123"},
@@ -53,7 +53,7 @@ def test_valid_request(cosmosdb_container_mock):
         enable_cross_partition_query=True,
     )
     cosmosdb_container_mock.return_value.delete_item.assert_called_once_with(
-        item=[{"id": "123", "userId": "123"}]
+        item={"id": "123", "userId": "123"}, partition_key="123"
     )
 
 
