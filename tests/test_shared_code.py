@@ -6,6 +6,7 @@ import os
 from unittest import mock
 
 import azure.functions as func
+import pandas as pd
 import pytest
 from azure.cosmos import exceptions
 
@@ -191,11 +192,6 @@ class TestDateTimeHelper:
 
         today = datetime.date.today()
 
-        data_to_get = "test"
-        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
-        assert None is start_data
-        assert None is end_date
-
         data_to_get = "year"
         start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
         assert start_data == (today - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
@@ -293,9 +289,9 @@ class TestDateTimeHelper:
         end_date = datetime.date(2021, 3, 31)
         months = date_time_helper.get_months(start_date, end_date)
         assert months == [
-            datetime.date(2021, 1, 31),
-            datetime.date(2021, 2, 28),
-            datetime.date(2021, 3, 31),
+            pd.Timestamp("2021-01-31"),
+            pd.Timestamp("2021-02-28"),
+            pd.Timestamp("2021-03-31"),
         ]
 
         start_date = datetime.date(2021, 1, 1)

@@ -6,7 +6,7 @@ import logging
 import random
 from typing import Callable
 
-from azure.cosmos import cosmos_client, errors
+from azure.cosmos import cosmos_client, exceptions
 
 from shared_code import get_config
 
@@ -47,10 +47,10 @@ async def container_function_with_back_off(
         try:
             await function()
             break
-        except errors.CosmosResourceExistsError:
+        except exceptions.CosmosResourceExistsError:
             logging.debug("Item already exists")
             break
-        except errors.CosmosHttpResponseError as err:
+        except exceptions.CosmosHttpResponseError as err:
             if err.status_code == 404:
                 logging.debug("Item not found")
                 break
