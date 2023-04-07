@@ -168,6 +168,13 @@ Body
 | userId    | {{userId}} | text | `string`                            | true     |
 | dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
 
+Body
+
+| Param     | value      | Type | Allowed values                      | Required |
+| --------- | ---------- | ---- | ----------------------------------- | -------- |
+| userId    | {{userId}} | text | `string`                            | true     |
+| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+
 ### orchestrator_start
 
 | Method | URL                             | content-type | Usage                               |
@@ -238,6 +245,16 @@ Body
 | Param              | value       | Type | Allowed values     | Required |
 | ------------------ | ----------- | ---- | ------------------ | -------- |
 | containersToDelete | output_only | text | all \| output_only | true     |
+
+### delete_input_items
+
+| Method | URL                                    | content-type | Usage                                                        |
+| ------ | -------------------------------------- | ------------ | ------------------------------------------------------------ |
+| POST   | {{base_url}}/delete/delete_input_items | json         | Function will delete a list of items in the input containers |
+
+Body
+
+Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
 
 ### add_item_to_input
 

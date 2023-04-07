@@ -1,13 +1,12 @@
 """Date and time Helper functions"""
 from datetime import date, timedelta
-from typing import Union
 
 import pandas as pd
 
 
 def get_quarter_first_and_last_date(
     quarter: str,
-) -> Union[tuple[date, date], tuple[None, None]]:
+) -> tuple[date, date] | tuple[None, None]:
     """Get first and last date of quarter"""
     quarter_and_year = quarter.split(" ")
     quarter = quarter_and_year[0]
@@ -31,7 +30,7 @@ def get_quarter_first_and_last_date(
     return None, None
 
 
-def datatogetswitch(datatoget: str) -> Union[tuple[str, str], tuple[None, None]]:
+def datatogetswitch(datatoget: str) -> tuple[date, date] | tuple[None, None]:
     """Home made match function"""
     end_date = date.today()
     if datatoget == "year":
@@ -52,7 +51,7 @@ def datatogetswitch(datatoget: str) -> Union[tuple[str, str], tuple[None, None]]
     return start_date, end_date
 
 
-def month_to_quarter(month: str) -> Union[str, None]:
+def month_to_quarter(month: str) -> str | None:
     """Convert month to quarter"""
     if month in ["January", "February", "March"]:
         return "Q1"
@@ -65,7 +64,7 @@ def month_to_quarter(month: str) -> Union[str, None]:
     return None
 
 
-def get_quarters(start_date: Union[str, date], end_date: Union[str, date]) -> list:
+def get_quarters(start_date: str | date, end_date: str | date) -> list:
     """Get quarters between start and end date"""
     quarters = (
         pd.date_range(
@@ -85,7 +84,7 @@ def get_quarters(start_date: Union[str, date], end_date: Union[str, date]) -> li
     return output_quarters
 
 
-def get_months(start_date: Union[str, date], end_date: Union[str, date]) -> list:
+def get_months(start_date: str | date, end_date: str | date) -> list:
     """Get months between start and end date"""
     months = pd.date_range(
         pd.to_datetime(start_date),
@@ -95,7 +94,7 @@ def get_months(start_date: Union[str, date], end_date: Union[str, date]) -> list
     return months
 
 
-def get_weeks(start_date: Union[str, date], end_date: Union[str, date]) -> list:
+def get_weeks(start_date: str | date, end_date: str | date) -> list:
     """Get weeks between start and end date"""
     weeks = pd.date_range(
         pd.to_datetime(start_date),

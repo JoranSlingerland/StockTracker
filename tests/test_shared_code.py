@@ -320,6 +320,11 @@ class TestSchemas:
         schema = schemas.transaction_input()
         assert isinstance(schema, dict)
 
+    def test_delete_item(self):
+        """Test delete item"""
+        schema = schemas.delete_item()
+        assert isinstance(schema, dict)
+
 
 class TestUtils:
     """Test utils"""

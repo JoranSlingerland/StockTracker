@@ -58,3 +58,26 @@ def transaction_input() -> dict:
         },
         "additionalProperties": False,
     }
+
+
+def delete_item() -> dict:
+    """Schema to delete item"""
+    return {
+        "type": "object",
+        "properties": {
+            "itemIds": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "minItems": 1,
+                "additionalItems": False,
+            },
+            "container": {
+                "type": "string",
+                "minLength": 1,
+                "enum": ["input_invested", "input_transactions"],
+            },
+            "userId": {"type": "string", "minLength": 1},
+        },
+        "additionalProperties": False,
+        "required": ["itemIds", "container", "userId"],
+    }
