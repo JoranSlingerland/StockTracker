@@ -4,7 +4,6 @@ import copy
 import logging
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Union
 
 
 def main(payload: str) -> str:
@@ -31,7 +30,7 @@ def main(payload: str) -> str:
     return None, None, stocks
 
 
-def filter_output(output: list, days_to_update: Union[int, str]) -> list:
+def filter_output(output: list, days_to_update: int | str) -> list:
     """Filter output list"""
     if days_to_update == "all":
         return output
