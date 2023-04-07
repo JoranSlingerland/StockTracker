@@ -1,5 +1,6 @@
 """Date and time Helper functions"""
 from datetime import date, timedelta
+from typing import Literal
 
 import pandas as pd
 
@@ -30,7 +31,9 @@ def get_quarter_first_and_last_date(
     return None, None
 
 
-def datatogetswitch(datatoget: str) -> tuple[date, date] | tuple[None, None]:
+def datatogetswitch(
+    datatoget: Literal["year", "month", "week", "ytd"]
+) -> tuple[str, str]:
     """Home made match function"""
     end_date = date.today()
     if datatoget == "year":
@@ -41,17 +44,29 @@ def datatogetswitch(datatoget: str) -> tuple[date, date] | tuple[None, None]:
         start_date = end_date - timedelta(days=7)
     elif datatoget == "ytd":
         start_date = date(end_date.year, 1, 1)
-    else:
-        return None, None
 
     start_date = start_date.strftime("%Y-%m-%d")
     end_date = end_date.strftime("%Y-%m-%d")
 
-    # return nothing if no match
     return start_date, end_date
 
 
-def month_to_quarter(month: str) -> str | None:
+def month_to_quarter(
+    month: Literal[
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+) -> Literal["Q1", "Q2", "Q3" "Q4"]:
     """Convert month to quarter"""
     if month in ["January", "February", "March"]:
         return "Q1"
@@ -61,7 +76,6 @@ def month_to_quarter(month: str) -> str | None:
         return "Q3"
     if month in ["October", "November", "December"]:
         return "Q4"
-    return None
 
 
 def get_quarters(start_date: str | date, end_date: str | date) -> list:

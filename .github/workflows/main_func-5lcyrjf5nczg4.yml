@@ -12,7 +12,7 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "." # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.10" # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -r requirements/prod.txt
+        run: pip install -r requirements.txt
 
       # Optional: Add step to run tests here
 
@@ -65,6 +65,6 @@ jobs:
           app-name: "func-5lcyrjf5nczg4"
           slot-name: "Production"
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5DD00D1AFF76415F81FA889EFE76486B }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C5E7B7B039FE48EDB7A47D2B6FDCADF3 }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
