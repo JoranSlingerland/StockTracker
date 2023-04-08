@@ -40,11 +40,16 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     provisioning_tasks.append(provision_task)
     api_data = (yield context.task_all(provisioning_tasks))[0]
 
-    # step 3 recreate containers / remove items
+    # step 3 remove items
     logging.info("Step 3: Delete cosmosdb items")
-    result = yield context.call_activity(
-        "delete_cosmosdb_items", [days_to_update, userid]
+    provisioning_tasks = []
+    id_ = 1
+    child_id = f"{context.instance_id}:{id_}"
+    provision_task = context.call_sub_orchestrator(
+        "delete_cosmosdb_items_orchestrator", [days_to_update, userid], child_id
     )
+    provisioning_tasks.append(provision_task)
+    result = (yield context.task_all(provisioning_tasks))[0]
 
     # step 4 - output meta data to cosmosdb
     logging.info("Step 4: Output meta data to cosmosdb")
@@ -90,7 +95,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # step 8 - output to cosmosdb
     logging.info("Step 8: Output to cosmosdb")
     provisioning_tasks = []
-    id_ = 1
+    id_ = 2
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
         "output_to_cosmosdb_orchestrator", data, child_id
