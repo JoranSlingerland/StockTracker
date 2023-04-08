@@ -23,7 +23,7 @@ def get_clearbit_api_key() -> str:
     return os.environ["CLEARBIT_API_KEY"]
 
 
-def get_cosmosdb() -> dict:
+def get_cosmosdb() -> dict[str, str]:
     """Get cosmosdb"""
 
     load_dotenv()
@@ -36,7 +36,7 @@ def get_cosmosdb() -> dict:
     }
 
 
-def get_containers() -> dict:
+def get_containers() -> dict[str, list[dict[str, str | bool]]]:
     """Get containers"""
 
     return {

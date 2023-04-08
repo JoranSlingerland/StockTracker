@@ -37,9 +37,9 @@ def cosmosdb_container(container_name: str):
 
 async def container_function_with_back_off(
     function: Callable,
-    max_retries=10,
-    delay=random.uniform(0.0, 0.2),
-    max_delay=5,
+    max_retries: int = 10,
+    delay: float = random.uniform(0.0, 0.2),
+    max_delay: int = 5,
 ):
     """Async fill with backoff"""
     retry_count = 0
