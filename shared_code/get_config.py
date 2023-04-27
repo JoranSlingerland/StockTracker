@@ -76,5 +76,12 @@ def get_containers() -> dict[str, list[dict[str, str | bool]]]:
                 "input_container": False,
                 "output_container": True,
             },
+            {
+                "container_name": "users",
+                "partition_key": "/id",
+                "candelete": False,
+                "input_container": False,
+                "output_container": False,
+            },
         ]
     }

@@ -266,6 +266,28 @@ Body
 
 Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
 
+### add_user_data
+
+| Method | URL                            | content-type | Usage                          |
+| ------ | ------------------------------ | ------------ | ------------------------------ |
+| POST   | {{base_url}}/add/add_user_data | json         | Function will update user data |
+
+Body
+
+Body needs to confirm to the schema found in the [schema](.\shared_code\schemas.py) file.
+
+### get_user_data
+
+| Method | URL                             | content-type | Usage                       |
+| ------ | ------------------------------- | ------------ | --------------------------- |
+| POST   | {{base_url}}/data/get_user_data | form-data    | Function will get user data |
+
+Body
+
+| Param  | value       | Type | Allowed values | Required |
+| ------ | ----------- | ---- | -------------- | -------- |
+| userId | output_only | text | `string`       | true     |
+
 ### Main stocktracker function
 
 | Function                  | Usage                                                                                                                                    | Link and options                                              |
