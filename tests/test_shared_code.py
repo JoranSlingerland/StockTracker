@@ -10,8 +10,14 @@ import pandas as pd
 import pytest
 from azure.cosmos import exceptions
 
-from shared_code import (aio_helper, cosmosdb_module, date_time_helper,
-                         get_config, schemas, utils)
+from shared_code import (
+    aio_helper,
+    cosmosdb_module,
+    date_time_helper,
+    get_config,
+    schemas,
+    utils,
+)
 
 
 @pytest.mark.asyncio()
