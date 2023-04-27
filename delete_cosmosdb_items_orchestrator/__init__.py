@@ -20,6 +20,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
                 "delete_cosmosdb_items", [container_name, batch]
             )
 
+    if not result:
+        result = '{"status": "No items to delete"}'
+
     return result
 
 
