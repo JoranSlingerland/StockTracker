@@ -49,10 +49,8 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 
 | Name               | Value                                                                              |
 | ------------------ | ---------------------------------------------------------------------------------- |
-| Api_key            | < Your Alpha vantage API key >                                                     |
 | AZURE_CREDENTIALS  | I'm not sure anymore but it has something to do with the azure/login@v1 action : ) |
 | AZURE_SUBSCRIPTION | Your Azure subscription ID                                                         |
-| clearbit_Api_key   | < Your clearbit API key >                                                          |
 | SWA_REPO_TOKEN     | The PAT token you generated                                                        |
 
 ### local development environment
@@ -61,14 +59,12 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 - Install [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=github#install-azurite)
 - Setup a .env file in the stocktracker root with the values below
 
-| Name                      | Notes                          | Example                                          |
-| ------------------------- | ------------------------------ | ------------------------------------------------ |
-| Api_key                   | < Your Alpha vantage API key > | A1B2C3                                           |
-| CLEARBIT_API_KEY          | < Your clearbit API key >      | A1B2C3                                           |
-| COSMOSDB_ENDPOINT         | < Link to your database>       | [https://localhost:8081](https://localhost:8081) |
-| COSMOSDB_KEY              | < CosmosDB Access key >        | A1B2C3                                           |
-| COSMOSDB_DATABASE         | < CosmosDB Database name>      | stocktracker                                     |
-| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Thoughput >         | 1000                                             |
+| Name                      | Notes                     | Example                                          |
+| ------------------------- | ------------------------- | ------------------------------------------------ |
+| COSMOSDB_ENDPOINT         | < Link to your database>  | [https://localhost:8081](https://localhost:8081) |
+| COSMOSDB_KEY              | < CosmosDB Access key >   | A1B2C3                                           |
+| COSMOSDB_DATABASE         | < CosmosDB Database name> | stocktracker                                     |
+| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Thoughput >    | 1000                                             |
 
 - Startup the API running the task `func host start`
 - run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
@@ -77,6 +73,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 ## Usage
 
 - Go to /authenticated/settings admin page and create the containers.
+- Go to /authenticated/settings Account page and add your api keys.
 - Add data in /authenticated/actions
 - Refresh the data by going to /authenticated/settings and clicking the refresh data button.
 - After it has finished you can view the data
