@@ -5,14 +5,12 @@ import time
 
 import requests
 
-from shared_code import get_config
-
 
 def main(payload: str) -> str:
     """Get data from API"""
 
-    url = payload
-    api_key = get_config.get_api_key()
+    url = payload[0]
+    api_key = payload[1]
     url = f"{url}&apikey={api_key}"
 
     errorcounter = 0

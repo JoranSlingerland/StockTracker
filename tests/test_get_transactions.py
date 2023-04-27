@@ -1,11 +1,11 @@
-"""Test the get_transactions module."""
+"""Test the get_input_data module."""
 
 from datetime import date
 from unittest.mock import patch
 
 import pandas as pd
 
-from get_transactions import main
+from get_input_data import main
 
 transactions_data = [
     {
@@ -58,6 +58,19 @@ invested_data = [
         "_ts": 1678635686,
     }
 ]
+user_data = [
+    {
+        "id": "123",
+        "dark_mode": True,
+        "clearbit_api_key": "sk_34b1f39ac8e8fba6fde27dbb0d813e24",
+        "alpha_vantage_api_key": "V9CQXQUZYUA8F1JD",
+        "_rid": "+qI9AL5k7vYCAAAAAAAAAA==",
+        "_self": "dbs/+qI9AA==/colls/+qI9AL5k7vY=/docs/+qI9AL5k7vYCAAAAAAAAAA==/",
+        "_etag": '"00000000-0000-0000-7956-ed2637b301d9"',
+        "_attachments": "attachments/",
+        "_ts": 1682634223,
+    }
+]
 
 
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
@@ -67,6 +80,7 @@ def test_get_transactions(cosmosdb_container_mock):
     cosmosdb_container_mock.return_value.query_items.side_effect = [
         transactions_data,
         invested_data,
+        user_data,
     ]
     start_date = date.fromisoformat("2021-01-01")
     end_date = date.today()
@@ -113,7 +127,13 @@ def test_get_transactions(cosmosdb_container_mock):
     ]
     assert result["daterange"] == daterange
     assert result["symbols"] == ["AMD", "MSFT"]
-    assert cosmosdb_container_mock.return_value.query_items.call_count == 2
+    assert result["user_data"] == {
+        "id": "123",
+        "dark_mode": True,
+        "clearbit_api_key": "sk_34b1f39ac8e8fba6fde27dbb0d813e24",
+        "alpha_vantage_api_key": "V9CQXQUZYUA8F1JD",
+    }
+    assert cosmosdb_container_mock.return_value.query_items.call_count == 3
     assert cosmosdb_container_mock.return_value.query_items.call_args_list[0][1] == {
         "query": "SELECT * FROM c WHERE c.userid = @userid",
         "parameters": [{"name": "@userid", "value": "123"}],
@@ -121,6 +141,11 @@ def test_get_transactions(cosmosdb_container_mock):
     }
     assert cosmosdb_container_mock.return_value.query_items.call_args_list[1][1] == {
         "query": "SELECT * FROM c WHERE c.userid = @userid",
+        "parameters": [{"name": "@userid", "value": "123"}],
+        "enable_cross_partition_query": True,
+    }
+    assert cosmosdb_container_mock.return_value.query_items.call_args_list[2][1] == {
+        "query": "SELECT * FROM c WHERE c.id = @userid",
         "parameters": [{"name": "@userid", "value": "123"}],
         "enable_cross_partition_query": True,
     }

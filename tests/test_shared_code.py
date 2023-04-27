@@ -10,14 +10,8 @@ import pandas as pd
 import pytest
 from azure.cosmos import exceptions
 
-from shared_code import (
-    aio_helper,
-    cosmosdb_module,
-    date_time_helper,
-    get_config,
-    schemas,
-    utils,
-)
+from shared_code import (aio_helper, cosmosdb_module, date_time_helper,
+                         get_config, schemas, utils)
 
 
 @pytest.mark.asyncio()
@@ -118,18 +112,6 @@ class TestCosmosdbModule:
 
 class TestGetConfig:
     """Test get_config.py"""
-
-    @mock.patch.dict(os.environ, {"API_KEY": "test_api_key"})
-    def test_get_api_key(self):
-        """Test get api key"""
-        api_key = get_config.get_api_key()
-        assert api_key == "test_api_key"
-
-    @mock.patch.dict(os.environ, {"CLEARBIT_API_KEY": "test_clearbit_api_key"})
-    def test_get_clearbit_api_key(self):
-        """Test get clearbit api key"""
-        clearbit_api_key = get_config.get_clearbit_api_key()
-        assert clearbit_api_key == "test_clearbit_api_key"
 
     @mock.patch.dict(
         os.environ,

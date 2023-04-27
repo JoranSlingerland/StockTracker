@@ -7,22 +7,6 @@ from dotenv import load_dotenv
 
 
 # functions
-def get_api_key() -> str:
-    """Get api key"""
-
-    load_dotenv()
-
-    return os.environ["API_KEY"]
-
-
-def get_clearbit_api_key() -> str:
-    """Get clearbit api key"""
-
-    load_dotenv()
-
-    return os.environ["CLEARBIT_API_KEY"]
-
-
 def get_cosmosdb() -> dict[str, str]:
     """Get cosmosdb"""
 
