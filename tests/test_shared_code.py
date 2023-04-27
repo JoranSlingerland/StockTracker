@@ -386,3 +386,25 @@ class TestUtils:
         assert isinstance(request, func.HttpRequest)
         assert 'form-data; name="symbol"' in request.get_body().decode("utf-8")
         assert "ABC" in request.get_body().decode("utf-8")
+
+
+class TestValidateJson:
+    """Test validate json"""
+
+    def test_valid_json(self):
+        """Test valid json"""
+        input_json = {"symbol": "ABC"}
+        input_schema = {"symbol": {"type": "string"}}
+        result = utils.validate_json(input_json, input_schema)
+        assert result is None
+
+    def test_invalid_json(self):
+        """Test invalid json"""
+        input_json = {"symbol": 123}
+        input_schema = {
+            "type": "object",
+            "properties": {"symbol": {"type": "string"}},
+        }
+        result = utils.validate_json(input_json, input_schema)
+        assert result.status_code == 400
+        assert result.get_body() == b'{"result": "Schema validation failed"}'

@@ -1,6 +1,7 @@
 """General utility functions"""
 import azure.functions as func
 from azure.cosmos.container import ContainerProxy
+from jsonschema import validate
 from urllib3 import encode_multipart_formdata
 
 
@@ -41,3 +42,16 @@ def create_form_func_request(body: dict, url: str) -> func.HttpRequest:
         body=body,
     )
     return req
+
+
+def validate_json(instance, schema) -> None | func.HttpResponse:
+    """Validate input."""
+    try:
+        validate(instance=instance, schema=schema)
+        return None
+    except Exception:
+        return func.HttpResponse(
+            body='{"result": "Schema validation failed"}',
+            mimetype="application/json",
+            status_code=400,
+        )

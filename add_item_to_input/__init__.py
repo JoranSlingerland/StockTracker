@@ -7,9 +7,8 @@ from functools import partial
 
 import azure.functions as func
 from dateutil import parser
-from jsonschema import validate
 
-from shared_code import aio_helper, cosmosdb_module, schemas
+from shared_code import aio_helper, cosmosdb_module, schemas, utils
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -29,10 +28,12 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # validate input
     if input_type == "stock":
-        validate_error = validate_json(instance=items, schema=schemas.stock_input())
+        validate_error = utils.validate_json(
+            instance=items, schema=schemas.stock_input()
+        )
         container_name = "input_transactions"
     elif input_type == "transaction":
-        validate_error = validate_json(
+        validate_error = utils.validate_json(
             instance=items, schema=schemas.transaction_input()
         )
         container_name = "input_invested"
@@ -66,17 +67,3 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200,
     )
-
-
-def validate_json(instance, schema):
-    """Validate input."""
-    try:
-        validate(instance=instance, schema=schema)
-        return None
-    except Exception as ex:
-        logging.error(ex)
-        return func.HttpResponse(
-            body='{"result": "Schema validation failed"}',
-            mimetype="application/json",
-            status_code=400,
-        )
