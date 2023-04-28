@@ -27,24 +27,27 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # step 1 - Get the input from the sql database
     logging.info("Step 1: Getting transactions")
-    transactions = yield context.call_activity("get_transactions", [userid])
+    input_data = yield context.call_activity("get_input_data", [userid])
 
     # Step 2 - Get api data
     logging.info("Step 2.1: Getting api data")
     provisioning_tasks = []
     id_ = 0
     child_id = f"{context.instance_id}:{id_}"
-    provision_task = context.call_sub_orchestrator(
-        "get_api_data", transactions, child_id
-    )
+    provision_task = context.call_sub_orchestrator("get_api_data", input_data, child_id)
     provisioning_tasks.append(provision_task)
     api_data = (yield context.task_all(provisioning_tasks))[0]
 
-    # step 3 recreate containers / remove items
+    # step 3 remove items
     logging.info("Step 3: Delete cosmosdb items")
-    result = yield context.call_activity(
-        "delete_cosmosdb_items", [days_to_update, userid]
+    provisioning_tasks = []
+    id_ = 1
+    child_id = f"{context.instance_id}:{id_}"
+    provision_task = context.call_sub_orchestrator(
+        "delete_cosmosdb_items_orchestrator", [days_to_update, userid], child_id
     )
+    provisioning_tasks.append(provision_task)
+    result = (yield context.task_all(provisioning_tasks))[0]
 
     # step 4 - output meta data to cosmosdb
     logging.info("Step 4: Output meta data to cosmosdb")
@@ -55,7 +58,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # Step 5 - Rebuild the transactions object
     logging.info("Step 5: Get transactions by day")
     day_by_day = yield context.call_activity(
-        "get_transactions_by_day", [transactions, api_data["forex_data"]]
+        "get_transactions_by_day", [input_data, api_data["forex_data"]]
     )
 
     # step 6 - add stock_data to stock_held
@@ -70,7 +73,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             day_by_day["stock_held"],
             api_data["stock_data"],
             api_data["forex_data"],
-            transactions,
+            input_data,
             days_to_update,
             userid,
         ],
@@ -80,17 +83,17 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     logging.info("Step 7: Calculate totals")
     (
         day_by_day["invested"],
-        transactions,
+        input_data,
         data,  # Only used for return value everything else gets a None value to free up memory
     ) = yield context.call_activity(
         "calculate_totals",
-        [data, day_by_day["invested"], transactions, userid],
+        [data, day_by_day["invested"], input_data, userid],
     )
 
     # step 8 - output to cosmosdb
     logging.info("Step 8: Output to cosmosdb")
     provisioning_tasks = []
-    id_ = 1
+    id_ = 2
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
         "output_to_cosmosdb_orchestrator", data, child_id

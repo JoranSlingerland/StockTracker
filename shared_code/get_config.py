@@ -7,23 +7,7 @@ from dotenv import load_dotenv
 
 
 # functions
-def get_api_key() -> str:
-    """Get api key"""
-
-    load_dotenv()
-
-    return os.environ["API_KEY"]
-
-
-def get_clearbit_api_key() -> str:
-    """Get clearbit api key"""
-
-    load_dotenv()
-
-    return os.environ["CLEARBIT_API_KEY"]
-
-
-def get_cosmosdb() -> dict:
+def get_cosmosdb() -> dict[str, str]:
     """Get cosmosdb"""
 
     load_dotenv()
@@ -36,7 +20,7 @@ def get_cosmosdb() -> dict:
     }
 
 
-def get_containers() -> dict:
+def get_containers() -> dict[str, list[dict[str, str | bool]]]:
     """Get containers"""
 
     return {
@@ -75,6 +59,13 @@ def get_containers() -> dict:
                 "candelete": True,
                 "input_container": False,
                 "output_container": True,
+            },
+            {
+                "container_name": "users",
+                "partition_key": "/id",
+                "candelete": False,
+                "input_container": False,
+                "output_container": False,
             },
         ]
     }

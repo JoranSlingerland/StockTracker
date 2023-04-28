@@ -25,7 +25,14 @@ def main(payload: str) -> dict:
     transactions = get_cosmosdb_items(
         query, parameters, "input_transactions", keys_to_pop
     )
+    transactions.sort(key=lambda x: x["date"])
+
     invested = get_cosmosdb_items(query, parameters, "input_invested", keys_to_pop)
+    invested.sort(key=lambda x: x["date"])
+
+    user_data = get_cosmosdb_items(
+        "SELECT * FROM c WHERE c.id = @userid", parameters, "users", keys_to_pop
+    )[0]
 
     end_date = date.today()
     start_date = transactions[0]["date"]
@@ -37,6 +44,7 @@ def main(payload: str) -> dict:
         "invested": invested,
         "daterange": daterange,
         "symbols": symbols,
+        "user_data": user_data,
     }
 
 
@@ -55,7 +63,5 @@ def get_cosmosdb_items(
 
     for key_to_pop in keys_to_pop:
         [d.pop(key_to_pop, None) for d in items]
-
-    items.sort(key=lambda x: x["date"])
 
     return items

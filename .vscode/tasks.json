@@ -6,7 +6,14 @@
       "command": "host start",
       "problemMatcher": "$func-python-watch",
       "isBackground": true,
-      "dependsOn": ["pip install (functions)", "azurite"]
+      "dependsOn": ["pip install (functions)", "azurite"],
+      "presentation": {
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
     },
     {
       "label": "azurite",
@@ -28,6 +35,13 @@
           "beginsPattern": "Azurite Blob service is starting",
           "endsPattern": "Azurite Blob service is successfully listening"
         }
+      },
+      "presentation": {
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       }
     },
     {

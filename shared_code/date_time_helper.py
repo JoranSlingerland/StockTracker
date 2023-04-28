@@ -66,7 +66,7 @@ def month_to_quarter(
         "November",
         "December",
     ]
-) -> Literal["Q1", "Q2", "Q3" "Q4"]:
+) -> Literal["Q1", "Q2", "Q3", "Q4"]:
     """Convert month to quarter"""
     if month in ["January", "February", "March"]:
         return "Q1"

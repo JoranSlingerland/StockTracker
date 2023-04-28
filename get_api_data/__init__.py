@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import azure.durable_functions as df
 import requests
 
-from shared_code import get_config, utils
+from shared_code import utils
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
@@ -18,6 +18,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # initialize variables
     symbols = context.get_input()["symbols"]
     transactions = context.get_input()["transactions"]
+    user_data = context.get_input()["user_data"]
     base_currency = "EUR"
     stock_data = {}
     forex_data = {}
@@ -26,7 +27,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     for symbol in symbols:
         temp_data = yield context.call_activity(
             "call_alphavantage_api",
-            f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&outputsize=full&datatype=compact",
+            [
+                f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&outputsize=full&datatype=compact",
+                user_data["alpha_vantage_api_key"],
+            ],
         )
         temp_data = filter_stock_data(temp_data, transactions, symbol)
         stock_data.update({symbol: temp_data})
@@ -38,7 +42,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             currency = "GBP"
             temp_data = yield context.call_activity(
                 "call_alphavantage_api",
-                f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                [
+                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                    user_data["alpha_vantage_api_key"],
+                ],
             )
             gbx_data = {
                 "Meta Data": {
@@ -67,13 +74,18 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         else:
             temp_data = yield context.call_activity(
                 "call_alphavantage_api",
-                f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                [
+                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                    user_data["alpha_vantage_api_key"],
+                ],
             )
             temp_data = filter_forex_data(temp_data, transactions, currency)
             forex_data.update({currency: temp_data})
 
     # Get stock meta data
-    stock_meta_data = get_stock_meta_data(symbols, transactions)
+    stock_meta_data = get_stock_meta_data(
+        symbols, transactions, user_data["clearbit_api_key"]
+    )
 
     return {
         "stock_data": stock_data,
@@ -123,13 +135,14 @@ def call_clearbit_api(url: str, clearbit_api_key: str) -> dict:
     return None
 
 
-def get_stock_meta_data(symbols: list, transactions: list) -> list:
+def get_stock_meta_data(
+    symbols: list, transactions: list, clearbit_api_key: str
+) -> list:
     """Get stock meta data from the API"""
     logging.info("Getting stock meta data")
 
     # initialize variables
     output = []
-    clearbit_api_key = get_config.get_clearbit_api_key()
 
     for symbol in symbols:
         domain = [x for x in transactions if x["symbol"] == symbol]

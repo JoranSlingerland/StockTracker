@@ -81,3 +81,18 @@ def delete_item() -> dict:
         "additionalProperties": False,
         "required": ["itemIds", "container", "userId"],
     }
+
+
+def user_data() -> dict:
+    """Schema for user data"""
+    return {
+        "type": "object",
+        "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "dark_mode": {"type": "boolean"},
+            "clearbit_api_key": {"type": "string", "minLength": 1},
+            "alpha_vantage_api_key": {"type": "string", "minLength": 1},
+        },
+        "additionalProperties": False,
+        "required": ["id", "dark_mode", "clearbit_api_key", "alpha_vantage_api_key"],
+    }
