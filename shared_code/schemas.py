@@ -92,7 +92,14 @@ def user_data() -> dict:
             "dark_mode": {"type": "boolean"},
             "clearbit_api_key": {"type": "string", "minLength": 1},
             "alpha_vantage_api_key": {"type": "string", "minLength": 1},
+            "currency": {"type": "string", "minLength": 1, "maxLength": 3},
         },
         "additionalProperties": False,
-        "required": ["id", "dark_mode", "clearbit_api_key", "alpha_vantage_api_key"],
+        "required": [
+            "id",
+            "dark_mode",
+            "clearbit_api_key",
+            "alpha_vantage_api_key",
+            "currency",
+        ],
     }
