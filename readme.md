@@ -18,7 +18,7 @@ The project consists of three repositories:
 | -------------------------------------------------------------------------------- | ------------------------------------------- | -------- |
 | [API](https://github.com/JoranSlingerland/StockTracker)                          | This repo which will be used to gather data | Python   |
 | [Frontend](https://github.com/JoranSlingerland/StockTracker-frontend)            | Frontend repo which will create the website | React    |
-| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resouces to Azure        | Bicep    |
+| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure        | Bicep    |
 
 ## API
 
@@ -34,12 +34,12 @@ This project will be using the [Alpha vantage API](https://www.alphavantage.co/)
 
 ### Azure environment
 
-For the azure enviorment you can either use the [One time deployment](#one-time-deployment) or the [Pipeline deployment](#pipeline-deployment)
+For the azure environment you can either use the [One time deployment](#one-time-deployment) or the [Pipeline deployment](#pipeline-deployment)
 
 #### One time deployment
 
 - Run the deployment by [clicking Here](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fgist.githubusercontent.com%2FJoranSlingerland%2Fa9087b977db092d71212e442dd5c5975%2Fraw%2FStocktrackerBuild).
-- I'd recommend not chaning any of the default values. But you can if you want to.
+- I'd recommend not changing any of the default values. But you can if you want to.
 
 #### Pipeline deployment
 
@@ -64,7 +64,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 | COSMOSDB_ENDPOINT         | < Link to your database>  | [https://localhost:8081](https://localhost:8081) |
 | COSMOSDB_KEY              | < CosmosDB Access key >   | A1B2C3                                           |
 | COSMOSDB_DATABASE         | < CosmosDB Database name> | stocktracker                                     |
-| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Thoughput >    | 1000                                             |
+| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Throughput >    | 1000                                             |
 
 - Startup the API running the task `func host start`
 - run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
@@ -80,7 +80,7 @@ For the azure enviorment you can either use the [One time deployment](#one-time-
 
 ## Azure Functions
 
-All Azure functions availible in the api.
+All Azure functions available in the api.
 
 ### get_barchart_data
 
@@ -229,13 +229,13 @@ Body
 
 | Method | URL                                                   | content-type | Usage                                         |
 | ------ | ----------------------------------------------------- | ------------ | --------------------------------------------- |
-| GET    | {{base_url}}/priveleged/create_cosmosdb_and_container | form-data    | Function will create a cosmosdb and container |
+| GET    | {{base_url}}/privileged/create_cosmosdb_and_container | form-data    | Function will create a cosmosdb and container |
 
 ### delete_cosmosdb_container
 
 | Method | URL                                               | content-type | Usage                                     |
 | ------ | ------------------------------------------------- | ------------ | ----------------------------------------- |
-| POST   | {{base_url}}/priveleged/delete_cosmosdb_container | form-data    | Function will delete a cosmosdb container |
+| POST   | {{base_url}}/privileged/delete_cosmosdb_container | form-data    | Function will delete a cosmosdb container |
 
 Body
 
@@ -289,9 +289,9 @@ Body
 
 | Function                  | Usage                                                                                                                                    | Link and options                                              |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| stocktracker_orchestrator | Function will get all the data from the input tables and use this to create the ouput data. This will then be outputted to the CosmosDB. | /api/orchestrators/stocktracker_orchestrator/{days_to_update} |
+| stocktracker_orchestrator | Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB. | /api/orchestrators/stocktracker_orchestrator/{days_to_update} |
 
-Function will get all the data from the input tables and use this to create the ouput data. This will then be outputed to the CosmosDB.
+Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB.
 
 ### functions diagram
 
