@@ -99,15 +99,15 @@ def new_result_object(datatype: str) -> dict or None:
         return {
             "labels": [],
             "datasets": [
-                {"label": "Value", "borderColor": "#0e8505", "data": []},
-                {"label": "Invested", "borderColor": "#090a09", "data": []},
+                {"label": "Value", "data": []},
+                {"label": "Invested", "data": []},
             ],
         }
     if datatype == "total_gains":
         return {
             "labels": [],
             "datasets": [
-                {"label": "Gains", "borderColor": "#0e8505", "data": []},
+                {"label": "Gains", "data": []},
             ],
         }
 

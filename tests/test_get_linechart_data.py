@@ -156,7 +156,6 @@ def test_total_gains(mock_cosmosdb_container):
         "datasets": [
             {
                 "label": "Gains",
-                "borderColor": "#0e8505",
                 "data": [318.700256, 318.700256],
             }
         ],
@@ -196,10 +195,9 @@ def test_invested_and_value(mock_cosmosdb_container):
         "datasets": [
             {
                 "label": "Value",
-                "borderColor": "#0e8505",
                 "data": [368.700256, 368.700256],
             },
-            {"label": "Invested", "borderColor": "#090a09", "data": [50, 50]},
+            {"label": "Invested", "data": [50, 50]},
         ],
     }
 
