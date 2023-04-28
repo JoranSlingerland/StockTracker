@@ -1,5 +1,5 @@
 requests==2.28.2
-pandas==1.5.3
+pandas==2.0.1
 python-dotenv==1.0.0
 azure-functions==1.13.3
 azure-functions-durable==1.2.2
