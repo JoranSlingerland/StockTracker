@@ -17,6 +17,7 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     symbols = payload[3]["symbols"]
     daterange = payload[3]["daterange"]
+    userdata = payload[3]["user_data"]
     days_to_update = payload[4]
     userid = payload[5]
 
@@ -24,7 +25,7 @@ def main(payload: str) -> str:
         stocks_held_realized, stocks_held_unrealized, symbols, daterange
     )
     stocks = pop_keys(stocks, ["date", "symbol", "currency"])
-    stocks = add_stock_data(symbols, stocks, stock_data, forex_data, userid)
+    stocks = add_stock_data(symbols, stocks, stock_data, forex_data, userid, userdata)
     stocks = filter_output(stocks, days_to_update)
 
     return None, None, stocks
@@ -44,7 +45,12 @@ def filter_output(output: list, days_to_update: int | str) -> list:
 
 
 def add_stock_data(
-    symbols: list, stocks_held, stock_data: dict, forex_data: dict, userid: str
+    symbols: list,
+    stocks_held,
+    stock_data: dict,
+    forex_data: dict,
+    userid: str,
+    userdata: dict,
 ) -> list:
     """Update unrealized stock data"""
     output = []
@@ -91,7 +97,7 @@ def add_stock_data(
                         "4. close"
                     ]
                 )
-                if stock["currency"] == "EUR":
+                if stock["currency"] == userdata["currency"]:
                     forex_high = float(1)
                 else:
                     forex_high = float(

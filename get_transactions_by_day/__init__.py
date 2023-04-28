@@ -13,12 +13,13 @@ def main(payload: str) -> str:
 
     # get input data
     transactions = payload[0]["transactions"]
+    user_data = payload[0]["user_data"]
     invested = payload[0]["invested"]
     daterange = payload[0]["daterange"]
     forex_data = payload[1]
 
     # add data to transactions
-    transactions = add_data(transactions, forex_data)
+    transactions = add_data(transactions, forex_data, user_data)
     transactions = get_day_by_day_transactions(transactions, daterange)
 
     invested = add_data_invested(invested)
@@ -42,7 +43,7 @@ def main(payload: str) -> str:
 
 
 # start range rebuild_transactions
-def add_data(transactions, forex_data):
+def add_data(transactions, forex_data, user_data):
     """Add data to transactions"""
     output = []
     days_to_substract = 0
@@ -53,7 +54,7 @@ def add_data(transactions, forex_data):
             date_object = date_object - timedelta(days=days_to_substract)
             date_object = date_object.strftime("%Y-%m-%d")
             try:
-                if transaction["currency"] == "EUR":
+                if transaction["currency"] == user_data["currency"]:
                     transaction.update(
                         {
                             "cost_per_share": transaction["cost"]

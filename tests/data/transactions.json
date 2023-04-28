@@ -145,5 +145,12 @@
     }
   ],
   "daterange": ["2023-03-27", "2023-03-28", "2023-03-29"],
-  "symbols": ["GOOGL", "aapl", "MSFT", "AMD", "VWRL.AMS"]
+  "symbols": ["GOOGL", "aapl", "MSFT", "AMD", "VWRL.AMS"],
+  "user_data": {
+    "id": "123",
+    "dark_mode": false,
+    "clearbit_api_key": "abc",
+    "alpha_vantage_api_key": "456",
+    "currency": "EUR"
+  }
 }

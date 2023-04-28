@@ -19,7 +19,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     symbols = context.get_input()["symbols"]
     transactions = context.get_input()["transactions"]
     user_data = context.get_input()["user_data"]
-    base_currency = "EUR"
     stock_data = {}
     forex_data = {}
 
@@ -43,14 +42,14 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             temp_data = yield context.call_activity(
                 "call_alphavantage_api",
                 [
-                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={user_data['currency']}&outputsize=full",
                     user_data["alpha_vantage_api_key"],
                 ],
             )
             gbx_data = {
                 "Meta Data": {
                     "1. Information": "Forex Daily Prices (open, high, low, close)",
-                    "2. From Symbol": "EUR",
+                    "2. From Symbol": user_data["currency"],
                     "3. To Symbol": "GBX",
                     "4. Output Size": "Full size",
                     "5. Last Refreshed": "2022-02-09 19:05:00",
@@ -75,7 +74,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             temp_data = yield context.call_activity(
                 "call_alphavantage_api",
                 [
-                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={base_currency}&outputsize=full",
+                    f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={currency}&to_symbol={user_data['currency']}&outputsize=full",
                     user_data["alpha_vantage_api_key"],
                 ],
             )
