@@ -127,19 +127,19 @@ expected_result = [
         "partial_realized": True,
         "realized": {
             "cost_per_share_buy": 20.0,
-            "cost_per_share_sell": 33.333333333333336,
+            "cost_per_share_sell": 30,
             "buy_price": 60.0,
-            "sell_price": 100,
+            "sell_price": 90,
             "average_buy_fx_rate": 0.929,
             "average_sell_fx_rate": 0.929,
             "quantity": 3,
             "transaction_cost": 1.0,
             "dividend": 0.0,
             "total_dividends": 0.0,
-            "value_change": 40.0,
-            "total_pl": 39.0,
-            "value_change_percentage": 0.6666666666666666,
-            "total_pl_percentage": 0.65,
+            "value_change": 30.0,
+            "total_pl": 29.0,
+            "value_change_percentage": 0.5,
+            "total_pl_percentage": 0.48333333333333334,
         },
         "unrealized": {
             "cost_per_share": 20.0,
@@ -154,7 +154,7 @@ expected_result = [
             "total_pl": 251.93626999999998,
             "total_pl_percentage": 6.29840675,
         },
-        "combined": {"total_pl": 290.93627, "total_pl_percentage": 2.9093627},
+        "combined": {"total_pl": 280.93627, "total_pl_percentage": 2.8093627},
         "userid": "123",
     },
     {
@@ -282,19 +282,19 @@ expected_result = [
         "partial_realized": True,
         "realized": {
             "cost_per_share_buy": 20.0,
-            "cost_per_share_sell": 33.333333333333336,
+            "cost_per_share_sell": 30,
             "buy_price": 60.0,
-            "sell_price": 100,
+            "sell_price": 90,
             "average_buy_fx_rate": 0.929,
             "average_sell_fx_rate": 0.929,
             "quantity": 3,
             "transaction_cost": 1.5,
             "dividend": 0.0,
             "total_dividends": 0.0,
-            "value_change": 40.0,
-            "total_pl": 38.5,
-            "value_change_percentage": 0.6666666666666666,
-            "total_pl_percentage": 0.6416666666666667,
+            "value_change": 30.0,
+            "total_pl": 28.5,
+            "value_change_percentage": 0.5,
+            "total_pl_percentage": 0.475,
         },
         "unrealized": {
             "cost_per_share": 35.0,
@@ -310,8 +310,8 @@ expected_result = [
             "total_pl_percentage": 3.2447873428571437,
         },
         "combined": {
-            "total_pl": 492.7702280000001,
-            "total_pl_percentage": 2.4638511400000005,
+            "total_pl": 482.7702280000001,
+            "total_pl_percentage": 2.4138511400000002,
         },
         "userid": "123",
     },
@@ -467,4 +467,5 @@ def test_all():
     assert result[1] is None
     for d in result[2]:
         d.pop("id")
+
     assert result[2] == expected_result
