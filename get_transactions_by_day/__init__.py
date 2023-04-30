@@ -46,19 +46,19 @@ def main(payload: str) -> str:
 def add_data(transactions, forex_data, user_data):
     """Add data to transactions"""
     output = []
-    days_to_substract = 0
+    days_to_subtract = 0
     for transaction in transactions:
         while True:
             date_string = f"{transaction['date']} 00:00:00"
             date_object = datetime.fromisoformat(date_string)
-            date_object = date_object - timedelta(days=days_to_substract)
+            date_object = date_object - timedelta(days=days_to_subtract)
             date_object = date_object.strftime("%Y-%m-%d")
             try:
                 if transaction["currency"] == user_data["currency"]:
                     transaction.update(
                         {
-                            "cost_per_share": transaction["cost"]
-                            / transaction["quantity"],
+                            "cost": transaction["cost_per_share"]
+                            * transaction["quantity"],
                             "forex_rate": 1,
                             "transaction_date": transaction["date"],
                         }
@@ -66,7 +66,7 @@ def add_data(transactions, forex_data, user_data):
                     break
                 transaction.update(
                     {
-                        "cost_per_share": transaction["cost"] / transaction["quantity"],
+                        "cost": transaction["cost_per_share"] * transaction["quantity"],
                         "forex_rate": float(
                             forex_data[transaction["currency"]][
                                 "Time Series FX (Daily)"
@@ -77,9 +77,9 @@ def add_data(transactions, forex_data, user_data):
                 )
                 break
             except KeyError as error:
-                if days_to_substract > 100:
+                if days_to_subtract > 100:
                     raise KeyError from error
-                days_to_substract += 1
+                days_to_subtract += 1
         transaction.pop("date")
         transaction.pop("id")
         output.append(transaction)
@@ -323,7 +323,7 @@ def create_buys_and_sells_object(
 
 
 def calculate_deposits_and_withdrawals(invested, daterange):
-    """Calculate depoisits and withdrawals"""
+    """Calculate deposits and withdrawals"""
     logging.info("Calculating deposits and withdrawals")
 
     output_list = []
