@@ -61,7 +61,7 @@ def add_stock_data(
 
     # initialize variables
     for stock in stocks_held:
-        days_to_substract = 0
+        days_to_subtract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
         # add id
         stock.update(
@@ -75,7 +75,7 @@ def add_stock_data(
             try:
                 date_string = f"{stock['date']} 00:00:00"
                 date_object = datetime.fromisoformat(date_string)
-                date_object = date_object - timedelta(days=days_to_substract)
+                date_object = date_object - timedelta(days=days_to_subtract)
                 date_object = date_object.strftime("%Y-%m-%d")
                 stock_open = float(
                     stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
@@ -201,9 +201,9 @@ def add_stock_data(
                 )
                 break
             except KeyError:
-                days_to_substract += 1
+                days_to_subtract += 1
                 logging.debug(
-                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
+                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_subtract} day(s)'
                 )
         output.append(stock)
     return output
@@ -219,9 +219,13 @@ def merge_realized_unrealized(
         "date": "",
         "symbol": "",
         "cost_per_share_buy": 0.0,
+        "cost_per_share_buy_foreign": 0.0,
         "cost_per_share_sell": 0.0,
+        "cost_per_share_sell_foreign": 0.0,
         "buy_price": 0.0,
+        "buy_price_foreign": 0.0,
         "sell_price": 0.0,
+        "sell_price_foreign": 0.0,
         "average_buy_fx_rate": 0.0,
         "average_sell_fx_rate": 0.0,
         "quantity": 0.0,
@@ -233,7 +237,9 @@ def merge_realized_unrealized(
         "date": "",
         "symbol": "",
         "cost_per_share": 0.0,
+        "cost_per_share_foreign": 0.0,
         "total_cost": 0.0,
+        "total_cost_foreign": 0.0,
         "average_fx_rate": 0.0,
         "quantity": 0.0,
         "transaction_cost": 0.0,

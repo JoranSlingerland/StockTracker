@@ -54,6 +54,11 @@ def add_data(transactions, forex_data, user_data):
             date_object = date_object - timedelta(days=days_to_subtract)
             date_object = date_object.strftime("%Y-%m-%d")
             try:
+                forex_rate = float(
+                    forex_data[transaction["currency"]]["Time Series FX (Daily)"][
+                        date_object
+                    ]["4. close"]
+                )
                 if transaction["currency"] == user_data["currency"]:
                     transaction.update(
                         {
@@ -61,17 +66,22 @@ def add_data(transactions, forex_data, user_data):
                             * transaction["quantity"],
                             "forex_rate": 1,
                             "transaction_date": transaction["date"],
+                            "cost_per_share_foreign": transaction["cost_per_share"],
+                            "cost_foreign": transaction["cost_per_share"]
+                            * transaction["quantity"],
                         }
                     )
                     break
                 transaction.update(
                     {
-                        "cost": transaction["cost_per_share"] * transaction["quantity"],
-                        "forex_rate": float(
-                            forex_data[transaction["currency"]][
-                                "Time Series FX (Daily)"
-                            ][date_object]["4. close"]
-                        ),
+                        "cost": transaction["cost_per_share"]
+                        * transaction["quantity"]
+                        * forex_rate,
+                        "cost_per_share": transaction["cost_per_share"] * forex_rate,
+                        "cost_per_share_foreign": transaction["cost_per_share"],
+                        "cost_foreign": transaction["cost_per_share"]
+                        * transaction["quantity"],
+                        "forex_rate": forex_rate,
                         "transaction_date": transaction["date"],
                     }
                 )
@@ -144,6 +154,8 @@ def calculate_realized_and_unrealized(single_day_transactions):
                         {
                             "quantity": buy["quantity"] + total_sells,
                             "cost": buy["cost"] + total_sells * buy["cost_per_share"],
+                            "cost_foreign": buy["cost_foreign"]
+                            + total_sells * buy["cost_per_share_foreign"],
                         }
                     )
                     realized.append(buy)
@@ -152,6 +164,8 @@ def calculate_realized_and_unrealized(single_day_transactions):
                         {
                             "quantity": abs(total_sells),
                             "cost": abs(total_sells) * buy["cost_per_share"],
+                            "cost_foreign": abs(total_sells)
+                            * buy["cost_per_share_foreign"],
                             "transaction_cost": float(0),
                         }
                     )
@@ -274,9 +288,17 @@ def merge_sells_and_buys(stocks_held, daterange, transaction_type):
                     "date": single_stock_list[0]["date"],
                     "symbol": symbol,
                     "cost_per_share_buy": single_stock_list[0]["cost_per_share"],
+                    "cost_per_share_buy_foreign": single_stock_list[0][
+                        "cost_per_share_foreign"
+                    ],
                     "cost_per_share_sell": single_stock_list[1]["cost_per_share"],
+                    "cost_per_share_sell_foreign": single_stock_list[1][
+                        "cost_per_share_foreign"
+                    ],
                     "buy_price": single_stock_list[0]["total_cost"],
+                    "buy_price_foreign": single_stock_list[0]["total_cost_foreign"],
                     "sell_price": single_stock_list[1]["total_cost"],
+                    "sell_price_foreign": single_stock_list[1]["total_cost_foreign"],
                     "average_buy_fx_rate": single_stock_list[0]["average_fx_rate"],
                     "average_sell_fx_rate": single_stock_list[1]["average_fx_rate"],
                     "quantity": single_stock_list[0]["quantity"],
@@ -308,7 +330,10 @@ def create_buys_and_sells_object(
         "symbol": symbol,
         "cost_per_share": sum(d["cost"] for d in date_stock_held)
         / sum(d["quantity"] for d in date_stock_held),
+        "cost_per_share_foreign": sum(d["cost_foreign"] for d in date_stock_held)
+        / sum(d["quantity"] for d in date_stock_held),
         "total_cost": sum(d["cost"] for d in date_stock_held),
+        "total_cost_foreign": sum(d["cost_foreign"] for d in date_stock_held),
         "average_fx_rate": utils.get_weighted_average(forex_rate, cost),
         "quantity": sum(d["quantity"] for d in date_stock_held),
         "transaction_type": transaction_type,
