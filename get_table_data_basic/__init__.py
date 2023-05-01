@@ -109,7 +109,7 @@ def construct_query(andor, fully_realized, partial_realized):
         query = "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
     if fully_realized is not None and partial_realized is not None:
         if andor == "or":
-            query = "select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+            query = "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date"
         if andor == "and":
             query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
     if query is None:

@@ -220,7 +220,7 @@ def test_valid_input_stocks_held_partial_realized(
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": None},
-            {"name": "@partial_realized", "value": "true"},
+            {"name": "@partial_realized", "value": True},
             {"name": "@start_date", "value": "2023-03-03"},
             {"name": "@end_date", "value": "2023-04-02"},
         ],
@@ -260,11 +260,11 @@ def test_valid_input_stocks_held_or(add_meta_data_to_stock_data, cosmosdb_contai
     cosmosdb_container.return_value.query_items.assert_called_once()
     cosmosdb_container.return_value.read_all_items.assert_not_called()
     cosmosdb_container.return_value.query_items.assert_called_once_with(
-        query="select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
+        query="select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date",
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": True},
-            {"name": "@partial_realized", "value": "true"},
+            {"name": "@partial_realized", "value": True},
             {"name": "@start_date", "value": "2023-03-03"},
             {"name": "@end_date", "value": "2023-04-02"},
         ],
@@ -308,7 +308,7 @@ def test_valid_input_stocks_held_and(add_meta_data_to_stock_data, cosmosdb_conta
         parameters=[
             {"name": "@userid", "value": "123"},
             {"name": "@fully_realized", "value": True},
-            {"name": "@partial_realized", "value": "true"},
+            {"name": "@partial_realized", "value": True},
             {"name": "@start_date", "value": "2023-03-03"},
             {"name": "@end_date", "value": "2023-04-02"},
         ],
