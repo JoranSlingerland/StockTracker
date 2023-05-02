@@ -98,12 +98,12 @@ def add_stock_data(
                     ]
                 )
                 if stock["currency"] == userdata["currency"]:
-                    forex_high = float(1)
+                    forex_close = float(1)
                 else:
-                    forex_high = float(
+                    forex_close = float(
                         forex_data[stock["currency"]]["Time Series FX (Daily)"][
                             date_object
-                        ]["2. high"]
+                        ]["4. close"]
                     )
 
                 single_day_dividend_data = (
@@ -112,19 +112,19 @@ def add_stock_data(
                             "7. dividend amount"
                         ]
                     )
-                    * forex_high
+                    * forex_close
                 ) * stock["unrealized"]["quantity"]
                 temp_total_dividends += single_day_dividend_data
                 total_dividends.update({stock["symbol"]: temp_total_dividends})
 
                 stock["unrealized"].update(
                     {
-                        "open_value": stock_open * forex_high,
-                        "high_value": stock_high * forex_high,
-                        "low_value": stock_low * forex_high,
-                        "close_value": stock_close * forex_high,
+                        "open_value": stock_open * forex_close,
+                        "high_value": stock_high * forex_close,
+                        "low_value": stock_low * forex_close,
+                        "close_value": stock_close * forex_close,
                         "total_value": stock_close
-                        * forex_high
+                        * forex_close
                         * stock["unrealized"]["quantity"],
                     }
                 )
