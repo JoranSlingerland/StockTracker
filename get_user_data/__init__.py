@@ -38,6 +38,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
 
+    result[0].update({"isLoading": False})
+
+    keys_to_pop = [
+        "_rid",
+        "_self",
+        "_etag",
+        "_attachments",
+        "_ts",
+    ]
+    for key in keys_to_pop:
+        result[0].pop(key)
+
     return func.HttpResponse(
         body=json.dumps(result[0]), mimetype="application/json", status_code=200
     )
