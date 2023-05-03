@@ -9,7 +9,7 @@ from shared_code import cosmosdb_module, date_time_helper
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """Main fucntion"""
+    """Main function"""
     logging.info("Python HTTP trigger function processed a request.")
     userid = req.form.get("userId", None)
     datatoget = req.form.get("dataToGet", None)
@@ -50,12 +50,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if datatoget == "max":
         output_object = {
-            "total_value_gain": end_date_totals["total_value"],
+            "total_value_gain": end_date_totals["unrealized"]["total_value"],
             "total_value_gain_percentage": 1,
-            "total_pl": end_date_totals["total_pl"],
-            "total_pl_percentage": end_date_totals["total_pl_percentage"],
-            "total_dividends": end_date_totals["total_dividends"],
-            "transaction_cost": end_date_totals["transaction_cost"],
+            "total_pl": end_date_totals["unrealized"]["total_pl"],
+            "total_pl_percentage": end_date_totals["unrealized"]["total_pl_percentage"],
+            "total_dividends": end_date_totals["realized"]["dividends"],
+            "transaction_cost": end_date_totals["realized"]["transaction_cost"],
         }
     else:
         start_date = (date_time_helper.datatogetswitch(datatoget))[0]
@@ -64,21 +64,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 [item for item in items if item["date"] == start_date]
             )[0]
         output_object = {
-            "total_value_gain": end_date_totals["total_value"]
-            - start_date_totals["total_value"],
-            "total_value_gain_percentage": (
-                end_date_totals["total_value"] - start_date_totals["total_value"]
+            "total_value_gain": end_date_totals["unrealized"]["total_value"]
+            - start_date_totals["unrealized"]["total_value"],
+            "total_value_gain_percentage": 0.0
+            if start_date_totals["unrealized"]["total_value"] == 0
+            else (
+                end_date_totals["unrealized"]["total_value"]
+                - start_date_totals["unrealized"]["total_value"]
             )
-            / start_date_totals["total_value"],
-            "total_pl": end_date_totals["total_pl"] - start_date_totals["total_pl"],
-            "total_pl_percentage": (
-                end_date_totals["total_pl"] - start_date_totals["total_pl"]
+            / start_date_totals["unrealized"]["total_value"],
+            "total_pl": end_date_totals["unrealized"]["total_pl"]
+            - start_date_totals["unrealized"]["total_pl"],
+            "total_pl_percentage": 0.0
+            if start_date_totals["unrealized"]["total_value"] == 0
+            else (
+                end_date_totals["unrealized"]["total_pl"]
+                - start_date_totals["unrealized"]["total_pl"]
             )
-            / start_date_totals["total_value"],
-            "total_dividends": end_date_totals["total_dividends"]
-            - start_date_totals["total_dividends"],
-            "transaction_cost": end_date_totals["transaction_cost"]
-            - start_date_totals["transaction_cost"],
+            / start_date_totals["unrealized"]["total_value"],
+            "total_dividends": end_date_totals["realized"]["dividends"]
+            - start_date_totals["realized"]["dividends"],
+            "transaction_cost": end_date_totals["realized"]["transaction_cost"]
+            - start_date_totals["realized"]["transaction_cost"],
         }
     return func.HttpResponse(
         body=json.dumps(output_object), mimetype="application/json", status_code=200

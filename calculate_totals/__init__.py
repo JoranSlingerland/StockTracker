@@ -1,4 +1,4 @@
-""""Function to calulate totals"""
+""""Function to calculate totals"""
 
 import logging
 import uuid
@@ -16,38 +16,93 @@ def main(payload: str) -> str:
     output = []
     # loop through dates
     for single_date in daterange:
-        stocks_single_date = [
-            d
-            for d in stocks_held
-            if d["date"] == single_date and d["fully_realized"] is False
-        ]
+        stocks_single_date = [d for d in stocks_held if d["date"] == single_date]
         invested_single_date = [d for d in invested if d["date"] == single_date]
 
         totals = {
             "date": single_date,
-            "total_cost": sum(
-                d["unrealized"]["total_cost"] for d in stocks_single_date
-            ),
-            "total_value": sum(
-                d["unrealized"]["total_value"] for d in stocks_single_date
-            ),
             "total_invested": invested_single_date[0]["invested"],
-            "total_pl": sum(d["unrealized"]["total_value"] for d in stocks_single_date)
-            - invested_single_date[0]["invested"],
-            "total_pl_percentage": (
-                sum(d["unrealized"]["total_value"] for d in stocks_single_date)
-                - invested_single_date[0]["invested"]
-            )
-            / invested_single_date[0]["invested"],
-            "total_dividends": sum(
-                d["realized"]["total_dividends"] for d in stocks_single_date
-            ),
-            "transaction_cost": sum(
-                d["realized"]["transaction_cost"] for d in stocks_single_date
-            ),
+            "realized": {
+                "dividends": sum(
+                    d["realized"]["total_dividends"] for d in stocks_single_date
+                ),
+                "transaction_cost": sum(
+                    d["realized"]["transaction_cost"] for d in stocks_single_date
+                ),
+                "value_pl": sum(d["realized"]["value_pl"] for d in stocks_single_date),
+                "forex_pl": sum(d["realized"]["forex_pl"] for d in stocks_single_date),
+                "total_pl": sum(d["realized"]["total_pl"] for d in stocks_single_date),
+            },
+            "unrealized": {
+                "total_cost": sum(
+                    d["unrealized"]["total_cost"] for d in stocks_single_date
+                ),
+                "total_value": sum(
+                    d["unrealized"]["total_value"] for d in stocks_single_date
+                ),
+                "value_pl": sum(
+                    d["unrealized"]["value_pl"] for d in stocks_single_date
+                ),
+                "forex_pl": sum(
+                    d["unrealized"]["forex_pl"] for d in stocks_single_date
+                ),
+                "total_pl": sum(
+                    d["unrealized"]["total_pl"] for d in stocks_single_date
+                ),
+            },
+            "combined": {},
             "userid": userid,
             "id": str(uuid.uuid4()),
         }
+
+        totals["combined"].update(
+            {
+                "value_pl": totals["realized"]["value_pl"]
+                + totals["unrealized"]["value_pl"],
+                "forex_pl": totals["realized"]["forex_pl"]
+                + totals["unrealized"]["forex_pl"],
+                "total_pl": totals["realized"]["total_pl"]
+                + totals["unrealized"]["total_pl"],
+            }
+        )
+
+        totals["combined"].update(
+            {
+                "value_pl_percentage": totals["combined"]["value_pl"]
+                / totals["total_invested"],
+                "forex_pl_percentage": totals["combined"]["forex_pl"]
+                / totals["total_invested"],
+                "total_pl_percentage": totals["combined"]["total_pl"]
+                / totals["total_invested"],
+            }
+        )
+
+        totals["realized"].update(
+            {
+                "dividends_percentage": totals["realized"]["dividends"]
+                / totals["total_invested"],
+                "transaction_cost_percentage": totals["realized"]["transaction_cost"]
+                / totals["total_invested"],
+                "value_pl_percentage": totals["realized"]["value_pl"]
+                / totals["total_invested"],
+                "forex_pl_percentage": totals["realized"]["forex_pl"]
+                / totals["total_invested"],
+                "total_pl_percentage": totals["realized"]["total_pl"]
+                / totals["total_invested"],
+            }
+        )
+
+        totals["unrealized"].update(
+            {
+                "value_pl_percentage": totals["unrealized"]["value_pl"]
+                / totals["total_invested"],
+                "forex_pl_percentage": totals["unrealized"]["forex_pl"]
+                / totals["total_invested"],
+                "total_pl_percentage": totals["unrealized"]["total_pl"]
+                / totals["total_invested"],
+            }
+        )
+
         output.append(totals)
 
     return None, None, {"stocks_held": stocks_held, "totals": output}

@@ -10,37 +10,75 @@ from shared_code.utils import create_form_func_request
 mock_data_container_totals = [
     {
         "date": "2023-03-17",
-        "total_cost": 350,
-        "total_value": 368.700256,
-        "total_invested": 50,
-        "total_pl": 318.700256,
-        "total_pl_percentage": 6.3740051200000005,
-        "total_dividends": 0,
-        "transaction_cost": 2,
+        "total_invested": 1009,
+        "realized": {
+            "dividends": 0,
+            "transaction_cost": 6,
+            "value_pl": 75.872,
+            "forex_pl": 5.1414668000000106,
+            "total_pl": 75.01346680000002,
+            "dividends_percentage": 0,
+            "transaction_cost_percentage": 0.005946481665014866,
+            "value_pl_percentage": 0.07519524281466798,
+            "forex_pl_percentage": 0.005095606342913787,
+            "total_pl_percentage": 0.07434436749256691,
+        },
+        "unrealized": {
+            "total_cost": 1375.1439999999998,
+            "total_value": 1541.132028,
+            "value_pl": 161.58002800000017,
+            "forex_pl": 3.987917600000018,
+            "total_pl": 165.9880280000002,
+            "value_pl_percentage": 0.16013877898909828,
+            "forex_pl_percentage": 0.003952346481665032,
+            "total_pl_percentage": 0.16450746085232926,
+        },
+        "combined": {
+            "value_pl": 237.45202800000015,
+            "forex_pl": 9.129384400000028,
+            "total_pl": 241.00149480000022,
+            "value_pl_percentage": 0.23533402180376625,
+            "forex_pl_percentage": 0.009047952824578818,
+            "total_pl_percentage": 0.23885182834489616,
+        },
         "userid": "123",
-        "id": "907f8bda-bb92-4e40-b660-dce648268156",
-        "_rid": "+qI9AMSGUAtbFAAAAAAAAA==",
-        "_self": "dbs/+qI9AA==/colls/+qI9AMSGUAs=/docs/+qI9AMSGUAtbFAAAAAAAAA==/",
-        "_etag": '"00000000-0000-0000-5925-1001a9d301d9"',
-        "_attachments": "attachments/",
-        "_ts": 1679094370,
+        "id": "ced537b3-1034-49b9-b80f-dfd24deb24c2",
     },
     {
         "date": "2023-03-18",
-        "total_cost": 350,
-        "total_value": 368.700256,
-        "total_invested": 50,
-        "total_pl": 318.700256,
-        "total_pl_percentage": 6.3740051200000005,
-        "total_dividends": 0,
-        "transaction_cost": 2,
+        "total_invested": 1009,
+        "realized": {
+            "dividends": 0,
+            "transaction_cost": 6,
+            "value_pl": 75.872,
+            "forex_pl": 5.1414668000000106,
+            "total_pl": 75.01346680000002,
+            "dividends_percentage": 0,
+            "transaction_cost_percentage": 0.005946481665014866,
+            "value_pl_percentage": 0.07519524281466798,
+            "forex_pl_percentage": 0.005095606342913787,
+            "total_pl_percentage": 0.07434436749256691,
+        },
+        "unrealized": {
+            "total_cost": 1375.1439999999998,
+            "total_value": 1552.1033880000002,
+            "value_pl": 167.6873879999999,
+            "forex_pl": 8.388378400000143,
+            "total_pl": 176.95938800000044,
+            "value_pl_percentage": 0.16619166303270555,
+            "forex_pl_percentage": 0.008313556392467931,
+            "total_pl_percentage": 0.17538095936570905,
+        },
+        "combined": {
+            "value_pl": 243.5593879999999,
+            "forex_pl": 13.529845200000153,
+            "total_pl": 251.97285480000045,
+            "value_pl_percentage": 0.24138690584737355,
+            "forex_pl_percentage": 0.013409162735381718,
+            "total_pl_percentage": 0.24972532685827598,
+        },
         "userid": "123",
-        "id": "d1ff60c2-f51f-40ec-93a6-8533124834cd",
-        "_rid": "+qI9AMSGUAteFAAAAAAAAA==",
-        "_self": "dbs/+qI9AA==/colls/+qI9AMSGUAs=/docs/+qI9AMSGUAteFAAAAAAAAA==/",
-        "_etag": '"00000000-0000-0000-5925-11373c9f01d9"',
-        "_attachments": "attachments/",
-        "_ts": 1679094372,
+        "id": "8b269758-4359-4d15-b27c-df99e02d0395",
     },
 ]
 
@@ -156,7 +194,7 @@ def test_total_gains(mock_cosmosdb_container):
         "datasets": [
             {
                 "label": "Gains",
-                "data": [318.700256, 318.700256],
+                "data": [165.9880280000002, 176.95938800000044],
             }
         ],
     }
@@ -195,12 +233,13 @@ def test_invested_and_value(mock_cosmosdb_container):
         "datasets": [
             {
                 "label": "Value",
-                "data": [368.700256, 368.700256],
+                "data": [1541.132028, 1552.1033880000002],
             },
-            {"label": "Invested", "data": [50, 50]},
+            {"label": "Invested", "data": [1009, 1009]},
         ],
     }
 
     response = main(req)
+    # response = json.loads(response.get_body().decode("utf-8"))s
     assert response.get_body() == json.dumps(expected_body).encode("utf-8")
     assert response.status_code == 200
