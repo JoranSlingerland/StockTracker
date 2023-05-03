@@ -20,9 +20,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.0005270496978561116
     },
     "unrealized": {
@@ -37,11 +39,21 @@
       "low_value": 94.37448707,
       "close_value": 94.86771399999999,
       "total_value": 948.6771399999999,
+      "value_pl": 856.0871399999999,
+      "forex_pl": -0.28799000000000957,
       "total_pl": 855.7771399999999,
-      "total_pl_percentage": 9.211809903121635
+      "total_pl_percentage": 9.211809903121635,
+      "value_pl_percentage": 9.215146824542517,
+      "forex_pl_percentage": -0.0031000000000001027
     },
     "combined": {
+      "value_pl": 856.0871399999999,
+      "forex_pl": -0.28799000000000957,
       "total_pl": 855.2771399999999,
+      "value_pl_percentage": 9.215146824542517,
+      "forex_pl_percentage": -0.0031000000000001027,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.005382131324004305,
       "total_pl_percentage": 9.20642777179763
     },
     "userid": "123"
@@ -67,9 +79,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.000682354208268097
     },
     "unrealized": {
@@ -84,11 +98,21 @@
       "low_value": 146.171833,
       "close_value": 146.55145199999998,
       "total_value": 732.7572599999999,
+      "value_pl": 640.1672599999999,
+      "forex_pl": -0.28799000000000957,
       "total_pl": 639.8572599999999,
-      "total_pl_percentage": 6.887591603875133
+      "total_pl_percentage": 6.887591603875133,
+      "value_pl_percentage": 6.890928525296016,
+      "forex_pl_percentage": -0.0031000000000001027
     },
     "combined": {
+      "value_pl": 640.1672599999999,
+      "forex_pl": -0.28799000000000957,
       "total_pl": 639.3572599999999,
+      "value_pl_percentage": 6.890928525296016,
+      "forex_pl_percentage": -0.0031000000000001027,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.005382131324004305,
       "total_pl_percentage": 6.8822094725511285
     },
     "userid": "123"
@@ -114,9 +138,11 @@
       "transaction_cost": 1.0,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 46.45,
+      "value_pl": 46.45,
+      "forex_pl": 0.0,
       "total_pl": 45.45,
-      "value_change_percentage": 1.0,
+      "value_pl_percentage": 1.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": 0.9784714747039828
     },
     "unrealized": {
@@ -131,11 +157,21 @@
       "low_value": 91.970254,
       "close_value": 93.159763,
       "total_value": 465.798815,
+      "value_pl": 419.693815,
+      "forex_pl": -0.3205050000000008,
       "total_pl": 419.348815,
-      "total_pl_percentage": 9.027961571582345
+      "total_pl_percentage": 9.027961571582345,
+      "value_pl_percentage": 9.035388912809472,
+      "forex_pl_percentage": -0.006900000000000017
     },
     "combined": {
+      "value_pl": 466.14381499999996,
+      "forex_pl": -0.3205050000000008,
       "total_pl": 464.798815,
+      "value_pl_percentage": 5.017694456404736,
+      "forex_pl_percentage": -0.0034500000000000086,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.01076426264800861,
       "total_pl_percentage": 5.0032165231431645
     },
     "userid": "123"
@@ -161,10 +197,12 @@
       "transaction_cost": 1.0,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 27.869999999999997,
-      "total_pl": 26.869999999999997,
-      "value_change_percentage": 0.49999999999999994,
-      "total_pl_percentage": 0.4820595622533189
+      "value_pl": 27.87,
+      "forex_pl": 0.0,
+      "total_pl": 26.87,
+      "value_pl_percentage": 0.5,
+      "forex_pl_percentage": 0.0,
+      "total_pl_percentage": 0.482059562253319
     },
     "unrealized": {
       "cost_per_share": 18.580000000000002,
@@ -178,11 +216,21 @@
       "low_value": 143.829158,
       "close_value": 145.369065,
       "total_value": 290.73813,
+      "value_pl": 253.85413000000003,
+      "forex_pl": -0.2564040000000007,
       "total_pl": 253.57813000000002,
-      "total_pl_percentage": 6.823953982777179
+      "total_pl_percentage": 6.823953982777179,
+      "value_pl_percentage": 6.8313813240043055,
+      "forex_pl_percentage": -0.006900000000000018
     },
     "combined": {
+      "value_pl": 281.72413,
+      "forex_pl": -0.2564040000000007,
       "total_pl": 280.44813,
+      "value_pl_percentage": 3.032552529601722,
+      "forex_pl_percentage": -0.0027600000000000072,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.01076426264800861,
       "total_pl_percentage": 3.018817330462863
     },
     "userid": "123"
@@ -208,9 +256,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.0009850680120310532
     },
     "unrealized": {
@@ -225,11 +275,21 @@
       "low_value": 250.85278671,
       "close_value": 253.78958300000002,
       "total_value": 507.57916600000004,
+      "value_pl": 277.05416600000007,
+      "forex_pl": -1.602525000000004,
       "total_pl": 275.32916600000004,
-      "total_pl_percentage": 1.1854861829924652
+      "total_pl_percentage": 1.1854861829924652,
+      "value_pl_percentage": 1.1929135242195912,
+      "forex_pl_percentage": -0.006900000000000017
     },
     "combined": {
+      "value_pl": 277.05416600000007,
+      "forex_pl": -1.602525000000004,
       "total_pl": 274.82916600000004,
+      "value_pl_percentage": 1.1929135242195912,
+      "forex_pl_percentage": -0.006900000000000017,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.002152852529601722,
       "total_pl_percentage": 1.1833333304628635
     },
     "userid": "123"
@@ -255,9 +315,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.005734354250239146
     },
     "unrealized": {
@@ -272,11 +334,21 @@
       "low_value": 85.635427,
       "close_value": 87.193776,
       "total_value": 87.193776,
+      "value_pl": -5.0162239999999985,
+      "forex_pl": -0.6410100000000016,
       "total_pl": -5.706224000000006,
-      "total_pl_percentage": -0.06142329386437035
+      "total_pl_percentage": -0.06142329386437035,
+      "value_pl_percentage": -0.05399595263724433,
+      "forex_pl_percentage": -0.006900000000000017
     },
     "combined": {
+      "value_pl": -5.0162239999999985,
+      "forex_pl": -0.6410100000000016,
       "total_pl": -6.206224000000006,
+      "value_pl_percentage": -0.05399595263724433,
+      "forex_pl_percentage": -0.006900000000000017,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.005382131324004305,
       "total_pl_percentage": -0.06680542518837465
     },
     "userid": "123"
@@ -302,9 +374,11 @@
       "transaction_cost": 1.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 92.9,
+      "value_pl": 92.9,
+      "forex_pl": 0.0,
       "total_pl": 91.4,
-      "value_change_percentage": 1.0,
+      "value_pl_percentage": 1.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": 0.9838536060279871
     },
     "unrealized": {
@@ -319,11 +393,21 @@
       "low_value": 92.7993,
       "close_value": 93.48158000000001,
       "total_value": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": 0.0,
-      "total_pl_percentage": 0.0
+      "total_pl_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0
     },
     "combined": {
+      "value_pl": 92.9,
+      "forex_pl": 0.0,
       "total_pl": 91.4,
+      "value_pl_percentage": 1.0,
+      "forex_pl_percentage": 0.0,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.016146393972012917,
       "total_pl_percentage": 0.9838536060279871
     },
     "userid": "123"
@@ -349,10 +433,12 @@
       "transaction_cost": 1.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 27.869999999999997,
-      "total_pl": 26.369999999999997,
-      "value_change_percentage": 0.49999999999999994,
-      "total_pl_percentage": 0.47308934337997843
+      "value_pl": 27.87,
+      "forex_pl": 0.0,
+      "total_pl": 26.37,
+      "value_pl_percentage": 0.5,
+      "forex_pl_percentage": 0.0,
+      "total_pl_percentage": 0.4730893433799785
     },
     "unrealized": {
       "cost_per_share": 32.515,
@@ -366,11 +452,21 @@
       "low_value": 146.9207,
       "close_value": 148.22994000000003,
       "total_value": 592.9197600000001,
+      "value_pl": 463.83976000000007,
+      "forex_pl": -0.9104200000000008,
       "total_pl": 462.8597600000001,
-      "total_pl_percentage": 3.558817161310165
+      "total_pl_percentage": 3.558817161310165,
+      "value_pl_percentage": 3.566352145163771,
+      "forex_pl_percentage": -0.007000000000000006
     },
     "combined": {
+      "value_pl": 491.7097600000001,
+      "forex_pl": -0.9104200000000008,
       "total_pl": 489.2297600000001,
+      "value_pl_percentage": 2.6464465016146397,
+      "forex_pl_percentage": -0.004900000000000004,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.008073196986006458,
       "total_pl_percentage": 2.6330988159311093
     },
     "userid": "123"
@@ -396,9 +492,11 @@
       "transaction_cost": 1.0,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 134.705,
+      "value_pl": 134.705,
+      "forex_pl": 0.0,
       "total_pl": 133.705,
-      "value_change_percentage": 1.1600000000000001,
+      "value_pl_percentage": 1.1600000000000001,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": 1.1513885898815932
     },
     "unrealized": {
@@ -413,11 +511,21 @@
       "low_value": 256.69402,
       "close_value": 258.63022,
       "total_value": 258.63022,
+      "value_pl": 143.38022,
+      "forex_pl": -0.8128750000000007,
       "total_pl": 142.50522,
-      "total_pl_percentage": 1.2271708934338
+      "total_pl_percentage": 1.2271708934338,
+      "value_pl_percentage": 1.234705877287406,
+      "forex_pl_percentage": -0.007000000000000006
     },
     "combined": {
+      "value_pl": 278.08522000000005,
+      "forex_pl": -0.8128750000000007,
       "total_pl": 276.21022000000005,
+      "value_pl_percentage": 1.1973529386437032,
+      "forex_pl_percentage": -0.003500000000000003,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.004305705059203444,
       "total_pl_percentage": 1.1892797416576966
     },
     "userid": "123"
@@ -443,9 +551,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.005643660622757632
     },
     "unrealized": {
@@ -460,11 +570,21 @@
       "low_value": 87.47014000000001,
       "close_value": 88.59498,
       "total_value": 88.59498,
+      "value_pl": -3.605019999999997,
+      "forex_pl": -0.6503000000000007,
       "total_pl": -4.305019999999999,
-      "total_pl_percentage": -0.04634036598493002
+      "total_pl_percentage": -0.04634036598493002,
+      "value_pl_percentage": -0.03880538213132397,
+      "forex_pl_percentage": -0.007000000000000006
     },
     "combined": {
+      "value_pl": -3.605019999999997,
+      "forex_pl": -0.6503000000000007,
       "total_pl": -4.805019999999999,
+      "value_pl_percentage": -0.03880538213132397,
+      "forex_pl_percentage": -0.007000000000000006,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.005382131324004305,
       "total_pl_percentage": -0.05172249730893432
     },
     "userid": "123"
@@ -490,9 +610,11 @@
       "transaction_cost": 0.5,
       "dividend": 0.0,
       "total_dividends": 0.0,
-      "value_change": 0.0,
+      "value_pl": 0.0,
+      "forex_pl": 0.0,
       "total_pl": -0.5,
-      "value_change_percentage": 0.0,
+      "value_pl_percentage": 0.0,
+      "forex_pl_percentage": 0.0,
       "total_pl_percentage": -0.0026047093144405085
     },
     "unrealized": {
@@ -507,11 +629,21 @@
       "low_value": 95.59,
       "close_value": 95.98,
       "total_value": 191.96,
+      "value_pl": 91.96000000000001,
+      "forex_pl": 0.0,
       "total_pl": 91.96000000000001,
-      "total_pl_percentage": 0.9196000000000001
+      "total_pl_percentage": 0.9196000000000001,
+      "value_pl_percentage": 0.9196000000000001,
+      "forex_pl_percentage": 0.0
     },
     "combined": {
+      "value_pl": 91.96000000000001,
+      "forex_pl": 0.0,
       "total_pl": 91.46000000000001,
+      "value_pl_percentage": 0.9196000000000001,
+      "forex_pl_percentage": 0.0,
+      "dividend_pl_percentage": 0.0,
+      "transaction_cost_percentage": 0.005,
       "total_pl_percentage": 0.9146000000000001
     },
     "userid": "123"
