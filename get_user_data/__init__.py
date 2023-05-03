@@ -9,7 +9,7 @@ from shared_code import cosmosdb_module
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """Main fucntion"""
+    """Main function"""
     logging.info("Getting container data")
     userid = req.form.get("userId", None)
 

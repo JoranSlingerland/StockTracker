@@ -7,7 +7,7 @@
       "direction": "in",
       "methods": ["post"],
       "authLevel": "anonymous",
-      "route": "priveleged/delete_cosmosdb_container"
+      "route": "privileged/delete_cosmosdb_container"
     },
     {
       "type": "http",

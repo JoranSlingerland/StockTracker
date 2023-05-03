@@ -10,7 +10,7 @@ from shared_code import cosmosdb_module, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """Main fucntion"""
+    """Main function"""
     logging.info("Getting container data")
     containername = req.form.get("containerName", None)
     userid = req.form.get("userId", None)
@@ -21,6 +21,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if fully_realized is not None:
         fully_realized = fully_realized == "true"
+    if partial_realized is not None:
+        partial_realized = partial_realized == "true"
 
     if not containername or not userid:
         logging.error("No container name provided")
@@ -107,7 +109,7 @@ def construct_query(andor, fully_realized, partial_realized):
         query = "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
     if fully_realized is not None and partial_realized is not None:
         if andor == "or":
-            query = "select * from c where c.partial_realized = @partial_realized or c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+            query = "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date"
         if andor == "and":
             query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
     if query is None:

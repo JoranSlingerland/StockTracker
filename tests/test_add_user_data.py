@@ -47,6 +47,7 @@ async def test_main(cosmosdb_container_mock):
         "dark_mode": True,
         "clearbit_api_key": "123",
         "alpha_vantage_api_key": "123",
+        "currency": "USD",
     }
 
     req = func.HttpRequest(

@@ -88,7 +88,7 @@ async def test_main(cosmosdb_container_mock):
             {
                 "symbol": "AMD",
                 "date": "2023-03-16T21:41:18.901Z",
-                "cost": 100,
+                "cost_per_share": 100,
                 "quantity": 1,
                 "transaction_type": "Buy",
                 "transaction_cost": 0.5,

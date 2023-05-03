@@ -12,6 +12,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     userid = context.get_input()[1]
 
     data = yield context.call_activity("items_to_delete", [days_to_update, userid])
+    result = '{"status": "No items to delete"}'
 
     for container_name, items in data.items():
         items = [items[i : i + 5000] for i in range(0, len(items), 5000)]
@@ -19,9 +20,6 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
             result = yield context.call_activity(
                 "delete_cosmosdb_items", [container_name, batch]
             )
-
-    if not result:
-        result = '{"status": "No items to delete"}'
 
     return result
 

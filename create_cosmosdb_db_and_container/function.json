@@ -7,7 +7,7 @@
       "direction": "in",
       "methods": ["get"],
       "authLevel": "anonymous",
-      "route": "priveleged/create_cosmosdb_and_container"
+      "route": "privileged/create_cosmosdb_and_container"
     },
     {
       "type": "http",

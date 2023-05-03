@@ -83,10 +83,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         for single_date_item in single_date_items:
             if datatype == "invested_and_value":
-                result["datasets"][0]["data"].append(single_date_item["total_value"])
+                result["datasets"][0]["data"].append(
+                    single_date_item["unrealized"]["total_value"]
+                )
                 result["datasets"][1]["data"].append(single_date_item["total_invested"])
             if datatype == "total_gains":
-                result["datasets"][0]["data"].append(single_date_item["total_pl"])
+                result["datasets"][0]["data"].append(
+                    single_date_item["unrealized"]["total_pl"]
+                )
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200

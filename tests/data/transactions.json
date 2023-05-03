@@ -3,7 +3,7 @@
     {
       "symbol": "GOOGL",
       "date": "2023-03-25",
-      "cost": 100,
+      "cost_per_share": 10,
       "quantity": 10,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -15,7 +15,7 @@
     {
       "symbol": "aapl",
       "date": "2023-03-27",
-      "cost": 100,
+      "cost_per_share": 20,
       "quantity": 5,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -27,7 +27,7 @@
     {
       "symbol": "MSFT",
       "date": "2023-03-28",
-      "cost": 250,
+      "cost_per_share": 125,
       "quantity": 2,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -39,7 +39,7 @@
     {
       "symbol": "AMD",
       "date": "2023-03-28",
-      "cost": 100,
+      "cost_per_share": 100,
       "quantity": 1,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -51,7 +51,7 @@
     {
       "symbol": "GOOGL",
       "date": "2023-03-28",
-      "cost": 100,
+      "cost_per_share": 20,
       "quantity": 5,
       "transaction_type": "Sell",
       "transaction_cost": 0.5,
@@ -63,7 +63,7 @@
     {
       "symbol": "aapl",
       "date": "2023-03-28",
-      "cost": 100,
+      "cost_per_share": 30,
       "quantity": 3,
       "transaction_type": "Sell",
       "transaction_cost": 0.5,
@@ -75,7 +75,7 @@
     {
       "symbol": "MSFT",
       "date": "2023-03-29",
-      "cost": 270,
+      "cost_per_share": 270,
       "quantity": 1,
       "transaction_type": "Sell",
       "transaction_cost": 0.5,
@@ -87,7 +87,7 @@
     {
       "symbol": "GOOGL",
       "date": "2023-03-29",
-      "cost": 100,
+      "cost_per_share": 20,
       "quantity": 5,
       "transaction_type": "Sell",
       "transaction_cost": 0.5,
@@ -99,7 +99,7 @@
     {
       "symbol": "aapl",
       "date": "2023-03-29",
-      "cost": 100,
+      "cost_per_share": 50,
       "quantity": 2,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -111,7 +111,7 @@
     {
       "symbol": "VWRL.AMS",
       "date": "2023-03-29",
-      "cost": 100,
+      "cost_per_share": 50,
       "quantity": 2,
       "transaction_type": "Buy",
       "transaction_cost": 0.5,
@@ -145,5 +145,12 @@
     }
   ],
   "daterange": ["2023-03-27", "2023-03-28", "2023-03-29"],
-  "symbols": ["GOOGL", "aapl", "MSFT", "AMD", "VWRL.AMS"]
+  "symbols": ["GOOGL", "aapl", "MSFT", "AMD", "VWRL.AMS"],
+  "user_data": {
+    "id": "123",
+    "dark_mode": false,
+    "clearbit_api_key": "abc",
+    "alpha_vantage_api_key": "456",
+    "currency": "EUR"
+  }
 }

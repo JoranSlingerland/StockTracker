@@ -17,6 +17,7 @@ def main(payload: str) -> str:
     forex_data = payload[2]
     symbols = payload[3]["symbols"]
     daterange = payload[3]["daterange"]
+    userdata = payload[3]["user_data"]
     days_to_update = payload[4]
     userid = payload[5]
 
@@ -24,7 +25,7 @@ def main(payload: str) -> str:
         stocks_held_realized, stocks_held_unrealized, symbols, daterange
     )
     stocks = pop_keys(stocks, ["date", "symbol", "currency"])
-    stocks = add_stock_data(symbols, stocks, stock_data, forex_data, userid)
+    stocks = add_stock_data(symbols, stocks, stock_data, forex_data, userid, userdata)
     stocks = filter_output(stocks, days_to_update)
 
     return None, None, stocks
@@ -44,7 +45,12 @@ def filter_output(output: list, days_to_update: int | str) -> list:
 
 
 def add_stock_data(
-    symbols: list, stocks_held, stock_data: dict, forex_data: dict, userid: str
+    symbols: list,
+    stocks_held,
+    stock_data: dict,
+    forex_data: dict,
+    userid: str,
+    userdata: dict,
 ) -> list:
     """Update unrealized stock data"""
     output = []
@@ -55,7 +61,7 @@ def add_stock_data(
 
     # initialize variables
     for stock in stocks_held:
-        days_to_substract = 0
+        days_to_subtract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
         # add id
         stock.update(
@@ -69,7 +75,7 @@ def add_stock_data(
             try:
                 date_string = f"{stock['date']} 00:00:00"
                 date_object = datetime.fromisoformat(date_string)
-                date_object = date_object - timedelta(days=days_to_substract)
+                date_object = date_object - timedelta(days=days_to_subtract)
                 date_object = date_object.strftime("%Y-%m-%d")
                 stock_open = float(
                     stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
@@ -91,13 +97,13 @@ def add_stock_data(
                         "4. close"
                     ]
                 )
-                if stock["currency"] == "EUR":
-                    forex_high = float(1)
+                if stock["currency"] == userdata["currency"]:
+                    forex_close = float(1)
                 else:
-                    forex_high = float(
+                    forex_close = float(
                         forex_data[stock["currency"]]["Time Series FX (Daily)"][
                             date_object
-                        ]["2. high"]
+                        ]["4. close"]
                     )
 
                 single_day_dividend_data = (
@@ -106,99 +112,153 @@ def add_stock_data(
                             "7. dividend amount"
                         ]
                     )
-                    * forex_high
+                    * forex_close
                 ) * stock["unrealized"]["quantity"]
-                temp_total_dividends += single_day_dividend_data
-                total_dividends.update({stock["symbol"]: temp_total_dividends})
-
-                stock["unrealized"].update(
-                    {
-                        "open_value": stock_open * forex_high,
-                        "high_value": stock_high * forex_high,
-                        "low_value": stock_low * forex_high,
-                        "close_value": stock_close * forex_high,
-                        "total_value": stock_close
-                        * forex_high
-                        * stock["unrealized"]["quantity"],
-                    }
-                )
-                stock["realized"].update(
-                    {
-                        "dividend": single_day_dividend_data,
-                        "total_dividends": total_dividends[stock["symbol"]],
-                        "value_change": stock["realized"]["sell_price"]
-                        - stock["realized"]["buy_price"],
-                        "total_pl": stock["realized"]["sell_price"]
-                        - stock["realized"]["buy_price"]
-                        - stock["realized"]["transaction_cost"]
-                        - stock["unrealized"]["transaction_cost"]
-                        + total_dividends[stock["symbol"]],
-                        "transaction_cost": stock["realized"]["transaction_cost"]
-                        + stock["unrealized"]["transaction_cost"],
-                    }
-                )
-                try:
-                    stock["realized"].update(
-                        {
-                            "value_change_percentage": (
-                                stock["realized"]["value_change"]
-                                / stock["realized"]["buy_price"]
-                            ),
-                            "total_pl_percentage": (
-                                stock["realized"]["total_pl"]
-                                / stock["realized"]["buy_price"]
-                            ),
-                        }
-                    )
-                except ZeroDivisionError:
-                    stock["realized"].update(
-                        {
-                            "value_change_percentage": 0.0,
-                            "total_pl_percentage": stock["realized"]["total_pl"]
-                            / stock["unrealized"]["total_value"],
-                        }
-                    )
-                stock["unrealized"].pop("transaction_cost", None)
-                try:
-                    stock["unrealized"].update(
-                        {
-                            "total_pl": stock["unrealized"]["total_value"]
-                            - stock["unrealized"]["total_cost"],
-                            "total_pl_percentage": (
-                                stock["unrealized"]["total_value"]
-                                - stock["unrealized"]["total_cost"]
-                            )
-                            / stock["unrealized"]["total_cost"],
-                        }
-                    )
-                except ZeroDivisionError:
-                    stock["unrealized"].update(
-                        {
-                            "total_pl": stock["unrealized"]["total_value"]
-                            - stock["unrealized"]["total_cost"],
-                            "total_pl_percentage": 0.0,
-                        }
-                    )
-                stock["combined"].update(
-                    {
-                        "total_pl": stock["realized"]["total_pl"]
-                        + stock["unrealized"]["total_pl"],
-                        "total_pl_percentage": (
-                            stock["realized"]["total_pl"]
-                            + stock["unrealized"]["total_pl"]
-                        )
-                        / (
-                            stock["unrealized"]["total_cost"]
-                            + stock["realized"]["buy_price"]
-                        ),
-                    }
-                )
-                break
             except KeyError:
-                days_to_substract += 1
+                days_to_subtract += 1
                 logging.debug(
-                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_substract} day(s)'
+                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_subtract} day(s)'
                 )
+            temp_total_dividends += single_day_dividend_data
+            total_dividends.update({stock["symbol"]: temp_total_dividends})
+
+            stock["unrealized"].update(
+                {
+                    "open_value": stock_open * forex_close,
+                    "high_value": stock_high * forex_close,
+                    "low_value": stock_low * forex_close,
+                    "close_value": stock_close * forex_close,
+                    "total_value": stock_close
+                    * forex_close
+                    * stock["unrealized"]["quantity"],
+                    "value_pl": (
+                        stock_close * stock["unrealized"]["quantity"]
+                        - stock["unrealized"]["cost_per_share_foreign"]
+                        * stock["unrealized"]["quantity"]
+                    )
+                    * forex_close,
+                    "forex_pl": (forex_close - stock["unrealized"]["average_fx_rate"])
+                    * stock["unrealized"]["total_cost"],
+                }
+            )
+
+            stock["realized"].update(
+                {
+                    "dividend": single_day_dividend_data,
+                    "total_dividends": total_dividends[stock["symbol"]],
+                    "value_pl": (
+                        stock["realized"]["sell_price_foreign"]
+                        - stock["realized"]["buy_price_foreign"]
+                    )
+                    * stock["realized"]["average_sell_fx_rate"],
+                    "transaction_cost": stock["realized"]["transaction_cost"]
+                    + stock["unrealized"]["transaction_cost"],
+                    "forex_pl": (
+                        stock["realized"]["average_sell_fx_rate"]
+                        - stock["realized"]["average_buy_fx_rate"]
+                    )
+                    * stock["realized"]["buy_price"],
+                }
+            )
+
+            stock["unrealized"].pop("transaction_cost", None)
+
+            stock["realized"].update(
+                {
+                    "total_pl": stock["realized"]["value_pl"]
+                    + stock["realized"]["forex_pl"]
+                    + stock["realized"]["dividend"]
+                    + total_dividends[stock["symbol"]]
+                    - stock["realized"]["transaction_cost"]
+                }
+            )
+            stock["realized"].update(
+                {
+                    "value_pl_percentage": 0.0
+                    if stock["realized"]["buy_price"] == 0
+                    else (
+                        stock["realized"]["value_pl"] / stock["realized"]["buy_price"]
+                    ),
+                    "forex_pl_percentage": 0.0
+                    if stock["realized"]["buy_price"] == 0
+                    else (
+                        stock["realized"]["forex_pl"] / stock["realized"]["buy_price"]
+                    ),
+                    "total_pl_percentage": stock["realized"]["total_pl"]
+                    / stock["unrealized"]["total_value"]
+                    if stock["realized"]["buy_price"] == 0
+                    else (
+                        stock["realized"]["total_pl"] / stock["realized"]["buy_price"]
+                    ),
+                }
+            )
+
+            stock["unrealized"].update(
+                {
+                    "total_pl": stock["unrealized"]["total_value"]
+                    - stock["unrealized"]["total_cost"],
+                    "total_pl_percentage": 0.0
+                    if stock["unrealized"]["total_cost"] == 0
+                    else (
+                        stock["unrealized"]["total_value"]
+                        - stock["unrealized"]["total_cost"]
+                    )
+                    / stock["unrealized"]["total_cost"],
+                    "value_pl_percentage": 0.0
+                    if stock["unrealized"]["total_cost"] == 0
+                    else (
+                        stock["unrealized"]["value_pl"]
+                        / stock["unrealized"]["total_cost"]
+                    ),
+                    "forex_pl_percentage": 0.0
+                    if stock["unrealized"]["total_cost"] == 0
+                    else (
+                        stock["unrealized"]["forex_pl"]
+                        / stock["unrealized"]["total_cost"]
+                    ),
+                }
+            )
+
+            stock["combined"].update(
+                {
+                    "value_pl": stock["realized"]["value_pl"]
+                    + stock["unrealized"]["value_pl"],
+                    "forex_pl": stock["realized"]["forex_pl"]
+                    + stock["unrealized"]["forex_pl"],
+                    "total_pl": stock["realized"]["total_pl"]
+                    + stock["unrealized"]["total_pl"],
+                }
+            )
+            stock["combined"].update(
+                {
+                    "value_pl_percentage": stock["combined"]["value_pl"]
+                    / (
+                        stock["unrealized"]["total_cost"]
+                        + stock["realized"]["buy_price"]
+                    ),
+                    "forex_pl_percentage": stock["combined"]["forex_pl"]
+                    / (
+                        stock["unrealized"]["total_cost"]
+                        + stock["realized"]["buy_price"]
+                    ),
+                    "dividend_pl_percentage": stock["realized"]["total_dividends"]
+                    / (
+                        stock["unrealized"]["total_cost"]
+                        + stock["realized"]["buy_price"]
+                    ),
+                    "transaction_cost_percentage": stock["realized"]["transaction_cost"]
+                    / (
+                        stock["unrealized"]["total_cost"]
+                        + stock["realized"]["buy_price"]
+                    ),
+                    "total_pl_percentage": stock["combined"]["total_pl"]
+                    / (
+                        stock["unrealized"]["total_cost"]
+                        + stock["realized"]["buy_price"]
+                    ),
+                }
+            )
+            break
         output.append(stock)
     return output
 
@@ -213,9 +273,13 @@ def merge_realized_unrealized(
         "date": "",
         "symbol": "",
         "cost_per_share_buy": 0.0,
+        "cost_per_share_buy_foreign": 0.0,
         "cost_per_share_sell": 0.0,
+        "cost_per_share_sell_foreign": 0.0,
         "buy_price": 0.0,
+        "buy_price_foreign": 0.0,
         "sell_price": 0.0,
+        "sell_price_foreign": 0.0,
         "average_buy_fx_rate": 0.0,
         "average_sell_fx_rate": 0.0,
         "quantity": 0.0,
@@ -227,7 +291,9 @@ def merge_realized_unrealized(
         "date": "",
         "symbol": "",
         "cost_per_share": 0.0,
+        "cost_per_share_foreign": 0.0,
         "total_cost": 0.0,
+        "total_cost_foreign": 0.0,
         "average_fx_rate": 0.0,
         "quantity": 0.0,
         "transaction_cost": 0.0,

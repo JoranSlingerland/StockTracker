@@ -79,7 +79,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         ],
     )
 
-    # step 7 - Calulate totals
+    # step 7 - Calculate totals
     logging.info("Step 7: Calculate totals")
     (
         day_by_day["invested"],
