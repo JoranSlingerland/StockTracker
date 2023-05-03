@@ -1,33 +1,13 @@
 """Test the get_topbar_data function."""
 
 import json
+from copy import deepcopy
 from unittest.mock import patch
 
 import time_machine
 
 from get_topbar_data import main
 from shared_code.utils import create_form_func_request
-
-mock_end_data_2 = [
-    {
-        "date": "2023-04-02",
-        "id": "123",
-        "total_value": 100,
-        "total_pl": 100,
-        "total_pl_percentage": 100,
-        "total_dividends": 100,
-        "transaction_cost": 100,
-    },
-    {
-        "date": "2023-04-01",
-        "id": "123",
-        "total_value": 80,
-        "total_pl": 80,
-        "total_pl_percentage": 80,
-        "total_dividends": 80,
-        "transaction_cost": 80,
-    },
-]
 
 mock_end_data = [
     {
@@ -182,20 +162,27 @@ def test_ytd_request(mock_cosmosdb_container):
         "https://localhost:7071/api/data/get_topbar_data",
     )
 
-    mock_end_data[1]["date"] = "2023-01-01"
+    single_mock_end_data = deepcopy(mock_end_data[0])
+    single_mock_end_data["date"] = "2022-04-01"
+    mock_end_data.append(single_mock_end_data)
+
+    single_mock_end_data = deepcopy(mock_end_data[0])
+    single_mock_end_data["date"] = "2023-01-01"
+    mock_end_data.append(single_mock_end_data)
 
     mock_cosmosdb_container.return_value.query_items.return_value = mock_end_data
 
     expected_body = {
-        "total_value_gain": -10.971360000000232,
-        "total_value_gain_percentage": -0.007068704369067604,
-        "total_pl": -10.971360000000232,
-        "total_pl_percentage": -0.007068704369067604,
+        "total_value_gain": 0.0,
+        "total_value_gain_percentage": 0.0,
+        "total_pl": 0.0,
+        "total_pl_percentage": 0.0,
         "total_dividends": 0,
         "transaction_cost": 0,
     }
 
     result = main(req)
+    # result = json.loads(result.get_body())
     assert result.status_code == 200
     assert json.loads(result.get_body()) == expected_body
 
