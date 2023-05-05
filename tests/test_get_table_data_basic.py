@@ -98,11 +98,17 @@ def test_empty_cosmosdb(add_meta_data_to_stock_data, cosmosdb_container):
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_transactions(add_meta_data_to_stock_data, cosmosdb_container):
     """Test valid input transactions"""
+    for item in mock_data:
+        item["cost_per_share"] = 10
+        item["quantity"] = 10
 
     cosmosdb_container.return_value.query_items.return_value = []
     cosmosdb_container.return_value.read_all_items.return_value = mock_data
     add_meta_data_to_stock_data.side_effect = add_meta_data
     expected_result = add_meta_data(mock_data, "")
+    for item in expected_result:
+        item["total_cost"] = 100
+
     expected_result = sorted(expected_result, key=lambda x: x["date"], reverse=True)
 
     req = create_form_func_request(
