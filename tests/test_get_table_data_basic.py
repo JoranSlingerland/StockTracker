@@ -1,6 +1,7 @@
 """Test get_table_data_basic"""
 
 import json
+from copy import deepcopy
 from unittest.mock import patch
 
 import time_machine
@@ -98,14 +99,16 @@ def test_empty_cosmosdb(add_meta_data_to_stock_data, cosmosdb_container):
 @patch("shared_code.utils.add_meta_data_to_stock_data")
 def test_valid_input_transactions(add_meta_data_to_stock_data, cosmosdb_container):
     """Test valid input transactions"""
-    for item in mock_data:
+    mock_data_copy = deepcopy(mock_data)
+
+    for item in mock_data_copy:
         item["cost_per_share"] = 10
         item["quantity"] = 10
 
     cosmosdb_container.return_value.query_items.return_value = []
-    cosmosdb_container.return_value.read_all_items.return_value = mock_data
+    cosmosdb_container.return_value.read_all_items.return_value = mock_data_copy
     add_meta_data_to_stock_data.side_effect = add_meta_data
-    expected_result = add_meta_data(mock_data, "")
+    expected_result = add_meta_data(mock_data_copy, "")
     for item in expected_result:
         item["total_cost"] = 100
 
