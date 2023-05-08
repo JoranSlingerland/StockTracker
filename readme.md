@@ -18,7 +18,7 @@ The project consists of three repositories:
 | -------------------------------------------------------------------------------- | ------------------------------------------- | -------- |
 | [API](https://github.com/JoranSlingerland/StockTracker)                          | This repo which will be used to gather data | Python   |
 | [Frontend](https://github.com/JoranSlingerland/StockTracker-frontend)            | Frontend repo which will create the website | React    |
-| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure        | Bicep    |
+| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure       | Bicep    |
 
 ## API
 
@@ -64,7 +64,7 @@ For the azure environment you can either use the [One time deployment](#one-time
 | COSMOSDB_ENDPOINT         | < Link to your database>  | [https://localhost:8081](https://localhost:8081) |
 | COSMOSDB_KEY              | < CosmosDB Access key >   | A1B2C3                                           |
 | COSMOSDB_DATABASE         | < CosmosDB Database name> | stocktracker                                     |
-| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Throughput >    | 1000                                             |
+| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Throughput >   | 1000                                             |
 
 - Startup the API running the task `func host start`
 - run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
@@ -137,7 +137,7 @@ Body
 | Param    | value      | Type | Allowed values                          | Required |
 | -------- | ---------- | ---- | --------------------------------------- | -------- |
 | userId   | {{userId}} | text | `string`                                | true     |
-| dataType | stocks     | text | stocks \| currency \| country \| sector | true     |
+| dataType |            | text | stocks \| currency \| country \| sector | true     |
 
 ### get_table_data_performance
 
@@ -147,30 +147,15 @@ Body
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param         | value      | Type    | Allowed values        | Required |
+| ------------- | ---------- | ------- | --------------------- | -------- |
+| userId        | {{userId}} | text    | `string`              | true     |
+| allData       |            | boolean | `boolean`             | false    |
+| startDate     |            | text    | yyyy-mm-dd            | false    |
+| endDate       |            | text    | yyyy-mm-dd            | false    |
+| containerName |            | text    | stocks_held \| totals | true     |
 
-### get_topbar_data
-
-| Method | URL                               | content-type | Usage                             |
-| ------ | --------------------------------- | ------------ | --------------------------------- |
-| POST   | {{base_url}}/data/get_topbar_data | form-data    | Function will get data for topbar |
-
-Body
-
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
-
-Body
-
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### orchestrator_start
 
@@ -287,8 +272,8 @@ Body
 
 ### Main stocktracker function
 
-| Function                  | Usage                                                                                                                                    | Link and options                                              |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Function                  | Usage                                                                                                                                     | Link and options                                              |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | stocktracker_orchestrator | Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB. | /api/orchestrators/stocktracker_orchestrator/{days_to_update} |
 
 Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB.
