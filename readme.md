@@ -120,11 +120,15 @@ Body
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataType  |            | text | invested_and_value \| total_gains   | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param     | value      | Type    | Allowed values                    | Required |
+| --------- | ---------- | ------- | --------------------------------- | -------- |
+| userId    | {{userId}} | text    | `string`                          | true     |
+| allData   |            | boolean | `boolean`                         | false    |
+| startDate |            | text    | yyyy-mm-dd                        | false    |
+| endDate   |            | text    | yyyy-mm-dd                        | false    |
+| dataType  |            | text    | invested_and_value \| total_gains | true     |
+
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### get_pie_data
 
