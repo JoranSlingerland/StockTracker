@@ -1,5 +1,5 @@
 """Date and time Helper functions"""
-from datetime import date, timedelta
+from datetime import date
 from typing import Literal
 
 import pandas as pd
@@ -29,26 +29,6 @@ def get_quarter_first_and_last_date(
         quarter_end_date = date(int(year), 12, 31)
         return quarter_start_date, quarter_end_date
     return None, None
-
-
-def datatogetswitch(
-    datatoget: Literal["year", "month", "week", "ytd"]
-) -> tuple[str, str]:
-    """Home made match function"""
-    end_date = date.today()
-    if datatoget == "year":
-        start_date = end_date - timedelta(days=365)
-    elif datatoget == "month":
-        start_date = end_date - timedelta(days=30)
-    elif datatoget == "week":
-        start_date = end_date - timedelta(days=7)
-    elif datatoget == "ytd":
-        start_date = date(end_date.year, 1, 1)
-
-    start_date = start_date.strftime("%Y-%m-%d")
-    end_date = end_date.strftime("%Y-%m-%d")
-
-    return start_date, end_date
 
 
 def month_to_quarter(

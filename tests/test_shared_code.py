@@ -175,31 +175,6 @@ class TestDateTimeHelper:
         assert None is start_date
         assert None is end_date
 
-    def test_datatogetswitch(self):
-        """Test data to get switch"""
-
-        today = datetime.date.today()
-
-        data_to_get = "year"
-        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
-        assert start_data == (today - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
-        assert end_date == today.strftime("%Y-%m-%d")
-
-        data_to_get = "month"
-        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
-        assert start_data == (today - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
-        assert end_date == today.strftime("%Y-%m-%d")
-
-        data_to_get = "week"
-        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
-        assert start_data == (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
-        assert end_date == today.strftime("%Y-%m-%d")
-
-        data_to_get = "ytd"
-        start_data, end_date = date_time_helper.datatogetswitch(data_to_get)
-        assert start_data == datetime.date(today.year, 1, 1).strftime("%Y-%m-%d")
-        assert end_date == today.strftime("%Y-%m-%d")
-
     def test_month_to_quarter(self):
         """Test month to quarter"""
         month = "January"
