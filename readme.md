@@ -56,7 +56,8 @@ For the azure environment you can either use the [One time deployment](#one-time
 ### local development environment
 
 - Install the [azure cosmosDB emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/local-emulator?tabs=ssl-netstd21)
-- Install [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=github#install-azurite)
+- Install Azurite: `npm install -g azurite`
+- Install static web apps cli: `npm install -g @azure/static-web-apps-cli`
 - Setup a .env file in the stocktracker root with the values below
 
 | Name                      | Notes                     | Example                                          |
