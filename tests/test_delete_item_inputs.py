@@ -8,6 +8,12 @@ from azure.cosmos import exceptions
 
 from delete_input_items import main
 
+body = {
+    "itemIds": ["123"],
+    "container": "input_invested",
+    "userId": "123",
+}
+
 
 def test_empty_request():
     """Test empty request"""
@@ -24,11 +30,6 @@ def test_empty_request():
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_valid_request(cosmosdb_container_mock):
     """Test valid request"""
-    body = {
-        "itemIds": ["123"],
-        "container": "input_invested",
-        "userId": "123",
-    }
     req = func.HttpRequest(
         method="POST",
         body=json.dumps(body).encode("utf-8"),
@@ -60,11 +61,6 @@ def test_valid_request(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
     """Test CosmosResourceNotFoundError"""
-    body = {
-        "itemIds": ["123"],
-        "container": "input_invested",
-        "userId": "123",
-    }
     req = func.HttpRequest(
         method="POST",
         body=json.dumps(body).encode("utf-8"),
@@ -89,12 +85,6 @@ def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_cosmos_http_response_error(cosmosdb_container_mock):
     """Test CosmosHttpResponseError"""
-    body = {
-        "itemIds": ["123"],
-        "container": "input_invested",
-        "userId": "123",
-    }
-
     req = func.HttpRequest(
         method="POST",
         body=json.dumps(body).encode("utf-8"),
@@ -119,12 +109,6 @@ def test_cosmos_http_response_error(cosmosdb_container_mock):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_no_cosmosdb_date(cosmosdb_container_mock):
     """Test no cosmosdb date"""
-    body = {
-        "itemIds": ["123"],
-        "container": "input_invested",
-        "userId": "123",
-    }
-
     req = func.HttpRequest(
         method="POST",
         body=json.dumps(body).encode("utf-8"),
@@ -145,11 +129,7 @@ def test_no_cosmosdb_date(cosmosdb_container_mock):
 def test_partial_error(cosmosdb_container_mock):
     """Test partial error"""
 
-    body = {
-        "itemIds": ["123", "456"],
-        "container": "input_invested",
-        "userId": "123",
-    }
+    body.update({"itemIds": ["123", "456"]})
 
     req = func.HttpRequest(
         method="POST",

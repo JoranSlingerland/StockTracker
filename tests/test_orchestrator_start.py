@@ -50,7 +50,7 @@ async def test_invalid_userid():
         "http://localhost:7071/api/orchestrator/start",
     )
 
-    excpected_response = func.HttpResponse(
+    expected_response = func.HttpResponse(
         '{"status": "Please pass a valid user id in the request body"}',
         status_code=400,
     )
@@ -60,8 +60,8 @@ async def test_invalid_userid():
         spec=df.DurableOrchestrationClient,
     ):
         response = await main(req, starter)
-        assert response.status_code == excpected_response.status_code
-        assert response.get_body() == excpected_response.get_body()
+        assert response.status_code == expected_response.status_code
+        assert response.get_body() == expected_response.get_body()
 
 
 @pytest.mark.asyncio()
@@ -76,7 +76,7 @@ async def test_invalid_function_name():
         "http://localhost:7071/api/orchestrator/start",
     )
 
-    excpected_response = func.HttpResponse(
+    expected_response = func.HttpResponse(
         '{"status": "Please pass a valid function name in the route parameters"}',
         status_code=400,
     )
@@ -86,8 +86,8 @@ async def test_invalid_function_name():
         spec=df.DurableOrchestrationClient,
     ):
         response = await main(req, starter)
-        assert response.status_code == excpected_response.status_code
-        assert response.get_body() == excpected_response.get_body()
+        assert response.status_code == expected_response.status_code
+        assert response.get_body() == expected_response.get_body()
 
 
 @pytest.mark.asyncio()
@@ -102,7 +102,7 @@ async def test_invalid_days_to_update():
         "http://localhost:7071/api/orchestrator/start",
     )
 
-    excpected_response = func.HttpResponse(
+    expected_response = func.HttpResponse(
         '{"status": "Please pass a valid number of days to update or pass all in the route parameters"}',
         status_code=400,
     )
@@ -112,5 +112,5 @@ async def test_invalid_days_to_update():
         spec=df.DurableOrchestrationClient,
     ):
         response = await main(req, starter)
-        assert response.status_code == excpected_response.status_code
-        assert response.get_body() == excpected_response.get_body()
+        assert response.status_code == expected_response.status_code
+        assert response.get_body() == expected_response.get_body()

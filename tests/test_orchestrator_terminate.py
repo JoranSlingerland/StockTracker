@@ -10,6 +10,19 @@ from shared_code.utils import create_form_func_request
 
 starter = MagicMock()
 
+get_status = MagicMock()
+get_status.to_json.return_value = {
+    "name": "stocktracker_orchestrator",
+    "instanceId": "123",
+    "createdTime": "2023-03-16T17:07:26.000000Z",
+    "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
+    "output": '{"status": "Done"}',
+    "input": '["all", "456"]',
+    "runtimeStatus": "Completed",
+    "customStatus": None,
+    "history": None,
+}
+
 
 @pytest.mark.asyncio()
 @patch("azure.durable_functions.DurableOrchestrationClient")
@@ -35,7 +48,6 @@ async def test_no_data(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
     get_status.to_json.return_value = {}
     mock_df.return_value.get_status.return_value = get_status
 
@@ -59,18 +71,6 @@ async def test_not_running(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
-    get_status.to_json.return_value = {
-        "name": "stocktracker_orchestrator",
-        "instanceId": "123",
-        "createdTime": "2023-03-16T17:07:26.000000Z",
-        "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
-        "output": '{"status": "Done"}',
-        "input": '["all", "456"]',
-        "runtimeStatus": "Completed",
-        "customStatus": None,
-        "history": None,
-    }
     mock_df.return_value.get_status.return_value = get_status
 
     response = await main(req, starter)
@@ -90,18 +90,6 @@ async def test_unauthorized(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
-    get_status.to_json.return_value = {
-        "name": "stocktracker_orchestrator",
-        "instanceId": "123",
-        "createdTime": "2023-03-16T17:07:26.000000Z",
-        "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
-        "output": '{"status": "Done"}',
-        "input": '["all", "456"]',
-        "runtimeStatus": "Running",
-        "customStatus": None,
-        "history": None,
-    }
     mock_df.return_value.get_status.return_value = get_status
 
     response = await main(req, starter)
@@ -124,18 +112,6 @@ async def test_invalid_json(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
-    get_status.to_json.return_value = {
-        "name": "stocktracker_orchestrator",
-        "instanceId": "123",
-        "createdTime": "2023-03-16T17:07:26.000000Z",
-        "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
-        "output": '{"status": "Done"}',
-        "input": "invalid json",
-        "runtimeStatus": "Running",
-        "customStatus": None,
-        "history": None,
-    }
     get_status.to_json.side_effect = AttributeError()
     mock_df.return_value.get_status.return_value = get_status
 
@@ -156,18 +132,7 @@ async def test_failed_termination(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
-    get_status.to_json.return_value = {
-        "name": "stocktracker_orchestrator",
-        "instanceId": "123",
-        "createdTime": "2023-03-16T17:07:26.000000Z",
-        "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
-        "output": '{"status": "Done"}',
-        "input": '["all", "456"]',
-        "runtimeStatus": "Running",
-        "customStatus": None,
-        "history": None,
-    }
+    get_status.to_json.return_value.update({"runtimeStatus": "Running"})
     mock_df.return_value.get_status.return_value = get_status
     mock_df.return_value.terminate.side_effect = Exception()
 
@@ -188,20 +153,9 @@ async def test_terminate(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status = MagicMock()
-    get_status.to_json.return_value = {
-        "name": "stocktracker_orchestrator",
-        "instanceId": "123",
-        "createdTime": "2023-03-16T17:07:26.000000Z",
-        "lastUpdatedTime": "2023-03-16T17:08:32.000000Z",
-        "output": '{"status": "Done"}',
-        "input": '["all", "456"]',
-        "runtimeStatus": "Running",
-        "customStatus": None,
-        "history": None,
-    }
+    get_status.to_json.return_value.update({"runtimeStatus": "Running"})
+
     mock_df.return_value.get_status.return_value = get_status
-    # mock_df.return_value.terminate = MagicMock()
     mock_df.return_value.terminate.return_value = True
 
     response = await main(req, starter)
