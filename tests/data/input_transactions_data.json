@@ -1,0 +1,36 @@
+[
+  {
+    "symbol": "AMD",
+    "date": "2023-04-24",
+    "quantity": 20,
+    "transaction_type": "Buy",
+    "transaction_cost": 0.5,
+    "currency": "USD",
+    "domain": "amd.com",
+    "cost_per_share": 80,
+    "userid": "123",
+    "id": "78601921-7515-4ee3-b1ec-80223bd1257b",
+    "_rid": "+qI9AO-crigSAAAAAAAAAA==",
+    "_self": "dbs/+qI9AA==/colls/+qI9AO-crig=/docs/+qI9AO-crigSAAAAAAAAAA==/",
+    "_etag": "\"00000000-0000-0000-7b4c-4eb3c78701d9\"",
+    "_attachments": "attachments/",
+    "_ts": 1682849565
+  },
+  {
+    "symbol": "MSFT",
+    "date": "2023-04-04",
+    "currency": "USD",
+    "cost_per_share": 200,
+    "quantity": 1,
+    "transaction_type": "Buy",
+    "transaction_cost": 0.5,
+    "domain": "microsoft.com",
+    "userid": "123",
+    "id": "5e7674db-fbba-48b7-b2f5-93ea4b73fb00",
+    "_rid": "+qI9AO-crigVAAAAAAAAAA==",
+    "_self": "dbs/+qI9AA==/colls/+qI9AO-crig=/docs/+qI9AO-crigVAAAAAAAAAA==/",
+    "_etag": "\"00000000-0000-0000-7c63-c5be9a4d01d9\"",
+    "_attachments": "attachments/",
+    "_ts": 1682969594
+  }
+]

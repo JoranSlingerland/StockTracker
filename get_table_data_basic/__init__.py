@@ -45,6 +45,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         container = cosmosdb_module.cosmosdb_container("meta_data")
         result = utils.add_meta_data_to_stock_data(result, container)
 
+    if containername == "input_transactions":
+        for item in result:
+            item["total_cost"] = item["cost_per_share"] * item["quantity"]
+
     if not result:
         return func.HttpResponse(
             body="{[]}",

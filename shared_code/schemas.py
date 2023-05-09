@@ -93,6 +93,7 @@ def user_data() -> dict:
             "clearbit_api_key": {"type": "string", "minLength": 1},
             "alpha_vantage_api_key": {"type": "string", "minLength": 1},
             "currency": {"type": "string", "minLength": 1, "maxLength": 3},
+            "isLoading": {"type": "boolean"},
         },
         "additionalProperties": False,
         "required": [
@@ -101,5 +102,6 @@ def user_data() -> dict:
             "clearbit_api_key",
             "alpha_vantage_api_key",
             "currency",
+            "isLoading",
         ],
     }

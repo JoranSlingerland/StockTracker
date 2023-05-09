@@ -1,0 +1,84 @@
+[
+  {
+    "date": "2023-05-03",
+    "total_invested": 1009,
+    "realized": {
+      "dividends": 0,
+      "transaction_cost": 6,
+      "value_pl": 75.872,
+      "forex_pl": 5.1414668000000106,
+      "total_pl": 75.01346680000002,
+      "dividends_percentage": 0,
+      "transaction_cost_percentage": 0.005946481665014866,
+      "value_pl_percentage": 0.07519524281466798,
+      "forex_pl_percentage": 0.005095606342913787,
+      "total_pl_percentage": 0.07434436749256691
+    },
+    "unrealized": {
+      "total_cost": 1375.1439999999998,
+      "total_value": 1401.284808,
+      "value_pl": 27.812808000000178,
+      "forex_pl": -1.5126583999999859,
+      "total_pl": 26.140808000000334,
+      "value_pl_percentage": 0.02756472547076331,
+      "forex_pl_percentage": -0.0014991659068384398,
+      "total_pl_percentage": 0.02590763924677932
+    },
+    "combined": {
+      "value_pl": 103.68480800000017,
+      "forex_pl": 3.6288084000000245,
+      "total_pl": 101.15427480000035,
+      "value_pl_percentage": 0.1027599682854313,
+      "forex_pl_percentage": 0.003596440436075346,
+      "total_pl_percentage": 0.10025200673934624
+    },
+    "userid": "123",
+    "id": "d83ff8e2-35f2-46b1-9dec-411f391b782c",
+    "_rid": "+qI9AO2pFabRXAAAAAAAAA==",
+    "_self": "dbs/+qI9AA==/colls/+qI9AO2pFaY=/docs/+qI9AO2pFabRXAAAAAAAAA==/",
+    "_etag": "\"00000000-0000-0000-7ec8-fba7544901d9\"",
+    "_attachments": "attachments/",
+    "_ts": 1683232966
+  },
+  {
+    "date": "2023-05-04",
+    "total_invested": 1009,
+    "realized": {
+      "dividends": 0,
+      "transaction_cost": 6,
+      "value_pl": 75.872,
+      "forex_pl": 5.1414668000000106,
+      "total_pl": 75.01346680000002,
+      "dividends_percentage": 0,
+      "transaction_cost_percentage": 0.005946481665014866,
+      "value_pl_percentage": 0.07519524281466798,
+      "forex_pl_percentage": 0.005095606342913787,
+      "total_pl_percentage": 0.07434436749256691
+    },
+    "unrealized": {
+      "total_cost": 1375.1439999999998,
+      "total_value": 1493.7020429999998,
+      "value_pl": 113.99804299999992,
+      "forex_pl": 4.125432000000003,
+      "total_pl": 118.558043,
+      "value_pl_percentage": 0.11298121209117931,
+      "forex_pl_percentage": 0.004088634291377604,
+      "total_pl_percentage": 0.11750053815659069
+    },
+    "combined": {
+      "value_pl": 189.87004299999992,
+      "forex_pl": 9.266898800000014,
+      "total_pl": 193.5715098,
+      "value_pl_percentage": 0.1881764549058473,
+      "forex_pl_percentage": 0.009184240634291392,
+      "total_pl_percentage": 0.19184490564915757
+    },
+    "userid": "123",
+    "id": "b2954b62-849e-4957-818c-196fa81ea55f",
+    "_rid": "+qI9AO2pFabSXAAAAAAAAA==",
+    "_self": "dbs/+qI9AA==/colls/+qI9AO2pFaY=/docs/+qI9AO2pFabSXAAAAAAAAA==/",
+    "_etag": "\"00000000-0000-0000-7ec8-fba9b53501d9\"",
+    "_attachments": "attachments/",
+    "_ts": 1683232966
+  }
+]

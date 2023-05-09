@@ -3,7 +3,7 @@
 
 import json
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import azure.functions as func
 import pandas as pd
@@ -15,86 +15,77 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    datatype = req.form.get("dataType", None)
-    datatoget = req.form.get("dataToGet", None)
     userid = req.form.get("userId", None)
+    start_date = req.form.get("startDate", None)
+    end_date = req.form.get("endDate", None)
+    all_data = req.form.get("allData", None)
+    datatype = req.form.get("dataType", None)
 
-    if not datatype or not datatoget or not userid:
-        logging.error("No datatype provided")
+    # convert all_data to boolean
+    if all_data:
+        all_data = all_data == "true"
+
+    # Validate input
+    error, error_message = validate_input(
+        userid, start_date, end_date, all_data, datatype
+    )
+    if error:
         return func.HttpResponse(
-            body='{"status": "Please pass a name on the query string or in the request body"}',
+            body=f'{{"status": "{error_message}"}}',
             mimetype="application/json",
             status_code=400,
         )
-    datatype = datatype.lower()
-    datatoget = datatoget.lower()
-
     logging.info(f"Getting data for {datatype}")
-    items, start_date, end_date = get_query_parameters(datatype, datatoget, userid)
+
+    items, start_date, end_date = get_data(
+        datatype, all_data, start_date, end_date, userid
+    )
+
+    if items == []:
+        return func.HttpResponse(
+            body='{"status": No data found in database for this time frame"}',
+            mimetype="application/json",
+            status_code=500,
+        )
+
+    days = (
+        datetime.strptime(end_date, "%Y-%m-%d")
+        - datetime.strptime(start_date, "%Y-%m-%d")
+    ).days
 
     result = []
-    if datatoget == "max":
-        # get data by quarter
-        if datatype == "transaction_cost":
-            items.sort(key=lambda x: x["date"])
-        start_date = items[0]["date"]
-        end_date = date.today()
-        result = get_max_data(items, start_date, end_date, datatype)
-    if datatoget in ["year", "ytd"]:
-        result = get_year_ytd_data(items, start_date, end_date, datatype)
-    if datatoget in ["month", "week"]:
-        result = get_month_week_data(items, start_date, end_date, datatype)
 
-    if not result:
-        return func.HttpResponse(
-            body='{"status": Please pass a valid name on the query string or in the request body"}',
-            mimetype="application/json",
-            status_code=400,
-        )
+    if days > 365:
+        result = quarter_interval(items, start_date, end_date, datatype)
+    elif days > 30:
+        result = month_interval(items, start_date, end_date, datatype)
+    elif days > 0:
+        result = week_interval(items, start_date, end_date, datatype)
+
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )
 
 
-def get_query_parameters(datatype, datatoget, userid):
-    """Get query parameters"""
-    start_date = None
-    end_date = None
-    container = None
-    query = None
-    parameters = None
+def get_data(
+    datatype: str, all_data: bool, start_date: str, end_date: str, userid: str
+):
+    """Get data from database"""
+    if all_data:
+        query = "SELECT * FROM c WHERE c.userid = @userid"
+        parameters = [{"name": "@userid", "value": userid}]
+    else:
+        query = "SELECT * FROM c WHERE c.userid = @userid AND c.date >= @start_date AND c.date <= @end_date"
+        parameters = [
+            {"name": "@userid", "value": userid},
+            {"name": "@start_date", "value": start_date},
+            {"name": "@end_date", "value": end_date},
+        ]
 
     if datatype == "dividend":
         container = cosmosdb_module.cosmosdb_container("stocks_held")
-        if datatoget == "max":
-            query = "SELECT * FROM c WHERE c.userid = @userid"
-            parameters = [{"name": "@userid", "value": userid}]
-
-        else:
-            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
-            query = "SELECT * FROM c WHERE c.userid = @userid AND c.date >= @start_date AND c.date <= @end_date"
-            parameters = [
-                {"name": "@userid", "value": userid},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
-            ]
-
     if datatype == "transaction_cost":
         container = cosmosdb_module.cosmosdb_container("input_transactions")
-        if datatoget == "max":
-            query = "SELECT * FROM c WHERE c.userid = @userid"
-            parameters = [{"name": "@userid", "value": userid}]
-        else:
-            start_date, end_date = date_time_helper.datatogetswitch(datatoget)
-            query = "SELECT * FROM c WHERE c.userid = @userid AND c.date >= @start_date AND c.date <= @end_date"
-            parameters = [
-                {"name": "@userid", "value": userid},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
-            ]
-
-    if not container or not query or not parameters:
-        return [], None, None
 
     items = list(
         container.query_items(
@@ -103,11 +94,15 @@ def get_query_parameters(datatype, datatoget, userid):
             enable_cross_partition_query=True,
         )
     )
+    if items and all_data:
+        items.sort(key=lambda x: x["date"])
+        start_date = items[0]["date"]
+        end_date = date.today().strftime("%Y-%m-%d")
 
     return items, start_date, end_date
 
 
-def get_max_data(items, start_date, end_date, datatype):
+def quarter_interval(items, start_date, end_date, datatype):
     """Get max data"""
     quarters = date_time_helper.get_quarters(start_date, end_date)
     result = []
@@ -155,17 +150,10 @@ def get_max_data(items, start_date, end_date, datatype):
                     "category": symbol,
                 }
             result.append(temp_object)
-        if not all_symbols:
-            temp_object = {
-                "date": quarter,
-                "value": 0.00,
-                "category": "",
-            }
-            result.append(temp_object)
     return result
 
 
-def get_year_ytd_data(items, start_date, end_date, datatype):
+def month_interval(items, start_date, end_date, datatype):
     """Get year and ytd data"""
     result = []
     months = date_time_helper.get_months(start_date, end_date)
@@ -210,17 +198,10 @@ def get_year_ytd_data(items, start_date, end_date, datatype):
                     "category": symbol,
                 }
             result.append(temp_object)
-        if not all_symbols:
-            temp_object = {
-                "date": month.strftime("%Y %B"),
-                "value": 0.00,
-                "category": "",
-            }
-            result.append(temp_object)
     return result
 
 
-def get_month_week_data(items, start_date, end_date, datatype):
+def week_interval(items, start_date, end_date, datatype):
     """Get month and week data"""
     # get data by week
     weeks = date_time_helper.get_weeks(start_date, end_date)
@@ -266,12 +247,49 @@ def get_month_week_data(items, start_date, end_date, datatype):
                     "category": symbol,
                 }
             result.append(temp_object)
-        if not all_symbols:
-            temp_object = {
-                "date": week.strftime("%Y %U"),
-                "value": 0.00,
-                "category": "",
-            }
-            result.append(temp_object)
 
     return result
+
+
+def validate_input(
+    userid: str, start_date: str, end_date: str, all_data: bool, datatype: str
+):
+    """Validate input"""
+
+    error = False
+    error_message = ""
+
+    if start_date:
+        try:
+            datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            logging.error("Start date is not in the correct format")
+            error = True
+            error_message = "Start date is not in the correct format"
+
+    if end_date:
+        try:
+            datetime.strptime(end_date, "%Y-%m-%d")
+        except ValueError:
+            logging.error("End date is not in the correct format")
+            error = True
+            error_message = "End date is not in the correct format"
+
+    if start_date and end_date and start_date > end_date:
+        logging.error("Start date is after end date")
+        error = True
+        error_message = "Start date is after end date"
+
+    if (
+        not userid
+        or datatype not in ("dividend", "transaction_cost")
+        or (not all_data and (start_date is None or end_date is None))
+        or (all_data and (start_date or end_date))
+    ):
+        logging.error(
+            "Please pass a valid name on the query string or in the request body"
+        )
+        error = True
+        error_message = "Please pass a name on the query string or in the request body"
+
+    return error, error_message

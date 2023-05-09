@@ -18,7 +18,7 @@ The project consists of three repositories:
 | -------------------------------------------------------------------------------- | ------------------------------------------- | -------- |
 | [API](https://github.com/JoranSlingerland/StockTracker)                          | This repo which will be used to gather data | Python   |
 | [Frontend](https://github.com/JoranSlingerland/StockTracker-frontend)            | Frontend repo which will create the website | React    |
-| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure        | Bicep    |
+| [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure       | Bicep    |
 
 ## API
 
@@ -56,7 +56,8 @@ For the azure environment you can either use the [One time deployment](#one-time
 ### local development environment
 
 - Install the [azure cosmosDB emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/local-emulator?tabs=ssl-netstd21)
-- Install [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=github#install-azurite)
+- Install Azurite: `npm install -g azurite`
+- Install static web apps cli: `npm install -g @azure/static-web-apps-cli`
 - Setup a .env file in the stocktracker root with the values below
 
 | Name                      | Notes                     | Example                                          |
@@ -64,7 +65,7 @@ For the azure environment you can either use the [One time deployment](#one-time
 | COSMOSDB_ENDPOINT         | < Link to your database>  | [https://localhost:8081](https://localhost:8081) |
 | COSMOSDB_KEY              | < CosmosDB Access key >   | A1B2C3                                           |
 | COSMOSDB_DATABASE         | < CosmosDB Database name> | stocktracker                                     |
-| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Throughput >    | 1000                                             |
+| COSMOSDB_OFFER_THROUGHPUT | < CosmosDB Throughput >   | 1000                                             |
 
 - Startup the API running the task `func host start`
 - run the command `swa start http://localhost:8080 --run "yarn run dev" --api-location http://localhost:7071` to start the website and SWA endpoint.
@@ -90,11 +91,15 @@ All Azure functions available in the api.
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataType  |            | text | dividend \| transaction_cost        | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param     | value      | Type    | Allowed values               | Required |
+| --------- | ---------- | ------- | ---------------------------- | -------- |
+| userId    | {{userId}} | text    | `string`                     | true     |
+| allData   |            | boolean | `boolean`                    | false    |
+| startDate |            | text    | yyyy-mm-dd                   | false    |
+| endDate   |            | text    | yyyy-mm-dd                   | false    |
+| dataType  |            | text    | dividend \| transaction_cost | true     |
+
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### get_table_data_basic
 
@@ -120,11 +125,15 @@ Body
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataType  |            | text | invested_and_value \| total_gains   | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param     | value      | Type    | Allowed values                    | Required |
+| --------- | ---------- | ------- | --------------------------------- | -------- |
+| userId    | {{userId}} | text    | `string`                          | true     |
+| allData   |            | boolean | `boolean`                         | false    |
+| startDate |            | text    | yyyy-mm-dd                        | false    |
+| endDate   |            | text    | yyyy-mm-dd                        | false    |
+| dataType  |            | text    | invested_and_value \| total_gains | true     |
+
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### get_pie_data
 
@@ -137,7 +146,7 @@ Body
 | Param    | value      | Type | Allowed values                          | Required |
 | -------- | ---------- | ---- | --------------------------------------- | -------- |
 | userId   | {{userId}} | text | `string`                                | true     |
-| dataType | stocks     | text | stocks \| currency \| country \| sector | true     |
+| dataType |            | text | stocks \| currency \| country \| sector | true     |
 
 ### get_table_data_performance
 
@@ -147,30 +156,15 @@ Body
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param         | value      | Type    | Allowed values        | Required |
+| ------------- | ---------- | ------- | --------------------- | -------- |
+| userId        | {{userId}} | text    | `string`              | true     |
+| allData       |            | boolean | `boolean`             | false    |
+| startDate     |            | text    | yyyy-mm-dd            | false    |
+| endDate       |            | text    | yyyy-mm-dd            | false    |
+| containerName |            | text    | stocks_held \| totals | true     |
 
-### get_topbar_data
-
-| Method | URL                               | content-type | Usage                             |
-| ------ | --------------------------------- | ------------ | --------------------------------- |
-| POST   | {{base_url}}/data/get_topbar_data | form-data    | Function will get data for topbar |
-
-Body
-
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
-
-Body
-
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### orchestrator_start
 
@@ -287,8 +281,8 @@ Body
 
 ### Main stocktracker function
 
-| Function                  | Usage                                                                                                                                    | Link and options                                              |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Function                  | Usage                                                                                                                                     | Link and options                                              |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | stocktracker_orchestrator | Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB. | /api/orchestrators/stocktracker_orchestrator/{days_to_update} |
 
 Function will get all the data from the input tables and use this to create the output data. This will then be outputted to the CosmosDB.
