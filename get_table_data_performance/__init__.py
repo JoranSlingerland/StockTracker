@@ -87,22 +87,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 def get_max_data(container_name: str, userid: str):
     """ "Get max data for a user"""
 
-    container = cosmosdb_module.cosmosdb_container(container_name)
     start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
     end_date = date.today().strftime("%Y-%m-%d")
-    query = query_builder(container_name)
 
-    result = list(
-        container.query_items(
-            query=query,
-            parameters=[
-                {"name": "@userid", "value": userid},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
-            ],
-            enable_cross_partition_query=True,
-        )
-    )
+    result = run_query(container_name, start_date, end_date, userid)
+
     if result:
         result = sorted(result, key=lambda k: k["date"], reverse=True)
         last_date = result[0]["date"]
@@ -114,22 +103,10 @@ def get_max_data(container_name: str, userid: str):
 def get_non_max_data(container_name: str, userid: str, start_date: str, end_date: str):
     """Get non max data for a user"""
 
-    container = cosmosdb_module.cosmosdb_container(container_name)
     start_data = []
     end_data = []
-    query = query_builder(container_name)
 
-    data = list(
-        container.query_items(
-            query=query,
-            parameters=[
-                {"name": "@userid", "value": userid},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
-            ],
-            enable_cross_partition_query=True,
-        )
-    )
+    data = run_query(container_name, start_date, end_date, userid)
 
     if not data:
         return start_data, end_data
@@ -345,3 +322,23 @@ def query_builder(container_name: str):
         return "SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date and c.fully_realized = false and c.userid = @userid"
     if container_name == "totals":
         return "SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date and c.userid = @userid"
+
+
+def run_query(container_name: str, start_date: str, end_date: str, userid: str):
+    """Run query"""
+    container = cosmosdb_module.cosmosdb_container(container_name)
+    query = query_builder(container_name)
+
+    result = list(
+        container.query_items(
+            query=query,
+            parameters=[
+                {"name": "@userid", "value": userid},
+                {"name": "@start_date", "value": start_date},
+                {"name": "@end_date", "value": end_date},
+            ],
+            enable_cross_partition_query=True,
+        )
+    )
+
+    return result
