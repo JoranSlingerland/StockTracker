@@ -115,6 +115,7 @@ async def test_invalid_json(mock_df):
     )
 
     custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.return_value = {"runtimeStatus": "Running"}
     custom_get_status.to_json.side_effect = AttributeError()
     mock_df.return_value.get_status.return_value = custom_get_status
 
