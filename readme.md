@@ -90,11 +90,15 @@ All Azure functions available in the api.
 
 Body
 
-| Param     | value      | Type | Allowed values                      | Required |
-| --------- | ---------- | ---- | ----------------------------------- | -------- |
-| userId    | {{userId}} | text | `string`                            | true     |
-| dataType  |            | text | dividend \| transaction_cost        | true     |
-| dataToGet |            | text | max \| year \| ytd \| month \| week | true     |
+| Param     | value      | Type    | Allowed values               | Required |
+| --------- | ---------- | ------- | ---------------------------- | -------- |
+| userId    | {{userId}} | text    | `string`                     | true     |
+| allData   |            | boolean | `boolean`                    | false    |
+| startDate |            | text    | yyyy-mm-dd                   | false    |
+| endDate   |            | text    | yyyy-mm-dd                   | false    |
+| dataType  |            | text    | dividend \| transaction_cost | true     |
+
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
 ### get_table_data_basic
 
