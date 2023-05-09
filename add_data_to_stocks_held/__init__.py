@@ -302,54 +302,72 @@ def merge_realized_unrealized(
 
     for single_date in daterange:
         for symbol in symbols:
-            single_realized = [
-                d
-                for d in realized
-                if d["symbol"] == symbol and d["date"] == single_date
-            ]
-            single_unrealized = [
-                d
-                for d in unrealized
-                if d["symbol"] == symbol and d["date"] == single_date
-            ]
-            if not single_realized and not single_unrealized:
-                continue
-            if single_realized and not single_unrealized:
-                output_object = {
-                    "date": single_date,
-                    "symbol": symbol,
-                    "currency": single_realized[0]["currency"],
-                    "fully_realized": True,
-                    "partial_realized": False,
-                    "realized": single_realized[0],
-                    "unrealized": empty_unrealized,
-                    "combined": {},
-                }
-            if not single_realized and single_unrealized:
-                output_object = {
-                    "date": single_date,
-                    "symbol": symbol,
-                    "currency": single_unrealized[0]["currency"],
-                    "fully_realized": False,
-                    "partial_realized": False,
-                    "realized": empty_realized,
-                    "unrealized": single_unrealized[0],
-                    "combined": {},
-                }
-            if single_realized and single_unrealized:
-                output_object = {
-                    "date": single_date,
-                    "symbol": symbol,
-                    "currency": single_realized[0]["currency"],
-                    "fully_realized": False,
-                    "partial_realized": True,
-                    "realized": single_realized[0],
-                    "unrealized": single_unrealized[0],
-                    "combined": {},
-                }
-            output.append(output_object)
+            output_object = create_merged_object(
+                realized,
+                unrealized,
+                symbol,
+                single_date,
+                empty_unrealized,
+                empty_realized,
+            )
+            if output_object:
+                output.append(output_object)
 
     return output
+
+
+def create_merged_object(
+    realized: list,
+    unrealized: list,
+    symbol: str,
+    single_date: str,
+    empty_unrealized: dict,
+    empty_realized: dict,
+):
+    """Create merged object"""
+    single_realized = [
+        d for d in realized if d["symbol"] == symbol and d["date"] == single_date
+    ]
+    single_unrealized = [
+        d for d in unrealized if d["symbol"] == symbol and d["date"] == single_date
+    ]
+    if not single_realized and not single_unrealized:
+        return
+    if single_realized and not single_unrealized:
+        output_object = {
+            "date": single_date,
+            "symbol": symbol,
+            "currency": single_realized[0]["currency"],
+            "fully_realized": True,
+            "partial_realized": False,
+            "realized": single_realized[0],
+            "unrealized": empty_unrealized,
+            "combined": {},
+        }
+    if not single_realized and single_unrealized:
+        output_object = {
+            "date": single_date,
+            "symbol": symbol,
+            "currency": single_unrealized[0]["currency"],
+            "fully_realized": False,
+            "partial_realized": False,
+            "realized": empty_realized,
+            "unrealized": single_unrealized[0],
+            "combined": {},
+        }
+    if single_realized and single_unrealized:
+        output_object = {
+            "date": single_date,
+            "symbol": symbol,
+            "currency": single_realized[0]["currency"],
+            "fully_realized": False,
+            "partial_realized": True,
+            "realized": single_realized[0],
+            "unrealized": single_unrealized[0],
+            "combined": {},
+        }
+
+    return output_object
 
 
 def pop_keys(stocks: list, keys_to_pop) -> list:
