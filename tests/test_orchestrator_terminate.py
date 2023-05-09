@@ -1,5 +1,6 @@
 """Test Orchestrator Terminate."""
 
+from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
 import azure.durable_functions as df
@@ -48,8 +49,9 @@ async def test_no_data(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status.to_json.return_value = {}
-    mock_df.return_value.get_status.return_value = get_status
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.return_value = {}
+    mock_df.return_value.get_status.return_value = custom_get_status
 
     response = await main(req, starter)
     assert response.status_code == 401
@@ -112,8 +114,9 @@ async def test_invalid_json(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status.to_json.side_effect = AttributeError()
-    mock_df.return_value.get_status.return_value = get_status
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.side_effect = AttributeError()
+    mock_df.return_value.get_status.return_value = custom_get_status
 
     response = await main(req, starter)
     assert response.status_code == 404
@@ -132,8 +135,9 @@ async def test_failed_termination(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status.to_json.return_value.update({"runtimeStatus": "Running"})
-    mock_df.return_value.get_status.return_value = get_status
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.return_value.update({"runtimeStatus": "Running"})
+    mock_df.return_value.get_status.return_value = custom_get_status
     mock_df.return_value.terminate.side_effect = Exception()
 
     response = await main(req, starter)
@@ -153,9 +157,10 @@ async def test_terminate(mock_df):
         "http://localhost:7071/api/orchestrator/terminate",
     )
 
-    get_status.to_json.return_value.update({"runtimeStatus": "Running"})
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.return_value.update({"runtimeStatus": "Running"})
 
-    mock_df.return_value.get_status.return_value = get_status
+    mock_df.return_value.get_status.return_value = custom_get_status
     mock_df.return_value.terminate.return_value = True
 
     response = await main(req, starter)

@@ -1,5 +1,6 @@
 """Test Orchestrator purge."""
 
+from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
 import azure.durable_functions as df
@@ -46,8 +47,9 @@ async def test_no_data(mock_df):
         "http://localhost:7071/api/orchestrator/purge",
     )
 
-    get_status.to_json.return_value = {}
-    mock_df.return_value.get_status.return_value = get_status
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.return_value = {}
+    mock_df.return_value.get_status.return_value = custom_get_status
 
     response = await main(req, starter)
     assert response.status_code == 401
@@ -85,8 +87,9 @@ async def test_invalid_json(mock_df):
         "http://localhost:7071/api/orchestrator/purge",
     )
 
-    get_status.to_json.side_effect = AttributeError()
-    mock_df.return_value.get_status.return_value = get_status
+    custom_get_status = deepcopy(get_status)
+    custom_get_status.to_json.side_effect = AttributeError()
+    mock_df.return_value.get_status.return_value = custom_get_status
 
     response = await main(req, starter)
     assert response.status_code == 404
