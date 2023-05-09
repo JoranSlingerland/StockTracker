@@ -104,7 +104,7 @@ class TestInvalidRequest:
         assert result.status_code == 400
         assert (
             result.get_body()
-            == b'{"status": "Please pass a name on the query string or in the request body"}'
+            == b'{"status": "Invalid combination of parameters. Please pass a valid name in the request body"}'
         )
 
 
