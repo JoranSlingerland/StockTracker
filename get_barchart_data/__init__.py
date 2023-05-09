@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta
 import azure.functions as func
 import pandas as pd
 
-from shared_code import cosmosdb_module, date_time_helper, utils
+from shared_code import cosmosdb_module, date_time_helper, utils, validate_input
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -26,9 +26,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         all_data = all_data == "true"
 
     # Validate input
-    error, error_message = validate_input(
-        userid, start_date, end_date, all_data, datatype
+    error, error_message = validate_input.start_end_date_validation(
+        start_date, end_date
     )
+    if not error:
+        error, error_message = validate_input.validate_combination(
+            userid,
+            start_date,
+            end_date,
+            all_data,
+            datatype,
+            ["dividend", "transaction_cost"],
+        )
     if error:
         return func.HttpResponse(
             body=f'{{"status": "{error_message}"}}',
@@ -249,47 +258,3 @@ def week_interval(items, start_date, end_date, datatype):
             result.append(temp_object)
 
     return result
-
-
-def validate_input(
-    userid: str, start_date: str, end_date: str, all_data: bool, datatype: str
-):
-    """Validate input"""
-
-    error = False
-    error_message = ""
-
-    if start_date:
-        try:
-            datetime.strptime(start_date, "%Y-%m-%d")
-        except ValueError:
-            logging.error("Start date is not in the correct format")
-            error = True
-            error_message = "Start date is not in the correct format"
-
-    if end_date:
-        try:
-            datetime.strptime(end_date, "%Y-%m-%d")
-        except ValueError:
-            logging.error("End date is not in the correct format")
-            error = True
-            error_message = "End date is not in the correct format"
-
-    if start_date and end_date and start_date > end_date:
-        logging.error("Start date is after end date")
-        error = True
-        error_message = "Start date is after end date"
-
-    if (
-        not userid
-        or datatype not in ("dividend", "transaction_cost")
-        or (not all_data and (start_date is None or end_date is None))
-        or (all_data and (start_date or end_date))
-    ):
-        logging.error(
-            "Please pass a valid name on the query string or in the request body"
-        )
-        error = True
-        error_message = "Please pass a name on the query string or in the request body"
-
-    return error, error_message

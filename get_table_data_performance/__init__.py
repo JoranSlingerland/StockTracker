@@ -3,11 +3,11 @@
 
 import json
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 import azure.functions as func
 
-from shared_code import cosmosdb_module, utils
+from shared_code import cosmosdb_module, utils, validate_input
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -25,9 +25,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         all_data = all_data == "true"
 
     # Validate input
-    error, error_message = validate_input(
-        userid, start_date, end_date, all_data, container_name
+    error, error_message = validate_input.start_end_date_validation(
+        start_date, end_date
     )
+    if not error:
+        error, error_message = validate_input.validate_combination(
+            userid,
+            start_date,
+            end_date,
+            all_data,
+            container_name,
+            ["stocks_held", "totals"],
+        )
     if error:
         return func.HttpResponse(
             body=f'{{"status": "{error_message}"}}',
@@ -139,50 +148,6 @@ def get_non_max_data(container_name: str, userid: str, start_date: str, end_date
                 end_data.append(symbol_data[0])
 
     return start_data, end_data
-
-
-def validate_input(
-    userid: str, start_date: str, end_date: str, all_data: bool, container_name: str
-):
-    """Validate input"""
-
-    error = False
-    error_message = ""
-
-    if start_date:
-        try:
-            datetime.strptime(start_date, "%Y-%m-%d")
-        except ValueError:
-            logging.error("Start date is not in the correct format")
-            error = True
-            error_message = "Start date is not in the correct format"
-
-    if end_date:
-        try:
-            datetime.strptime(end_date, "%Y-%m-%d")
-        except ValueError:
-            logging.error("End date is not in the correct format")
-            error = True
-            error_message = "End date is not in the correct format"
-
-    if start_date and end_date and start_date > end_date:
-        logging.error("Start date is after end date")
-        error = True
-        error_message = "Start date is after end date"
-
-    if (
-        not userid
-        or container_name not in ("stocks_held", "totals")
-        or (not all_data and (start_date is None or end_date is None))
-        or (all_data and (start_date or end_date))
-    ):
-        logging.error(
-            "Please pass a valid name on the query string or in the request body"
-        )
-        error = True
-        error_message = "Please pass a name on the query string or in the request body"
-
-    return error, error_message
 
 
 def create_result_stocks_held(start_data: list, end_data: list):
