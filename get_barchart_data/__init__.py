@@ -56,13 +56,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     result = []
 
     if days > 365:
-        "generate with quarter interval"
         result = quarter_interval(items, start_date, end_date, datatype)
     elif days > 30:
-        "generate with month interval"
         result = month_interval(items, start_date, end_date, datatype)
     elif days > 0:
-        "generate with day interval"
         result = week_interval(items, start_date, end_date, datatype)
 
     return func.HttpResponse(

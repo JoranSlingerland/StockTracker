@@ -378,5 +378,5 @@ def query_builder(container_name: str):
     """Build query"""
     if container_name == "stocks_held":
         return "SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date and c.fully_realized = false and c.userid = @userid"
-    elif container_name == "totals":
+    if container_name == "totals":
         return "SELECT * FROM c WHERE c.date >= @start_date and c.date <= @end_date and c.userid = @userid"
