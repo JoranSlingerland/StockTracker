@@ -36,13 +36,12 @@ def test_no_containers_to_delete():
     response = main(req)
     assert (
         response.get_body()
-        == b'{"result": "Please pass a name on the query string or in the request body"}'
+        == b'{"result": "Please pass a valid name on the query string or in the request body"}'
     )
     assert response.status_code == 400
 
 
-@patch("shared_code.cosmosdb_module.cosmosdb_database")
-def test_invalid_containers_to_delete(mock_cosmosdb_database: MagicMock):
+def test_invalid_containers_to_delete():
     """Test invalid containers to delete"""
     req = utils.create_form_func_request(
         {"containersToDelete": "invalid"},
@@ -55,13 +54,15 @@ def test_invalid_containers_to_delete(mock_cosmosdb_database: MagicMock):
         == b'{"result": "Please pass a valid name on the query string or in the request body"}'
     )
     assert response.status_code == 400
-    mock_cosmosdb_database.assert_called_once()
 
 
+@patch("shared_code.utils.is_admin")
 @patch("shared_code.cosmosdb_module.cosmosdb_database")
 @patch("shared_code.get_config.get_containers")
 def test_all_containers_to_delete(
-    mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
+    mock_get_containers: MagicMock,
+    mock_cosmosdb_database: MagicMock,
+    mock_is_admin: MagicMock,
 ):
     """Test all containers to delete"""
     req = utils.create_form_func_request(
@@ -73,6 +74,7 @@ def test_all_containers_to_delete(
     delete_container.delete_container = MagicMock()
     mock_cosmosdb_database.return_value = delete_container
     mock_get_containers.return_value = containers
+    mock_is_admin.return_value = True
 
     response = main(req)
     assert response.get_body() == b'{"result": "done"}'
@@ -81,10 +83,13 @@ def test_all_containers_to_delete(
     assert delete_container.delete_container.call_count == 2
 
 
+@patch("shared_code.utils.is_admin")
 @patch("shared_code.cosmosdb_module.cosmosdb_database")
 @patch("shared_code.get_config.get_containers")
 def test_output_only_containers_to_delete(
-    mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
+    mock_get_containers: MagicMock,
+    mock_cosmosdb_database: MagicMock,
+    mock_is_admin: MagicMock,
 ):
     """Test output_only containers to delete"""
     req = utils.create_form_func_request(
@@ -96,6 +101,7 @@ def test_output_only_containers_to_delete(
     delete_container.delete_container = MagicMock()
     mock_cosmosdb_database.return_value = delete_container
     mock_get_containers.return_value = containers
+    mock_is_admin.return_value = True
 
     response = main(req)
     assert response.get_body() == b'{"result": "done"}'
@@ -104,10 +110,13 @@ def test_output_only_containers_to_delete(
     assert delete_container.delete_container.call_count == 1
 
 
+@patch("shared_code.utils.is_admin")
 @patch("shared_code.cosmosdb_module.cosmosdb_database")
 @patch("shared_code.get_config.get_containers")
 def test_all_containers_to_delete_with_exception(
-    mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
+    mock_get_containers: MagicMock,
+    mock_cosmosdb_database: MagicMock,
+    mock_is_admin: MagicMock,
 ):
     """Test all containers to delete invalid"""
     req = utils.create_form_func_request(
@@ -121,6 +130,7 @@ def test_all_containers_to_delete_with_exception(
     )
     mock_cosmosdb_database.return_value = delete_container
     mock_get_containers.return_value = containers
+    mock_is_admin.return_value = True
 
     response = main(req)
     assert response.get_body() == b'{"result": "deleted 0 out of 2 containers"}'
@@ -129,10 +139,13 @@ def test_all_containers_to_delete_with_exception(
     assert delete_container.delete_container.call_count == 2
 
 
+@patch("shared_code.utils.is_admin")
 @patch("shared_code.cosmosdb_module.cosmosdb_database")
 @patch("shared_code.get_config.get_containers")
 def test_output_only_containers_to_delete_with_exception(
-    mock_get_containers: MagicMock, mock_cosmosdb_database: MagicMock
+    mock_get_containers: MagicMock,
+    mock_cosmosdb_database: MagicMock,
+    mock_is_admin: MagicMock,
 ):
     """Test output_only containers to delete invalid"""
     req = utils.create_form_func_request(
@@ -146,9 +159,25 @@ def test_output_only_containers_to_delete_with_exception(
     )
     mock_cosmosdb_database.return_value = delete_container
     mock_get_containers.return_value = containers
+    mock_is_admin.return_value = True
 
     response = main(req)
     assert response.get_body() == b'{"result": "deleted 0 out of 1 containers"}'
     assert response.status_code == 500
     mock_cosmosdb_database.assert_called_once()
     assert delete_container.delete_container.call_count == 1
+
+
+@patch("shared_code.utils.is_admin")
+def test_unauthorized(mock_is_admin: MagicMock):
+    """Test unauthorized"""
+
+    mock_is_admin.return_value = False
+    req = utils.create_form_func_request(
+        {"containersToDelete": "all"},
+        "http://localhost:7071/api/priveleged/delete_cosmosdb_container",
+    )
+
+    response = main(req)
+    assert response.get_body() == b'{"result": "Not authorized"}'
+    assert response.status_code == 401

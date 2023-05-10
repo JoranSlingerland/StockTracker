@@ -71,3 +71,13 @@ def get_user(
         headers = json.loads(headers)
 
     return headers
+
+
+def is_admin(req) -> bool:
+    """Check if user is admin"""
+
+    user = get_user(req)
+
+    if "admin" in user["userRoles"]:
+        return True
+    return False
