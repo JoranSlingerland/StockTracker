@@ -20,7 +20,6 @@ def stock_input() -> dict:
                 "transaction_cost": {"type": "number"},
                 "currency": {"type": "string", "pattern": "[a-zA-Z]"},
                 "domain": {"type": "string"},
-                "userid": {"type": "string"},
             },
             "required": [
                 "symbol",
@@ -31,7 +30,6 @@ def stock_input() -> dict:
                 "transaction_cost",
                 "currency",
                 "domain",
-                "userid",
             ],
         },
         "additionalProperties": False,
@@ -52,9 +50,8 @@ def transaction_input() -> dict:
                 },
                 "date": {"type": "string", "pattern": "[0-9a-zA-Z]"},
                 "amount": {"type": "number"},
-                "userid": {"type": "string"},
             },
-            "required": ["transaction_type", "date", "amount", "userid"],
+            "required": ["transaction_type", "date", "amount"],
         },
         "additionalProperties": False,
     }
@@ -76,10 +73,9 @@ def delete_item() -> dict:
                 "minLength": 1,
                 "enum": ["input_invested", "input_transactions"],
             },
-            "userId": {"type": "string", "minLength": 1},
         },
         "additionalProperties": False,
-        "required": ["itemIds", "container", "userId"],
+        "required": ["itemIds", "container"],
     }
 
 
@@ -88,7 +84,6 @@ def user_data() -> dict:
     return {
         "type": "object",
         "properties": {
-            "id": {"type": "string", "minLength": 1},
             "dark_mode": {"type": "boolean"},
             "clearbit_api_key": {"type": "string", "minLength": 1},
             "alpha_vantage_api_key": {"type": "string", "minLength": 1},
@@ -97,7 +92,6 @@ def user_data() -> dict:
         },
         "additionalProperties": False,
         "required": [
-            "id",
             "dark_mode",
             "clearbit_api_key",
             "alpha_vantage_api_key",

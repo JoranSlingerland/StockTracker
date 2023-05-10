@@ -2,12 +2,16 @@
 
 import json
 from copy import deepcopy
+from pathlib import Path
 from unittest.mock import patch
 
 import time_machine
 
 from get_table_data_basic import main
 from shared_code.utils import create_form_func_request
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 
 def add_meta_data(result, container):
@@ -45,10 +49,11 @@ mock_result = [
 class TestValidRequest:
     """Valid request class"""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_transactions(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input transactions"""
         mock_data_copy = deepcopy(mock_data)
@@ -60,6 +65,7 @@ class TestValidRequest:
         cosmosdb_container.return_value.query_items.return_value = []
         cosmosdb_container.return_value.read_all_items.return_value = mock_data_copy
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
         expected_result = add_meta_data(mock_data_copy, "")
         for item in expected_result:
             item["total_cost"] = 100
@@ -67,7 +73,7 @@ class TestValidRequest:
         expected_result = sorted(expected_result, key=lambda x: x["date"], reverse=True)
 
         req = create_form_func_request(
-            {"containerName": "input_transactions", "userId": "123"},
+            {"containerName": "input_transactions"},
             "http://localhost:7071/api/data/get_table_data_basic",
         )
 
@@ -78,16 +84,18 @@ class TestValidRequest:
         cosmosdb_container.return_value.read_all_items.assert_called_once()
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_stocks_held(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input single day"""
 
         cosmosdb_container.return_value.query_items.return_value = mock_data
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(
             mock_result,
@@ -95,7 +103,7 @@ class TestValidRequest:
         )
 
         req = create_form_func_request(
-            {"containerName": "stocks_held", "userId": "123"},
+            {"containerName": "stocks_held"},
             "http://localhost:7071/api/data/get_table_data_basic",
         )
 
@@ -117,20 +125,22 @@ class TestValidRequest:
         )
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_stocks_held_fully_realized(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input single day"""
 
         cosmosdb_container.return_value.query_items.return_value = mock_data
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(mock_result, "")
         req = create_form_func_request(
-            {"containerName": "stocks_held", "userId": "123", "fullyRealized": "true"},
+            {"containerName": "stocks_held", "fullyRealized": "true"},
             "http://localhost:7071/api/data/get_table_data_basic",
         )
 
@@ -152,23 +162,24 @@ class TestValidRequest:
         )
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_stocks_held_partial_realized(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input single day"""
 
         cosmosdb_container.return_value.query_items.return_value = mock_data
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(mock_result, "")
 
         req = create_form_func_request(
             {
                 "containerName": "stocks_held",
-                "userId": "123",
                 "partialRealized": "true",
             },
             "http://localhost:7071/api/data/get_table_data_basic",
@@ -192,16 +203,18 @@ class TestValidRequest:
         )
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_stocks_held_or(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input single day"""
 
         cosmosdb_container.return_value.query_items.return_value = mock_data
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(
             mock_result,
@@ -211,7 +224,6 @@ class TestValidRequest:
         req = create_form_func_request(
             {
                 "containerName": "stocks_held",
-                "userId": "123",
                 "partialRealized": "true",
                 "fullyRealized": "true",
                 "andOr": "or",
@@ -237,16 +249,18 @@ class TestValidRequest:
         )
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_valid_input_stocks_held_and(
-        self, add_meta_data_to_stock_data, cosmosdb_container
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
     ):
         """Test valid input single day"""
 
         cosmosdb_container.return_value.query_items.return_value = mock_data
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.side_effect = add_meta_data
+        get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(
             mock_result,
@@ -256,7 +270,6 @@ class TestValidRequest:
         req = create_form_func_request(
             {
                 "containerName": "stocks_held",
-                "userId": "123",
                 "partialRealized": "true",
                 "fullyRealized": "true",
                 "andOr": "and",
@@ -300,11 +313,14 @@ class TestInvalidRequest:
             == b'{"status": "Please pass a name on the query string or in the request body"}'
         )
 
-    def test_invalid_parameters(self):
+    @patch("shared_code.utils.get_user")
+    def test_invalid_parameters(self, get_user):
         """Test invalid parameters"""
 
+        get_user.return_value = mock_get_user_data
+
         req = create_form_func_request(
-            {"containerName": "invalid", "userId": "123"},
+            {"containerName": "invalid"},
             "http://localhost:7071/api/data/get_table_data_basic",
         )
 
@@ -319,14 +335,18 @@ class TestInvalidRequest:
 class TestEdgeCases:
     """Edge cases class"""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
-    def test_empty_cosmosdb(self, add_meta_data_to_stock_data, cosmosdb_container):
+    def test_empty_cosmosdb(
+        self, add_meta_data_to_stock_data, cosmosdb_container, get_user
+    ):
         """Test empty cosmosdb"""
 
         cosmosdb_container.return_value.query_items.return_value = []
         cosmosdb_container.return_value.read_all_items.return_value = []
         add_meta_data_to_stock_data.return_value = []
+        get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {"containerName": "input_invested", "userId": "123"},

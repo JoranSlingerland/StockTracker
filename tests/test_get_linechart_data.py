@@ -12,6 +12,9 @@ from shared_code.utils import create_form_func_request
 with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:
     mock_totals_data = json.load(f)
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 
 class TestInvalidRequest:
     """Invalid request class"""
@@ -114,8 +117,9 @@ class TestInvalidRequest:
 class TestEdgeCases:
     """Edge cases class"""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_empty_container_max(self, mock_cosmosdb_container):
+    def test_empty_container_max(self, mock_cosmosdb_container, mock_get_user):
         """Test empty container"""
         req = create_form_func_request(
             {
@@ -127,6 +131,7 @@ class TestEdgeCases:
         )
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         response = main(req)
         assert (
@@ -135,8 +140,9 @@ class TestEdgeCases:
         )
         assert response.status_code == 500
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_empty_container_year(self, mock_cosmosdb_container):
+    def test_empty_container_year(self, mock_cosmosdb_container, mock_get_user):
         """Test empty container"""
         req = create_form_func_request(
             {
@@ -149,6 +155,7 @@ class TestEdgeCases:
         )
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         response = main(req)
         assert (
@@ -162,8 +169,9 @@ class TestValidRequest:
     """Test valid request"""
 
     @time_machine.travel("2023-05-04")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_total_gains(self, mock_cosmosdb_container):
+    def test_total_gains(self, mock_cosmosdb_container, mock_get_user):
         """Test total gains"""
         req = create_form_func_request(
             {
@@ -175,6 +183,7 @@ class TestValidRequest:
         )
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         expected_body = {
             "labels": ["2023-05-03", "2023-05-04"],
@@ -186,8 +195,9 @@ class TestValidRequest:
         assert response.status_code == 200
 
     @time_machine.travel("2023-05-04")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_invested_and_value(self, mock_cosmosdb_container):
+    def test_invested_and_value(self, mock_cosmosdb_container, mock_get_user):
         """Test invested and value"""
         req = create_form_func_request(
             {
@@ -199,6 +209,7 @@ class TestValidRequest:
         )
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         expected_body = {
             "labels": ["2023-05-03", "2023-05-04"],

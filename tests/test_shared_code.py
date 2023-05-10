@@ -1,8 +1,11 @@
 """Test get_config.py"""
 
 import asyncio
+import base64
 import datetime
+import json
 import os
+from pathlib import Path
 from unittest import mock
 
 import azure.functions as func
@@ -18,6 +21,9 @@ from shared_code import (
     schemas,
     utils,
 )
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 
 @pytest.mark.asyncio()
@@ -349,6 +355,61 @@ class TestUtils:
         assert isinstance(request, func.HttpRequest)
         assert 'form-data; name="symbol"' in request.get_body().decode("utf-8")
         assert "ABC" in request.get_body().decode("utf-8")
+
+    def test_get_user(self):
+        """Test get user"""
+        x_ms_client_principal = base64.b64encode(
+            json.dumps(mock_get_user_data).encode("ascii")
+        )
+
+        req = func.HttpRequest(
+            method="GET",
+            url="/api/user",
+            body=None,
+            headers={
+                "x-ms-client-principal": x_ms_client_principal,
+            },
+        )
+
+        user = utils.get_user(req)
+
+        assert user == mock_get_user_data
+
+    def test_is_admin(self):
+        """Test is admin"""
+        x_ms_client_principal = base64.b64encode(
+            json.dumps(mock_get_user_data).encode("ascii")
+        )
+
+        req = func.HttpRequest(
+            method="GET",
+            url="/api/user",
+            body=None,
+            headers={
+                "x-ms-client-principal": x_ms_client_principal,
+            },
+        )
+
+        result = utils.is_admin(req)
+        assert result is False
+
+        mock_get_user_data["userRoles"].append("admin")
+
+        x_ms_client_principal = base64.b64encode(
+            json.dumps(mock_get_user_data).encode("ascii")
+        )
+
+        req = func.HttpRequest(
+            method="GET",
+            url="/api/user",
+            body=None,
+            headers={
+                "x-ms-client-principal": x_ms_client_principal,
+            },
+        )
+
+        result = utils.is_admin(req)
+        assert result is True
 
 
 class TestValidateJson:

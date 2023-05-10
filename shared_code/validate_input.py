@@ -34,7 +34,6 @@ def start_end_date_validation(start_date: str, end_date: str):
 
 
 def validate_combination(
-    userid: str,
     start_date: str,
     end_date: str,
     all_data: bool,
@@ -47,8 +46,7 @@ def validate_combination(
     error_message = ""
 
     if (
-        not userid
-        or datatype not in (allowed_data_types)
+        datatype not in (allowed_data_types)
         or (not all_data and (start_date is None or end_date is None))
         or (all_data and (start_date or end_date))
     ):

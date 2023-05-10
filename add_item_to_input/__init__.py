@@ -46,6 +46,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     if validate_error:
         return validate_error
 
+    userid = utils.get_user(req)["userId"]
     container = cosmosdb_module.cosmosdb_container(container_name)
     tasks = []
 
@@ -53,6 +54,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         date = parser.parse(item["date"])
         item["date"] = date.strftime("%Y-%m-%d")
         item["id"] = str(uuid.uuid4())
+        item["userid"] = userid
         tasks.append(
             cosmosdb_module.container_function_with_back_off(
                 partial(container.create_item, item)

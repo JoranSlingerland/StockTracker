@@ -1,5 +1,6 @@
 """Test add_item_to_input.py"""
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import azure.functions as func
@@ -7,6 +8,9 @@ import pytest
 from azure.cosmos import ContainerProxy
 
 from add_item_to_input import main
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 
 @pytest.mark.asyncio()
@@ -31,7 +35,6 @@ async def test_invalid_transaction():
             {
                 "date": "2023-03-16T21:25:06.206Z",
                 "transaction_type": "Deposit",
-                "userid": "123",
             }
         ],
     }
@@ -61,7 +64,6 @@ async def test_invalid_stock():
                 "transaction_cost": 0.5,
                 "currency": "USD",
                 "domain": "amd.com",
-                "userid": "123",
             }
         ],
     }
@@ -79,8 +81,9 @@ async def test_invalid_stock():
 
 
 @pytest.mark.asyncio()
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-async def test_main(cosmosdb_container_mock):
+async def test_main(cosmosdb_container_mock, get_user_mock):
     """Test add_item_to_input"""
     body = {
         "type": "stock",
@@ -94,7 +97,6 @@ async def test_main(cosmosdb_container_mock):
                 "transaction_cost": 0.5,
                 "currency": "USD",
                 "domain": "amd.com",
-                "userid": "123",
             }
         ],
     }
@@ -107,6 +109,7 @@ async def test_main(cosmosdb_container_mock):
 
     cosmosdb_container_mock.return_value = MagicMock(spec=ContainerProxy)
     cosmosdb_container_mock.return_value.create_item = AsyncMock()
+    get_user_mock.return_value = mock_get_user_data
 
     response = await main(req)
 

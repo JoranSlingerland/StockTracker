@@ -6,17 +6,20 @@ import logging
 import azure.durable_functions as df
 import azure.functions as func
 
+from shared_code import utils
+
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Terminate orchestration"""
     client = df.DurableOrchestrationClient(starter)
     instance_id = req.form.get("instanceId", None)
-    userid = req.form.get("userId", None)
 
-    if not instance_id or not userid:
+    if not instance_id:
         return func.HttpResponse(
-            json.dumps({"error": "Missing instanceId or userId"}), status_code=400
+            json.dumps({"error": "Missing instanceId"}), status_code=400
         )
+
+    userid = utils.get_user(req)["userId"]
     logging.info(f"Terminating orchestration with ID {instance_id}")
 
     status = await client.get_status(instance_id)

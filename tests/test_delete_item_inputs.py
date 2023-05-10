@@ -1,6 +1,7 @@
 """Test delete_item_inputs"""
 
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import azure.functions as func
@@ -11,8 +12,10 @@ from delete_input_items import main
 body = {
     "itemIds": ["123"],
     "container": "input_invested",
-    "userId": "123",
 }
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 
 def test_empty_request():
@@ -27,8 +30,9 @@ def test_empty_request():
     assert response.get_body() == b'{"result": "Invalid json body"}'
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_valid_request(cosmosdb_container_mock):
+def test_valid_request(cosmosdb_container_mock, get_user_mock):
     """Test valid request"""
     req = func.HttpRequest(
         method="POST",
@@ -40,6 +44,7 @@ def test_valid_request(cosmosdb_container_mock):
         {"id": "123", "userId": "123"}
     ]
     cosmosdb_container_mock.return_value.delete_item.return_value = None
+    get_user_mock.return_value = mock_get_user_data
 
     response = main(req)
     assert response.status_code == 200
@@ -58,8 +63,9 @@ def test_valid_request(cosmosdb_container_mock):
     )
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
+def test_cosmos_resource_not_found_error(cosmosdb_container_mock, get_user_mock):
     """Test CosmosResourceNotFoundError"""
     req = func.HttpRequest(
         method="POST",
@@ -73,6 +79,7 @@ def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
     cosmosdb_container_mock.return_value.delete_item.side_effect = (
         exceptions.CosmosResourceNotFoundError(404)
     )
+    get_user_mock.return_value = mock_get_user_data
 
     response = main(req)
     assert response.status_code == 400
@@ -82,8 +89,9 @@ def test_cosmos_resource_not_found_error(cosmosdb_container_mock):
     )
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_cosmos_http_response_error(cosmosdb_container_mock):
+def test_cosmos_http_response_error(cosmosdb_container_mock, get_user_mock):
     """Test CosmosHttpResponseError"""
     req = func.HttpRequest(
         method="POST",
@@ -97,6 +105,7 @@ def test_cosmos_http_response_error(cosmosdb_container_mock):
     cosmosdb_container_mock.return_value.delete_item.side_effect = (
         exceptions.CosmosHttpResponseError(500)
     )
+    get_user_mock.return_value = mock_get_user_data
 
     response = main(req)
     assert response.status_code == 400
@@ -106,8 +115,9 @@ def test_cosmos_http_response_error(cosmosdb_container_mock):
     )
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_no_cosmosdb_date(cosmosdb_container_mock):
+def test_no_cosmosdb_date(cosmosdb_container_mock, get_user_mock):
     """Test no cosmosdb date"""
     req = func.HttpRequest(
         method="POST",
@@ -116,6 +126,7 @@ def test_no_cosmosdb_date(cosmosdb_container_mock):
     )
 
     cosmosdb_container_mock.return_value.query_items.return_value = []
+    get_user_mock.return_value = mock_get_user_data
 
     response = main(req)
     assert response.status_code == 400
@@ -125,8 +136,9 @@ def test_no_cosmosdb_date(cosmosdb_container_mock):
     )
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_partial_error(cosmosdb_container_mock):
+def test_partial_error(cosmosdb_container_mock, get_user_mock):
     """Test partial error"""
 
     body.update({"itemIds": ["123", "456"]})
@@ -141,6 +153,7 @@ def test_partial_error(cosmosdb_container_mock):
         [{"id": "123", "userId": "123"}],
         [],
     ]
+    get_user_mock.return_value = mock_get_user_data
 
     response = main(req)
     assert response.status_code == 400

@@ -5,20 +5,14 @@ import logging
 
 import azure.functions as func
 
-from shared_code import cosmosdb_module
+from shared_code import cosmosdb_module, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Getting container data")
-    userid = req.form.get("userId", None)
 
-    if not userid:
-        return func.HttpResponse(
-            body='{"status": "Please pass a name on the query string or in the request body"}',
-            mimetype="application/json",
-            status_code=400,
-        )
+    userid = utils.get_user(req)["userId"]
 
     container = cosmosdb_module.cosmosdb_container("users")
     result = list(
@@ -46,6 +40,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         "_etag",
         "_attachments",
         "_ts",
+        "id",
     ]
     for key in keys_to_pop:
         result[0].pop(key)

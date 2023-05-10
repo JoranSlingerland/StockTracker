@@ -8,11 +8,12 @@ from azure.cosmos.partition_key import PartitionKey
 from create_cosmosdb_db_and_container import main
 
 
+@patch("shared_code.utils.is_admin")
 @patch("azure.cosmos.cosmos_client.CosmosClient")
 @patch("shared_code.get_config.get_containers")
 @patch("shared_code.get_config.get_cosmosdb")
 def test_create_db_and_table(
-    mock_get_cosmosdb, mock_get_containers, mock_cosmos_client
+    mock_get_cosmosdb, mock_get_containers, mock_cosmos_client, mock_is_admin
 ):
     """Test create_db_and_table"""
     mock_get_cosmosdb.return_value = {
@@ -38,6 +39,7 @@ def test_create_db_and_table(
         mock_database
     )
     mock_database.create_container_if_not_exists.return_value = None
+    mock_is_admin.return_value = True
 
     request = func.HttpRequest(method="GET", url="http://localhost", body=b"")
     response = main(request)
@@ -54,3 +56,17 @@ def test_create_db_and_table(
     mock_database.create_container_if_not_exists.assert_called_once_with(
         id="test_container", partition_key=PartitionKey(path="/test_partition_key")
     )
+
+
+@patch("shared_code.utils.is_admin")
+def test_unauthorized(mock_is_admin):
+    """Test unauthorized"""
+    request = func.HttpRequest(method="GET", url="http://localhost", body=b"")
+
+    mock_is_admin.return_value = False
+
+    response = main(request)
+
+    assert response.status_code == 401
+    assert response.mimetype == "application/json"
+    assert response.get_body() == b'{"result": "Not authorized"}'

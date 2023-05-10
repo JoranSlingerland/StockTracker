@@ -13,7 +13,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Getting container data")
     containername = req.form.get("containerName", None)
-    userid = req.form.get("userId", None)
 
     andor = req.form.get("andOr", None)
     fully_realized = req.form.get("fullyRealized", None)
@@ -24,7 +23,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if partial_realized is not None:
         partial_realized = partial_realized == "true"
 
-    if not containername or not userid:
+    if not containername:
         logging.error("No container name provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -32,13 +31,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
 
+    userid = utils.get_user(req)["userId"]
+
     result = get_items(containername, andor, fully_realized, partial_realized, userid)
 
     if isinstance(result, func.HttpResponse):
         return result
 
     if containername in ("input_invested", "input_transactions"):
-        # sort result by transaction_date
         result = sorted(result, key=lambda k: k["date"], reverse=True)
 
     if containername == "input_transactions" or containername == "stocks_held":
@@ -96,6 +96,10 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
             enable_cross_partition_query=True,
         )
     )
+
+    for key in ["userid", "_rid", "_self", "_etag", "_attachments", "_ts"]:
+        [item.pop(key, None) for item in result]
+
     if result:
         result = sorted(result, key=lambda k: k["date"], reverse=True)
         most_recent_date = result[0]["date"]

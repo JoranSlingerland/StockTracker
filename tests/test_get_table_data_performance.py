@@ -13,6 +13,9 @@ with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:
 with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
     mock_stocks_held_data = json.load(f)
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 
 def add_meta_data(result, container):
     """ "Add meta data to result"""
@@ -111,11 +114,13 @@ class TestInvalidRequest:
 class TestValidRequest:
     """Test valid request."""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_max_totals(self, mock_cosmosdb_container):
+    def test_max_totals(self, mock_cosmosdb_container, mock_get_user):
         """Text max totals."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -132,11 +137,13 @@ class TestValidRequest:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == [mock_totals_data[1]]
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_totals_with_dates(self, mock_cosmosdb_container):
+    def test_totals_with_dates(self, mock_cosmosdb_container, mock_get_user):
         """Test totals with dates."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -183,23 +190,18 @@ class TestValidRequest:
                 "forex_pl_percentage": 0.0055878001982160455,
                 "total_pl_percentage": 0.09159289890981134,
             },
-            "userid": "123",
             "id": "b2954b62-849e-4957-818c-196fa81ea55f",
-            "_rid": "+qI9AO2pFabSXAAAAAAAAA==",
-            "_self": "dbs/+qI9AA==/colls/+qI9AO2pFaY=/docs/+qI9AO2pFabSXAAAAAAAAA==/",
-            "_etag": '"00000000-0000-0000-7ec8-fba9b53501d9"',
-            "_attachments": "attachments/",
-            "_ts": 1683232966,
         }
 
         assert result.status_code == 200
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == [expected_result]
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_stock_data(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test stock data."""
 
@@ -207,6 +209,7 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -278,13 +281,7 @@ class TestValidRequest:
                     "transaction_cost_percentage": 0.0027397260273972603,
                     "total_pl_percentage": 0,
                 },
-                "userid": "123",
                 "id": "564faf16-d658-4542-940f-a25c59416726",
-                "_rid": "+qI9AO8k4CsHNgAAAAAAAA==",
-                "_self": "dbs/+qI9AA==/colls/+qI9AO8k4Cs=/docs/+qI9AO8k4CsHNgAAAAAAAA==/",
-                "_etag": '"00000000-0000-0000-7ec8-f4cc056001d9"',
-                "_attachments": "attachments/",
-                "_ts": 1683232954,
                 "meta": {"test": "test"},
             },
             {
@@ -344,13 +341,7 @@ class TestValidRequest:
                     "transaction_cost_percentage": 0.003449919710959454,
                     "total_pl_percentage": 0.06595178544174987,
                 },
-                "userid": "123",
                 "id": "b8913991-067d-42d6-871d-71f0b434f9ed",
-                "_rid": "+qI9AO8k4CsINgAAAAAAAA==",
-                "_self": "dbs/+qI9AA==/colls/+qI9AO8k4Cs=/docs/+qI9AO8k4CsINgAAAAAAAA==/",
-                "_etag": '"00000000-0000-0000-7ec8-f4ce55fd01d9"',
-                "_attachments": "attachments/",
-                "_ts": 1683232954,
                 "meta": {"test": "test"},
             },
         ]
@@ -363,11 +354,13 @@ class TestValidRequest:
 class TestEdgeCases:
     """Test edge cases."""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_max(self, mock_cosmosdb_container):
+    def test_no_data_max(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -384,11 +377,13 @@ class TestEdgeCases:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == []
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_dates(self, mock_cosmosdb_container):
+    def test_no_data_dates(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -406,11 +401,13 @@ class TestEdgeCases:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == []
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_stocks_held(self, mock_cosmosdb_container):
+    def test_no_data_stocks_held(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {

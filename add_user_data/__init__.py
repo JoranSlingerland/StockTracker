@@ -23,6 +23,9 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     if utils.validate_json(data, schemas.user_data()):
         return utils.validate_json(data, schemas.user_data())
 
+    userid = utils.get_user(req)["userId"]
+    data["id"] = userid
+
     container_name = "users"
     container = cosmosdb_module.cosmosdb_container(container_name)
     container.upsert_item(data)

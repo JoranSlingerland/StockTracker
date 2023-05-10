@@ -1,0 +1,7 @@
+{
+  "userId": "123",
+  "userRoles": ["anonymous", "authenticated"],
+  "claims": [],
+  "identityProvider": "",
+  "userDetails": "test"
+}

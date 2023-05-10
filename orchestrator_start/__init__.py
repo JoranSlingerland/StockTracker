@@ -5,22 +5,17 @@ import logging
 import azure.durable_functions as df
 import azure.functions as func
 
+from shared_code import utils
+
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Http Trigger"""
     client = df.DurableOrchestrationClient(starter)
 
-    userid = req.form.get("userId", None)
-    functionname = req.form.get("functionName", None)
+    function_name = req.form.get("functionName", None)
     days_to_update = req.form.get("daysToUpdate", None)
 
-    # check if userid is a string
-    if not isinstance(userid, str):
-        return func.HttpResponse(
-            '{"status": "Please pass a valid user id in the request body"}',
-            status_code=400,
-        )
-    if functionname != "stocktracker_orchestrator":
+    if function_name != "stocktracker_orchestrator":
         return func.HttpResponse(
             '{"status": "Please pass a valid function name in the route parameters"}',
             status_code=400,
@@ -31,7 +26,9 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
             status_code=400,
         )
 
-    instance_id = await client.start_new(functionname, None, [days_to_update, userid])
+    userid = utils.get_user(req)["userId"]
+
+    instance_id = await client.start_new(function_name, None, [days_to_update, userid])
 
     logging.info("Started orchestration with ID = '%s'.", instance_id)
 

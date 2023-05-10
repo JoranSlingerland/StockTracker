@@ -6,12 +6,19 @@ import azure.functions as func
 from azure.cosmos import cosmos_client
 from azure.cosmos.partition_key import PartitionKey
 
-from shared_code import get_config
+from shared_code import get_config, utils
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Creating sql tables")
+
+    if not utils.is_admin(req):
+        return func.HttpResponse(
+            body='{"result": "Not authorized"}',
+            mimetype="application/json",
+            status_code=401,
+        )
 
     # get config
     containers = (get_config.get_containers())["containers"]

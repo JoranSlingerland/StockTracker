@@ -7,14 +7,13 @@ from datetime import date
 import azure.functions as func
 import pandas as pd
 
-from shared_code import cosmosdb_module, validate_input
+from shared_code import cosmosdb_module, utils, validate_input
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    userid = req.form.get("userId", None)
     start_date = req.form.get("startDate", None)
     end_date = req.form.get("endDate", None)
     all_data = req.form.get("allData", None)
@@ -30,7 +29,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
     if not error:
         error, error_message = validate_input.validate_combination(
-            userid,
             start_date,
             end_date,
             all_data,
@@ -44,6 +42,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     logging.info(f"Getting data for {datatype}")
+
+    userid = utils.get_user(req)["userId"]
 
     container = cosmosdb_module.cosmosdb_container("totals")
     if all_data:

@@ -12,6 +12,9 @@ from shared_code.utils import create_form_func_request
 with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
     mock_stocks_held_data = json.load(f)
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 
 def add_meta_data(result, container):
     """ "Add meta data to result"""
@@ -27,10 +30,11 @@ class TestValidRequest:
     """Valid request class"""
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_datatype_stocks(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test datatype of stocks"""
 
@@ -38,10 +42,10 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
-                "userId": "123",
                 "dataType": "stocks",
             },
             "http://localhost:7071/api/data/get_pie_data",
@@ -58,10 +62,11 @@ class TestValidRequest:
         assert body["data"] == expected_body["data"]
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_datatype_currency(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test datatype of currency"""
 
@@ -69,10 +74,10 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
-                "userId": "123",
                 "dataType": "currency",
             },
             "http://localhost:7071/api/data/get_pie_data",
@@ -90,10 +95,11 @@ class TestValidRequest:
         assert body["data"] == expected_body["data"]
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_datatype_country(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test datatype of country"""
 
@@ -101,6 +107,7 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -122,10 +129,11 @@ class TestValidRequest:
         assert body["data"] == expected_body["data"]
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_datatype_sector(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test datatype of sector"""
 
@@ -133,6 +141,7 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -172,10 +181,11 @@ class TestInvalidRequest:
         )
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_invalid_datatype(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test invalid datatype"""
 
@@ -183,10 +193,10 @@ class TestInvalidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
-                "userId": "123",
                 "dataType": "invalid",
             },
             "http://localhost:7071/api/data/get_pie_data",
@@ -204,19 +214,20 @@ class TestEdgeCases:
     """Test edge cases"""
 
     @time_machine.travel("2023-04-02")
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_no_data_in_cosmosdb(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test no data in cosmosdb"""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
-                "userId": "123",
                 "dataType": "sector",
             },
             "http://localhost:7071/api/data/get_pie_data",

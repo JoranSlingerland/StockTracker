@@ -15,7 +15,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    userid = req.form.get("userId", None)
     start_date = req.form.get("startDate", None)
     end_date = req.form.get("endDate", None)
     all_data = req.form.get("allData", None)
@@ -31,7 +30,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
     if not error:
         error, error_message = validate_input.validate_combination(
-            userid,
             start_date,
             end_date,
             all_data,
@@ -44,6 +42,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+
+    userid = utils.get_user(req)["userId"]
+
     logging.info(f"Getting data for {datatype}")
 
     items, start_date, end_date = get_data(

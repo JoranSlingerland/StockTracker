@@ -91,13 +91,12 @@ All Azure functions available in the api.
 
 Body
 
-| Param     | value      | Type    | Allowed values               | Required |
-| --------- | ---------- | ------- | ---------------------------- | -------- |
-| userId    | {{userId}} | text    | `string`                     | true     |
-| allData   |            | boolean | `boolean`                    | false    |
-| startDate |            | text    | yyyy-mm-dd                   | false    |
-| endDate   |            | text    | yyyy-mm-dd                   | false    |
-| dataType  |            | text    | dividend \| transaction_cost | true     |
+| Param     | value | Type    | Allowed values               | Required |
+| --------- | ----- | ------- | ---------------------------- | -------- |
+| allData   |       | boolean | `boolean`                    | false    |
+| startDate |       | text    | yyyy-mm-dd                   | false    |
+| endDate   |       | text    | yyyy-mm-dd                   | false    |
+| dataType  |       | text    | dividend \| transaction_cost | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
@@ -109,13 +108,12 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param           | value      | Type | Allowed values                          | Required |
-| --------------- | ---------- | ---- | --------------------------------------- | -------- |
-| userId          | {{userId}} | text | `string`                                | true     |
-| containerName   |            | text | totals \| stocks_held \| input_invested | true     |
-| andOr           |            | text | and \| or                               | false    |
-| fullyRealized   |            | text | true \| false                           | false    |
-| partialRealized |            | text | true \| false                           | false    |
+| Param           | value | Type | Allowed values                          | Required |
+| --------------- | ----- | ---- | --------------------------------------- | -------- |
+| containerName   |       | text | totals \| stocks_held \| input_invested | true     |
+| andOr           |       | text | and \| or                               | false    |
+| fullyRealized   |       | text | true \| false                           | false    |
+| partialRealized |       | text | true \| false                           | false    |
 
 ### get_linechart_data
 
@@ -125,13 +123,12 @@ Body
 
 Body
 
-| Param     | value      | Type    | Allowed values                    | Required |
-| --------- | ---------- | ------- | --------------------------------- | -------- |
-| userId    | {{userId}} | text    | `string`                          | true     |
-| allData   |            | boolean | `boolean`                         | false    |
-| startDate |            | text    | yyyy-mm-dd                        | false    |
-| endDate   |            | text    | yyyy-mm-dd                        | false    |
-| dataType  |            | text    | invested_and_value \| total_gains | true     |
+| Param     | value | Type    | Allowed values                    | Required |
+| --------- | ----- | ------- | --------------------------------- | -------- |
+| allData   |       | boolean | `boolean`                         | false    |
+| startDate |       | text    | yyyy-mm-dd                        | false    |
+| endDate   |       | text    | yyyy-mm-dd                        | false    |
+| dataType  |       | text    | invested_and_value \| total_gains | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
@@ -143,10 +140,9 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param    | value      | Type | Allowed values                          | Required |
-| -------- | ---------- | ---- | --------------------------------------- | -------- |
-| userId   | {{userId}} | text | `string`                                | true     |
-| dataType |            | text | stocks \| currency \| country \| sector | true     |
+| Param    | value | Type | Allowed values                          | Required |
+| -------- | ----- | ---- | --------------------------------------- | -------- |
+| dataType |       | text | stocks \| currency \| country \| sector | true     |
 
 ### get_table_data_performance
 
@@ -156,13 +152,12 @@ Body
 
 Body
 
-| Param         | value      | Type    | Allowed values        | Required |
-| ------------- | ---------- | ------- | --------------------- | -------- |
-| userId        | {{userId}} | text    | `string`              | true     |
-| allData       |            | boolean | `boolean`             | false    |
-| startDate     |            | text    | yyyy-mm-dd            | false    |
-| endDate       |            | text    | yyyy-mm-dd            | false    |
-| containerName |            | text    | stocks_held \| totals | true     |
+| Param         | value | Type    | Allowed values        | Required |
+| ------------- | ----- | ------- | --------------------- | -------- |
+| allData       |       | boolean | `boolean`             | false    |
+| startDate     |       | text    | yyyy-mm-dd            | false    |
+| endDate       |       | text    | yyyy-mm-dd            | false    |
+| containerName |       | text    | stocks_held \| totals | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
@@ -174,11 +169,10 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param        | value      | Type | Allowed values            | Required |
-| ------------ | ---------- | ---- | ------------------------- | -------- |
-| userId       | {{userId}} | text | `string`                  | true     |
-| functionName |            | text | stocktracker_orchestrator | true     |
-| daysToUpdate |            | text | all \| `int`              | true     |
+| Param        | value | Type | Allowed values            | Required |
+| ------------ | ----- | ---- | ------------------------- | -------- |
+| functionName |       | text | stocktracker_orchestrator | true     |
+| daysToUpdate |       | text | all \| `int`              | true     |
 
 ### orchestrator_list
 
@@ -188,10 +182,9 @@ Body
 
 Body
 
-| Param  | value      | Type | Allowed values | Required |
-| ------ | ---------- | ---- | -------------- | -------- |
-| userId | {{userId}} | text | `string`       | true     |
-| days   |            | text | `int`          | true     |
+| Param | value | Type | Allowed values | Required |
+| ----- | ----- | ---- | -------------- | -------- |
+| days  |       | text | `int`          | true     |
 
 ### orchestrator_purge
 
@@ -201,10 +194,9 @@ Body
 
 Body
 
-| Param      | value      | Type | Allowed values | Required |
-| ---------- | ---------- | ---- | -------------- | -------- |
-| userId     | {{userId}} | text | `string`       | true     |
-| instanceId |            | text | `string`       | true     |
+| Param      | value | Type | Allowed values | Required |
+| ---------- | ----- | ---- | -------------- | -------- |
+| instanceId |       | text | `string`       | true     |
 
 ### orchestrator_terminate
 
@@ -214,10 +206,9 @@ Body
 
 Body
 
-| Param      | value      | Type | Allowed values | Required |
-| ---------- | ---------- | ---- | -------------- | -------- |
-| userId     | {{userId}} | text | `string`       | true     |
-| instanceId |            | text | `string`       | true     |
+| Param      | value | Type | Allowed values | Required |
+| ---------- | ----- | ---- | -------------- | -------- |
+| instanceId |       | text | `string`       | true     |
 
 ### create_cosmosdb_and_container
 
@@ -271,13 +262,7 @@ Body needs to confirm to the schema found in the [schema](.\shared_code\schemas.
 
 | Method | URL                             | content-type | Usage                       |
 | ------ | ------------------------------- | ------------ | --------------------------- |
-| POST   | {{base_url}}/data/get_user_data | form-data    | Function will get user data |
-
-Body
-
-| Param  | value       | Type | Allowed values | Required |
-| ------ | ----------- | ---- | -------------- | -------- |
-| userId | output_only | text | `string`       | true     |
+| POST   | {{base_url}}/data/get_user_data | None         | Function will get user data |
 
 ### Main stocktracker function
 
