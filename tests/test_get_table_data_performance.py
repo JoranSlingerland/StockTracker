@@ -13,6 +13,9 @@ with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:
 with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
     mock_stocks_held_data = json.load(f)
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 
 def add_meta_data(result, container):
     """ "Add meta data to result"""
@@ -111,11 +114,13 @@ class TestInvalidRequest:
 class TestValidRequest:
     """Test valid request."""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_max_totals(self, mock_cosmosdb_container):
+    def test_max_totals(self, mock_cosmosdb_container, mock_get_user):
         """Text max totals."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -132,11 +137,13 @@ class TestValidRequest:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == [mock_totals_data[1]]
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_totals_with_dates(self, mock_cosmosdb_container):
+    def test_totals_with_dates(self, mock_cosmosdb_container, mock_get_user):
         """Test totals with dates."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -196,10 +203,11 @@ class TestValidRequest:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == [expected_result]
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     @patch("shared_code.utils.add_meta_data_to_stock_data")
     def test_stock_data(
-        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container
+        self, mock_add_meta_data_to_stock_data, mock_cosmosdb_container, mock_get_user
     ):
         """Test stock data."""
 
@@ -207,6 +215,7 @@ class TestValidRequest:
             mock_stocks_held_data
         )
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -363,11 +372,13 @@ class TestValidRequest:
 class TestEdgeCases:
     """Test edge cases."""
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_max(self, mock_cosmosdb_container):
+    def test_no_data_max(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -384,11 +395,13 @@ class TestEdgeCases:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == []
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_dates(self, mock_cosmosdb_container):
+    def test_no_data_dates(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {
@@ -406,11 +419,13 @@ class TestEdgeCases:
         result_body = json.loads(result.get_body().decode("utf-8"))
         assert result_body == []
 
+    @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
-    def test_no_data_stocks_held(self, mock_cosmosdb_container):
+    def test_no_data_stocks_held(self, mock_cosmosdb_container, mock_get_user):
         """Test no data."""
 
         mock_cosmosdb_container.return_value.query_items.return_value = []
+        mock_get_user.return_value = mock_get_user_data
 
         req = create_form_func_request(
             {

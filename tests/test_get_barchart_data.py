@@ -16,6 +16,9 @@ with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
 with open(Path(__file__).parent / "data" / "input_transactions_data.json", "r") as f:
     mock_input_transactions_data = json.load(f)
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 dividend_req = create_form_func_request(
     {
         "dataType": "dividend",
@@ -31,14 +34,6 @@ transaction_cost_req = create_form_func_request(
     },
     "http://localhost/api/data/get_barchart_data",
 )
-
-mock_get_user_data = {
-    "userId": "123",
-    "userRoles": ["anonymous", "authenticated"],
-    "claims": [],
-    "identityProvider": "",
-    "userDetails": "test",
-}
 
 
 class TestInvalidRequest:

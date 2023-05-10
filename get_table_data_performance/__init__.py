@@ -13,7 +13,6 @@ from shared_code import cosmosdb_module, utils, validate_input
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Getting container data")
-    userid = req.form.get("userId", None)
     start_date = req.form.get("startDate", None)
     end_date = req.form.get("endDate", None)
     all_data = req.form.get("allData", None)
@@ -30,7 +29,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
     if not error:
         error, error_message = validate_input.validate_combination(
-            userid,
             start_date,
             end_date,
             all_data,
@@ -43,6 +41,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+
+    userid = utils.get_user(req)["userId"]
 
     # get data for max
     if all_data:

@@ -124,13 +124,12 @@ Body
 
 Body
 
-| Param     | value      | Type    | Allowed values                    | Required |
-| --------- | ---------- | ------- | --------------------------------- | -------- |
-| userId    | {{userId}} | text    | `string`                          | true     |
-| allData   |            | boolean | `boolean`                         | false    |
-| startDate |            | text    | yyyy-mm-dd                        | false    |
-| endDate   |            | text    | yyyy-mm-dd                        | false    |
-| dataType  |            | text    | invested_and_value \| total_gains | true     |
+| Param     | value | Type    | Allowed values                    | Required |
+| --------- | ----- | ------- | --------------------------------- | -------- |
+| allData   |       | boolean | `boolean`                         | false    |
+| startDate |       | text    | yyyy-mm-dd                        | false    |
+| endDate   |       | text    | yyyy-mm-dd                        | false    |
+| dataType  |       | text    | invested_and_value \| total_gains | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
@@ -155,13 +154,12 @@ Body
 
 Body
 
-| Param         | value      | Type    | Allowed values        | Required |
-| ------------- | ---------- | ------- | --------------------- | -------- |
-| userId        | {{userId}} | text    | `string`              | true     |
-| allData       |            | boolean | `boolean`             | false    |
-| startDate     |            | text    | yyyy-mm-dd            | false    |
-| endDate       |            | text    | yyyy-mm-dd            | false    |
-| containerName |            | text    | stocks_held \| totals | true     |
+| Param         | value | Type    | Allowed values        | Required |
+| ------------- | ----- | ------- | --------------------- | -------- |
+| allData       |       | boolean | `boolean`             | false    |
+| startDate     |       | text    | yyyy-mm-dd            | false    |
+| endDate       |       | text    | yyyy-mm-dd            | false    |
+| containerName |       | text    | stocks_held \| totals | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
