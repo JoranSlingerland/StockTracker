@@ -96,6 +96,10 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
             enable_cross_partition_query=True,
         )
     )
+
+    for key in ["userid", "_rid", "_self", "_etag", "_attachments", "_ts"]:
+        [item.pop(key, None) for item in result]
+
     if result:
         result = sorted(result, key=lambda k: k["date"], reverse=True)
         most_recent_date = result[0]["date"]

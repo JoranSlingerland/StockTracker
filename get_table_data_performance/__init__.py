@@ -79,6 +79,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not isinstance(result, list):
         result = [result]
 
+    for key in ["userid", "_rid", "_self", "_etag", "_attachments", "_ts"]:
+        [item.pop(key, None) for item in result]
+
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
     )

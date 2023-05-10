@@ -190,13 +190,7 @@ class TestValidRequest:
                 "forex_pl_percentage": 0.0055878001982160455,
                 "total_pl_percentage": 0.09159289890981134,
             },
-            "userid": "123",
             "id": "b2954b62-849e-4957-818c-196fa81ea55f",
-            "_rid": "+qI9AO2pFabSXAAAAAAAAA==",
-            "_self": "dbs/+qI9AA==/colls/+qI9AO2pFaY=/docs/+qI9AO2pFabSXAAAAAAAAA==/",
-            "_etag": '"00000000-0000-0000-7ec8-fba9b53501d9"',
-            "_attachments": "attachments/",
-            "_ts": 1683232966,
         }
 
         assert result.status_code == 200
@@ -287,13 +281,7 @@ class TestValidRequest:
                     "transaction_cost_percentage": 0.0027397260273972603,
                     "total_pl_percentage": 0,
                 },
-                "userid": "123",
                 "id": "564faf16-d658-4542-940f-a25c59416726",
-                "_rid": "+qI9AO8k4CsHNgAAAAAAAA==",
-                "_self": "dbs/+qI9AA==/colls/+qI9AO8k4Cs=/docs/+qI9AO8k4CsHNgAAAAAAAA==/",
-                "_etag": '"00000000-0000-0000-7ec8-f4cc056001d9"',
-                "_attachments": "attachments/",
-                "_ts": 1683232954,
                 "meta": {"test": "test"},
             },
             {
@@ -353,13 +341,7 @@ class TestValidRequest:
                     "transaction_cost_percentage": 0.003449919710959454,
                     "total_pl_percentage": 0.06595178544174987,
                 },
-                "userid": "123",
                 "id": "b8913991-067d-42d6-871d-71f0b434f9ed",
-                "_rid": "+qI9AO8k4CsINgAAAAAAAA==",
-                "_self": "dbs/+qI9AA==/colls/+qI9AO8k4Cs=/docs/+qI9AO8k4CsINgAAAAAAAA==/",
-                "_etag": '"00000000-0000-0000-7ec8-f4ce55fd01d9"',
-                "_attachments": "attachments/",
-                "_ts": 1683232954,
                 "meta": {"test": "test"},
             },
         ]
