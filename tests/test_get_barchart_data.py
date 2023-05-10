@@ -16,6 +16,24 @@ with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
 with open(Path(__file__).parent / "data" / "input_transactions_data.json", "r") as f:
     mock_input_transactions_data = json.load(f)
 
+dividend_req = create_form_func_request(
+    {
+        "userId": "123",
+        "dataType": "dividend",
+        "allData": "true",
+    },
+    "http://localhost/api/data/get_barchart_data",
+)
+
+transaction_cost_req = create_form_func_request(
+    {
+        "userId": "123",
+        "dataType": "transaction_cost",
+        "allData": "true",
+    },
+    "http://localhost/api/data/get_barchart_data",
+)
+
 
 class TestInvalidRequest:
     """Invalid request class"""
@@ -148,16 +166,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_dividends_quarter_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "dividend",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
-
         temp_copy = deepcopy(mock_stocks_held_data)
         temp_copy[0]["date"] = "2023-04-03"
 
@@ -175,7 +183,7 @@ class TestValidRequest:
             {"date": "Q2 2024", "value": 0.0, "category": "AMD"},
         ]
 
-        response = main(req)
+        response = main(dividend_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
 
@@ -183,15 +191,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_input_transactions_quarter_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "transaction_cost",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
 
         temp_copy = deepcopy(mock_input_transactions_data)
         temp_copy[0]["date"] = "2021-12-02"
@@ -212,7 +211,7 @@ class TestValidRequest:
             {"date": "Q4 2022", "value": 0.0, "category": "MSFT"},
         ]
 
-        response = main(req)
+        response = main(transaction_cost_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
 
@@ -220,15 +219,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_input_transactions_month_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "transaction_cost",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
 
         temp_copy = deepcopy(mock_input_transactions_data)
         temp_copy[0]["date"] = "2021-12-02"
@@ -243,7 +233,7 @@ class TestValidRequest:
             {"date": "2022 January", "value": 0.0, "category": "MSFT"},
         ]
 
-        response = main(req)
+        response = main(transaction_cost_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
 
@@ -251,15 +241,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_dividends_month_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "dividend",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
 
         temp_copy = deepcopy(mock_stocks_held_data)
         temp_copy[0]["date"] = "2023-04-03"
@@ -272,7 +253,7 @@ class TestValidRequest:
             {"date": "2023 May", "value": 0, "category": "AMD"},
         ]
 
-        response = main(req)
+        response = main(dividend_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
 
@@ -280,15 +261,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_dividends_week_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "dividend",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
 
         mock_cosmosdb_container.return_value.query_items.return_value = (
             mock_stocks_held_data
@@ -298,7 +270,7 @@ class TestValidRequest:
             {"date": "2023 19", "value": 0, "category": "AMD"},
         ]
 
-        response = main(req)
+        response = main(dividend_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
 
@@ -306,15 +278,6 @@ class TestValidRequest:
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
     def test_input_transactions_week_interval(self, mock_cosmosdb_container):
         """Test get_barchart_data with valid input"""
-
-        req = create_form_func_request(
-            {
-                "userId": "123",
-                "dataType": "transaction_cost",
-                "allData": "true",
-            },
-            "http://localhost/api/data/get_barchart_data",
-        )
 
         temp_copy = deepcopy(mock_input_transactions_data)
         temp_copy[0]["date"] = "2021-12-02"
@@ -327,6 +290,6 @@ class TestValidRequest:
             {"date": "2021 49", "value": 0.5, "category": "MSFT"},
         ]
 
-        response = main(req)
+        response = main(transaction_cost_req)
         assert response.status_code == 200
         assert response.get_body() == json.dumps(expected_result).encode("utf-8")
