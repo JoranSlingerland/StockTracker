@@ -1,5 +1,6 @@
 """Test add_item_to_input.py"""
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import azure.functions as func
@@ -7,6 +8,9 @@ import pytest
 from azure.cosmos import ContainerProxy
 
 from add_user_data import main
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 
 @pytest.mark.asyncio()
@@ -39,11 +43,11 @@ async def test_invalid_schema():
 
 
 @pytest.mark.asyncio()
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-async def test_main(cosmosdb_container_mock):
+async def test_main(cosmosdb_container_mock, get_user_mock):
     """Test add_item_to_input"""
     body = {
-        "id": "1",
         "dark_mode": True,
         "clearbit_api_key": "123",
         "alpha_vantage_api_key": "123",
@@ -59,6 +63,7 @@ async def test_main(cosmosdb_container_mock):
 
     cosmosdb_container_mock.return_value = MagicMock(spec=ContainerProxy)
     cosmosdb_container_mock.return_value.create_item = AsyncMock()
+    get_user_mock.return_value = mock_get_user_data
 
     response = await main(req)
 

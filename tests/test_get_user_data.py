@@ -1,10 +1,14 @@
 """Test get_user_data.py"""
 
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 from get_user_data import main
 from shared_code.utils import create_form_func_request
+
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
 
 mock_container_response = [
     {
@@ -21,29 +25,17 @@ mock_container_response = [
 ]
 
 
-def test_invalid_input():
-    """Test invalid input"""
-    req = create_form_func_request({}, "http://localhost:7071/api/data/get_user_data")
-
-    result = main(req)
-    assert result.status_code == 400
-    assert (
-        result.get_body()
-        == b'{"status": "Please pass a name on the query string or in the request body"}'
-    )
-
-
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_valid_request(cosmosdb_container):
+def test_valid_request(cosmosdb_container, get_user):
     """Test valid request"""
     req = create_form_func_request(
-        {
-            "userId": "1",
-        },
+        {},
         "http://localhost:7071/api/data/get_user_data",
     )
 
     cosmosdb_container.return_value.query_items.return_value = mock_container_response
+    get_user.return_value = mock_get_user_data
 
     result = main(req)
     body = json.loads(result.get_body().decode("utf-8"))
@@ -51,17 +43,17 @@ def test_valid_request(cosmosdb_container):
     assert body == mock_container_response[0]
 
 
+@patch("shared_code.utils.get_user")
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
-def test_no_data_in_cosmosdb(cosmosdb_container):
+def test_no_data_in_cosmosdb(cosmosdb_container, get_user):
     """Test no data in cosmosdb"""
     req = create_form_func_request(
-        {
-            "userId": "1",
-        },
+        {},
         "http://localhost:7071/api/data/get_user_data",
     )
 
     cosmosdb_container.return_value.query_items.return_value = []
+    get_user.return_value = mock_get_user_data
 
     result = main(req)
     assert result.status_code == 400
