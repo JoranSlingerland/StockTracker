@@ -1,6 +1,7 @@
 """Test Orchestrator List."""
 
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import azure.durable_functions as df
@@ -11,6 +12,9 @@ from shared_code.utils import create_form_func_request
 
 starter = MagicMock()
 
+with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
+    mock_get_user_data = json.load(f)
+
 
 @pytest.mark.asyncio()
 @patch("azure.durable_functions.DurableOrchestrationClient")
@@ -19,21 +23,23 @@ async def test_empty_request(df):
     req = create_form_func_request({}, "http://localhost:7071/api/orchestrator/list")
     response = await main(req, starter)
     assert response.status_code == 400
-    assert response.get_body() == b'{"error": "Missing days or userId"}'
+    assert response.get_body() == b'{"error": "Missing days"}'
 
 
 @pytest.mark.asyncio()
+@patch("shared_code.utils.get_user")
 @patch(
     "azure.durable_functions.DurableOrchestrationClient",
     spec=df.DurableOrchestrationClient,
 )
-async def test_no_data(mock_df):
+async def test_no_data(mock_df, get_user):
     """Test Orchestrator List."""
     req = create_form_func_request(
         {"days": "7", "userId": "123"}, "http://localhost:7071/api/orchestrator/list"
     )
     mock_df.get_status_by = AsyncMock()
     mock_df().get_status_by.return_value = []
+    get_user.return_value = mock_get_user_data
 
     response = await main(req, starter)
     assert response.status_code == 200
@@ -42,11 +48,12 @@ async def test_no_data(mock_df):
 
 # Define a test case for the Azure Function
 @pytest.mark.asyncio()
+@patch("shared_code.utils.get_user")
 @patch(
     "azure.durable_functions.DurableOrchestrationClient",
     spec=df.DurableOrchestrationClient,
 )
-async def test_main(mock_client):
+async def test_main(mock_client, get_user):
     """Test Orchestrator List."""
     request = create_form_func_request(
         {"days": "1", "userId": "123"}, "http://localhost:7071/api/orchestrator/list"
@@ -89,6 +96,7 @@ async def test_main(mock_client):
     }
 
     mock_client.return_value.get_status_by.return_value = [json_1, json_2]
+    get_user.return_value = mock_get_user_data
 
     expected_body = [
         {

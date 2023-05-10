@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import azure.durable_functions as df
 import azure.functions as func
 
-from shared_code import aio_helper
+from shared_code import aio_helper, utils
 
 
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
@@ -18,13 +18,12 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
 
     output = []
     days = req.form.get("days", None)
-    userid = req.form.get("userId", None)
     end_date = datetime.today()
 
-    if not days or not userid:
-        return func.HttpResponse(
-            json.dumps({"error": "Missing days or userId"}), status_code=400
-        )
+    if not days:
+        return func.HttpResponse(json.dumps({"error": "Missing days"}), status_code=400)
+
+    userid = utils.get_user(req)["userId"]
 
     tasks = []
     for i in range(int(days)):

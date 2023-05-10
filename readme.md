@@ -171,11 +171,10 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param        | value      | Type | Allowed values            | Required |
-| ------------ | ---------- | ---- | ------------------------- | -------- |
-| userId       | {{userId}} | text | `string`                  | true     |
-| functionName |            | text | stocktracker_orchestrator | true     |
-| daysToUpdate |            | text | all \| `int`              | true     |
+| Param        | value | Type | Allowed values            | Required |
+| ------------ | ----- | ---- | ------------------------- | -------- |
+| functionName |       | text | stocktracker_orchestrator | true     |
+| daysToUpdate |       | text | all \| `int`              | true     |
 
 ### orchestrator_list
 
@@ -185,10 +184,9 @@ Body
 
 Body
 
-| Param  | value      | Type | Allowed values | Required |
-| ------ | ---------- | ---- | -------------- | -------- |
-| userId | {{userId}} | text | `string`       | true     |
-| days   |            | text | `int`          | true     |
+| Param | value | Type | Allowed values | Required |
+| ----- | ----- | ---- | -------------- | -------- |
+| days  |       | text | `int`          | true     |
 
 ### orchestrator_purge
 
@@ -198,10 +196,9 @@ Body
 
 Body
 
-| Param      | value      | Type | Allowed values | Required |
-| ---------- | ---------- | ---- | -------------- | -------- |
-| userId     | {{userId}} | text | `string`       | true     |
-| instanceId |            | text | `string`       | true     |
+| Param      | value | Type | Allowed values | Required |
+| ---------- | ----- | ---- | -------------- | -------- |
+| instanceId |       | text | `string`       | true     |
 
 ### orchestrator_terminate
 
@@ -211,10 +208,9 @@ Body
 
 Body
 
-| Param      | value      | Type | Allowed values | Required |
-| ---------- | ---------- | ---- | -------------- | -------- |
-| userId     | {{userId}} | text | `string`       | true     |
-| instanceId |            | text | `string`       | true     |
+| Param      | value | Type | Allowed values | Required |
+| ---------- | ----- | ---- | -------------- | -------- |
+| instanceId |       | text | `string`       | true     |
 
 ### create_cosmosdb_and_container
 
