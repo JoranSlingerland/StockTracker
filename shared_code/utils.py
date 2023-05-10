@@ -1,4 +1,7 @@
 """General utility functions"""
+import base64
+import json
+
 import azure.functions as func
 from azure.cosmos.container import ContainerProxy
 from jsonschema import validate
@@ -55,3 +58,16 @@ def validate_json(instance, schema) -> None | func.HttpResponse:
             mimetype="application/json",
             status_code=400,
         )
+
+
+def get_user(
+    req: func.HttpRequest,
+) -> dict[str, str | list[str]]:
+    """Get user from request"""
+
+    headers = req.headers.get("x-ms-client-principal", None)
+    if headers:
+        headers = base64.b64decode(headers).decode("ascii")
+        headers = json.loads(headers)
+
+    return headers
