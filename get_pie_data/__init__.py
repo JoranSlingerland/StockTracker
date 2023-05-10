@@ -16,9 +16,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Getting table data")
 
     datatype = req.form.get("dataType", None)
-    userid = req.form.get("userId", None)
 
-    if not datatype or not userid:
+    if not datatype:
         logging.error("No datatype provided")
         return func.HttpResponse(
             body='{"status": "Please pass a name on the query string or in the request body"}',
@@ -26,6 +25,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
     datatype = datatype.lower()
+    userid = utils.get_user(req)["userId"]
 
     start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
     end_date = date.today().strftime("%Y-%m-%d")
@@ -54,7 +54,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     result_list = []
     for result in results:
-        temp_object = inputoptions(datatype, result)
+        temp_object = input_options(datatype, result)
         result_list.append(temp_object)
 
     result = remove_duplicates(datatype, result_list)
@@ -74,7 +74,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def inputoptions(datatype, row):
+def input_options(datatype, row):
     """Home made match function"""
     if datatype == "stocks":
         return {
@@ -113,10 +113,10 @@ def remove_duplicates(datatype, input_list):
 
         # loop through currencies and add to temp_list
         for currency in currencies:
-            filterd_input_list = [d for d in input_list if d["type"] == currency]
+            filtered_input_list = [d for d in input_list if d["type"] == currency]
             temp_object = {
                 "type": currency,
-                "value": sum(d["value"] for d in filterd_input_list),
+                "value": sum(d["value"] for d in filtered_input_list),
             }
             output_list.append(temp_object)
         return output_list
@@ -128,10 +128,10 @@ def remove_duplicates(datatype, input_list):
 
         # loop through countries and add to temp_list
         for country in countries:
-            filterd_input_list = [d for d in input_list if d["type"] == country]
+            filtered_input_list = [d for d in input_list if d["type"] == country]
             temp_object = {
                 "type": country,
-                "value": sum(d["value"] for d in filterd_input_list),
+                "value": sum(d["value"] for d in filtered_input_list),
             }
             output_list.append(temp_object)
         return output_list
@@ -143,10 +143,10 @@ def remove_duplicates(datatype, input_list):
 
         # loop through sectors and add to temp_list
         for sector in sectors:
-            filterd_input_list = [d for d in input_list if d["type"] == sector]
+            filtered_input_list = [d for d in input_list if d["type"] == sector]
             temp_object = {
                 "type": sector,
-                "value": sum(d["value"] for d in filterd_input_list),
+                "value": sum(d["value"] for d in filtered_input_list),
             }
             output_list.append(temp_object)
         return output_list

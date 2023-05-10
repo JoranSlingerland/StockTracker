@@ -108,13 +108,12 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param           | value      | Type | Allowed values                          | Required |
-| --------------- | ---------- | ---- | --------------------------------------- | -------- |
-| userId          | {{userId}} | text | `string`                                | true     |
-| containerName   |            | text | totals \| stocks_held \| input_invested | true     |
-| andOr           |            | text | and \| or                               | false    |
-| fullyRealized   |            | text | true \| false                           | false    |
-| partialRealized |            | text | true \| false                           | false    |
+| Param           | value | Type | Allowed values                          | Required |
+| --------------- | ----- | ---- | --------------------------------------- | -------- |
+| containerName   |       | text | totals \| stocks_held \| input_invested | true     |
+| andOr           |       | text | and \| or                               | false    |
+| fullyRealized   |       | text | true \| false                           | false    |
+| partialRealized |       | text | true \| false                           | false    |
 
 ### get_linechart_data
 
@@ -141,10 +140,9 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param    | value      | Type | Allowed values                          | Required |
-| -------- | ---------- | ---- | --------------------------------------- | -------- |
-| userId   | {{userId}} | text | `string`                                | true     |
-| dataType |            | text | stocks \| currency \| country \| sector | true     |
+| Param    | value | Type | Allowed values                          | Required |
+| -------- | ----- | ---- | --------------------------------------- | -------- |
+| dataType |       | text | stocks \| currency \| country \| sector | true     |
 
 ### get_table_data_performance
 
@@ -264,13 +262,7 @@ Body needs to confirm to the schema found in the [schema](.\shared_code\schemas.
 
 | Method | URL                             | content-type | Usage                       |
 | ------ | ------------------------------- | ------------ | --------------------------- |
-| POST   | {{base_url}}/data/get_user_data | form-data    | Function will get user data |
-
-Body
-
-| Param  | value       | Type | Allowed values | Required |
-| ------ | ----------- | ---- | -------------- | -------- |
-| userId | output_only | text | `string`       | true     |
+| POST   | {{base_url}}/data/get_user_data | None         | Function will get user data |
 
 ### Main stocktracker function
 

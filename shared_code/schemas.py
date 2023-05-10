@@ -73,10 +73,9 @@ def delete_item() -> dict:
                 "minLength": 1,
                 "enum": ["input_invested", "input_transactions"],
             },
-            "userId": {"type": "string", "minLength": 1},
         },
         "additionalProperties": False,
-        "required": ["itemIds", "container", "userId"],
+        "required": ["itemIds", "container"],
     }
 
 
