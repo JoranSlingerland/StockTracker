@@ -16,7 +16,7 @@ with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
 
 
-def add_meta_data(result, container):
+def add_meta_data(result, container, userid):
     """ "Add meta data to result"""
     for item in result:
         item["meta"] = {

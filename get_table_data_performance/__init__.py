@@ -72,8 +72,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     if container_name == "stocks_held":
-        container = cosmosdb_module.cosmosdb_container("meta_data")
-        result = utils.add_meta_data_to_stock_data(result, container)
+        result = utils.add_meta_data_to_stock_data(result, "meta_data", userid)
 
     # check if result is a list
     if not isinstance(result, list):

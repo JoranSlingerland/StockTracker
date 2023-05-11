@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 from unittest import mock
+from unittest.mock import patch
 
 import azure.functions as func
 import pandas as pd
@@ -319,7 +320,8 @@ class TestUtils:
         weighted_average = utils.get_weighted_average(data, weight)
         assert weighted_average == 3.0
 
-    def test_add_meta_data_to_stock_data(self):
+    @patch("shared_code.cosmosdb_module.cosmosdb_container")
+    def test_add_meta_data_to_stock_data(self, container):
         """Test add meta data to stock data"""
         stock_data = [{"symbol": "ABC"}, {"symbol": "XYZ"}]
         meta_data = [
@@ -327,17 +329,16 @@ class TestUtils:
             {"symbol": "XYZ", "name": "XYZ Inc."},
         ]
 
-        container = mock.Mock()
-        container.read_all_items.return_value = meta_data
-        result = utils.add_meta_data_to_stock_data(stock_data, container)
+        container.return_value.query_items.return_value = meta_data
+        result = utils.add_meta_data_to_stock_data(stock_data, "meta_data", "123")
         assert result == [
             {"symbol": "ABC", "meta": {"symbol": "ABC", "name": "ABC Inc."}},
             {"symbol": "XYZ", "meta": {"symbol": "XYZ", "name": "XYZ Inc."}},
         ]
 
         # Test when no meta data is found
-        container.read_all_items.return_value = []
-        result = utils.add_meta_data_to_stock_data(stock_data, container)
+        container.return_value.query_items.return_value = []
+        result = utils.add_meta_data_to_stock_data(stock_data, "meta_data", "123")
         assert result == [
             {"symbol": "ABC", "meta": {}},
             {"symbol": "XYZ", "meta": {}},

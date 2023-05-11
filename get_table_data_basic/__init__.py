@@ -42,8 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result = sorted(result, key=lambda k: k["date"], reverse=True)
 
     if containername == "input_transactions" or containername == "stocks_held":
-        container = cosmosdb_module.cosmosdb_container("meta_data")
-        result = utils.add_meta_data_to_stock_data(result, container)
+        result = utils.add_meta_data_to_stock_data(result, "meta_data", userid)
 
     if containername == "input_transactions":
         for item in result:
