@@ -1,11 +1,11 @@
-"""Test the get_items function."""
+"""Test the get_cosmosdb_items function."""
 
 from unittest.mock import MagicMock, call, patch
 
 import time_machine
 from azure.cosmos import ContainerProxy
 
-from get_items import main
+from get_cosmosdb_items import main
 
 mock_items_1 = [
     {
