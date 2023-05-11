@@ -20,7 +20,9 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     today = date.today().strftime("%Y-%m-%d")
 
-    data = yield context.call_activity("get_items", ["all", userid, ["meta_data"]])
+    data = yield context.call_activity(
+        "get_cosmosdb_items", ["all", userid, ["meta_data"]]
+    )
 
     unique_symbols = utils.get_unique_items(data["meta_data"], "symbol")
     symbols_to_update = []
