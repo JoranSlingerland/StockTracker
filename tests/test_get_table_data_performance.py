@@ -373,9 +373,8 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"
 
     @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
@@ -397,9 +396,8 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"
 
     @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
@@ -421,6 +419,5 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"

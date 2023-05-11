@@ -55,9 +55,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
         if not start_data and not end_data:
             return func.HttpResponse(
-                body="[]",
+                body="{status: 'No data'}",
                 mimetype="application/json",
-                status_code=200,
+                status_code=500,
             )
         if container_name == "stocks_held":
             result = create_result_stocks_held(start_data, end_data)
@@ -66,9 +66,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if not result:
         return func.HttpResponse(
-            body="[]",
+            body="{status: 'No data'}",
             mimetype="application/json",
-            status_code=200,
+            status_code=500,
         )
 
     if container_name == "stocks_held":
