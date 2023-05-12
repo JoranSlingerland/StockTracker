@@ -1,11 +1,11 @@
-"""Test the delete_cosmosdb_items function."""
+"""Test the get_cosmosdb_items function."""
 
 from unittest.mock import MagicMock, call, patch
 
 import time_machine
 from azure.cosmos import ContainerProxy
 
-from items_to_delete import main
+from get_cosmosdb_items import main
 
 mock_items_1 = [
     {
@@ -32,7 +32,7 @@ def test_all(cosmosdb_container_mock):
         mock_items_2,
     ]
 
-    result = main(["all", "123"])
+    result = main(["all", "123", ["stocks_held", "totals"]])
 
     assert result == {
         "stocks_held": mock_items_1,
@@ -74,7 +74,7 @@ def test_days(cosmosdb_container_mock):
         mock_items_2,
     ]
 
-    result = main([1, "123"])
+    result = main([1, "123", ["stocks_held", "totals"]])
 
     assert result == {
         "stocks_held": mock_items_1,

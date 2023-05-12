@@ -55,9 +55,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
         if not start_data and not end_data:
             return func.HttpResponse(
-                body="[]",
+                body="{status: 'No data'}",
                 mimetype="application/json",
-                status_code=200,
+                status_code=500,
             )
         if container_name == "stocks_held":
             result = create_result_stocks_held(start_data, end_data)
@@ -66,14 +66,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if not result:
         return func.HttpResponse(
-            body="[]",
+            body="{status: 'No data'}",
             mimetype="application/json",
-            status_code=200,
+            status_code=500,
         )
 
     if container_name == "stocks_held":
-        container = cosmosdb_module.cosmosdb_container("meta_data")
-        result = utils.add_meta_data_to_stock_data(result, container)
+        result = utils.add_meta_data_to_stock_data(result, "meta_data", userid)
 
     # check if result is a list
     if not isinstance(result, list):

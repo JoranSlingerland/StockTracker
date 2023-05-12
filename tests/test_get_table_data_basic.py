@@ -14,7 +14,7 @@ with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
 
 
-def add_meta_data(result, container):
+def add_meta_data(result, container_name, userid):
     """ "Add meta data to result"""
     for item in result:
         item["meta"] = {
@@ -66,7 +66,7 @@ class TestValidRequest:
         cosmosdb_container.return_value.read_all_items.return_value = mock_data_copy
         add_meta_data_to_stock_data.side_effect = add_meta_data
         get_user.return_value = mock_get_user_data
-        expected_result = add_meta_data(mock_data_copy, "")
+        expected_result = add_meta_data(mock_data_copy, "", "")
         for item in expected_result:
             item["total_cost"] = 100
 
@@ -99,6 +99,7 @@ class TestValidRequest:
 
         excepted_result = add_meta_data(
             mock_result,
+            "",
             "",
         )
 
@@ -138,7 +139,7 @@ class TestValidRequest:
         add_meta_data_to_stock_data.side_effect = add_meta_data
         get_user.return_value = mock_get_user_data
 
-        excepted_result = add_meta_data(mock_result, "")
+        excepted_result = add_meta_data(mock_result, "", "")
         req = create_form_func_request(
             {"containerName": "stocks_held", "fullyRealized": "true"},
             "http://localhost:7071/api/data/get_table_data_basic",
@@ -175,7 +176,7 @@ class TestValidRequest:
         add_meta_data_to_stock_data.side_effect = add_meta_data
         get_user.return_value = mock_get_user_data
 
-        excepted_result = add_meta_data(mock_result, "")
+        excepted_result = add_meta_data(mock_result, "", "")
 
         req = create_form_func_request(
             {
@@ -218,6 +219,7 @@ class TestValidRequest:
 
         excepted_result = add_meta_data(
             mock_result,
+            "",
             "",
         )
 
@@ -264,6 +266,7 @@ class TestValidRequest:
 
         excepted_result = add_meta_data(
             mock_result,
+            "",
             "",
         )
 

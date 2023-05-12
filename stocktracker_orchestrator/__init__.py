@@ -38,31 +38,25 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     provisioning_tasks.append(provision_task)
     api_data = (yield context.task_all(provisioning_tasks))[0]
 
-    # step 3 remove items
-    logging.info("Step 3: Delete cosmosdb items")
+    # step 3 - output meta data to cosmosdb
+    logging.info("Step 2.1: Getting api data")
     provisioning_tasks = []
     id_ = 1
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
-        "delete_cosmosdb_items_orchestrator", [days_to_update, userid], child_id
+        "output_meta_data_orchestrator", [userid, input_data], child_id
     )
     provisioning_tasks.append(provision_task)
     result = (yield context.task_all(provisioning_tasks))[0]
 
-    # step 4 - output meta data to cosmosdb
-    logging.info("Step 4: Output meta data to cosmosdb")
-    result = yield context.call_activity(
-        "output_to_cosmosdb", ["meta_data", api_data["stock_meta_data"]]
-    )
-
-    # Step 5 - Rebuild the transactions object
-    logging.info("Step 5: Get transactions by day")
+    # Step 4 - Rebuild the transactions object
+    logging.info("Step 4: Get transactions by day")
     day_by_day = yield context.call_activity(
         "get_transactions_by_day", [input_data, api_data["forex_data"]]
     )
 
-    # step 6 - add stock_data to stock_held
-    logging.info("Step 6: Add data to stocks held")
+    # step 5 - add stock_data to stock_held
+    logging.info("Step 5: Add data to stocks held")
     (
         day_by_day["stock_held"],
         api_data,
@@ -79,8 +73,8 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         ],
     )
 
-    # step 7 - Calculate totals
-    logging.info("Step 7: Calculate totals")
+    # step 6 - Calculate totals
+    logging.info("Step 6: Calculate totals")
     (
         day_by_day["invested"],
         input_data,
@@ -90,18 +84,18 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         [data, day_by_day["invested"], input_data, userid],
     )
 
-    # step 8 - output to cosmosdb
-    logging.info("Step 8: Output to cosmosdb")
+    # step 7 - output to cosmosdb
+    logging.info("Step 7: Output to cosmosdb")
     provisioning_tasks = []
     id_ = 2
     child_id = f"{context.instance_id}:{id_}"
     provision_task = context.call_sub_orchestrator(
-        "output_to_cosmosdb_orchestrator", data, child_id
+        "output_to_cosmosdb_orchestrator", [data, days_to_update, userid], child_id
     )
     provisioning_tasks.append(provision_task)
     result = (yield context.task_all(provisioning_tasks))[0]
 
-    logging.info("Step 9: Returning result")
+    logging.info("Step 8: Returning result")
     return result
 
 

@@ -51,6 +51,7 @@ async def test_main(cosmosdb_container_mock, get_user_mock):
         "dark_mode": True,
         "clearbit_api_key": "123",
         "alpha_vantage_api_key": "123",
+        "brandfetch_api_key": "123",
         "currency": "USD",
         "isLoading": False,
     }

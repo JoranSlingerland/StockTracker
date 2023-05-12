@@ -17,7 +17,7 @@ with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
 
 
-def add_meta_data(result, container):
+def add_meta_data(result, container, userid):
     """ "Add meta data to result"""
     for item in result:
         item["meta"] = {
@@ -373,9 +373,8 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"
 
     @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
@@ -397,9 +396,8 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"
 
     @patch("shared_code.utils.get_user")
     @patch("shared_code.cosmosdb_module.cosmosdb_container")
@@ -421,6 +419,5 @@ class TestEdgeCases:
 
         result = main(req)
 
-        assert result.status_code == 200
-        result_body = json.loads(result.get_body().decode("utf-8"))
-        assert result_body == []
+        assert result.status_code == 500
+        assert result.get_body() == b"{status: 'No data'}"

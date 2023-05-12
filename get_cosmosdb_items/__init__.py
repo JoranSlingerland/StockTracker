@@ -3,7 +3,7 @@
 import logging
 from datetime import date, timedelta
 
-from shared_code import cosmosdb_module, get_config
+from shared_code import cosmosdb_module
 
 
 def main(payload: list[str | int, str]) -> str:
@@ -17,8 +17,7 @@ def main(payload: list[str | int, str]) -> str:
     # get config
     days_to_update: str | int = payload[0]
     userid: str = payload[1]
-
-    containers = (get_config.get_containers())["containers"]
+    containers: list[str] = payload[2]
 
     if days_to_update == "all":
         query = "SELECT * FROM c WHERE c.userid = @userid"
@@ -38,17 +37,14 @@ def main(payload: list[str | int, str]) -> str:
     data = {}
 
     for container in containers:
-        if container["output_container"] and container["container_name"] != "meta_data":
-            container_client = cosmosdb_module.cosmosdb_container(
-                container["container_name"]
+        container_client = cosmosdb_module.cosmosdb_container(container)
+        items = list(
+            container_client.query_items(
+                query=query,
+                parameters=parameters,
+                enable_cross_partition_query=True,
             )
-            items = list(
-                container_client.query_items(
-                    query=query,
-                    parameters=parameters,
-                    enable_cross_partition_query=True,
-                )
-            )
-            data[container["container_name"]] = items
+        )
+        data[container] = items
 
     return data
