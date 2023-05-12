@@ -27,13 +27,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         cosmosdb_config["endpoint"], cosmosdb_config["key"]
     )
 
-    # create database
+    # create database and containers
     database = client.create_database_if_not_exists(
         id=cosmosdb_config["database"],
         offer_throughput=cosmosdb_config["offer_throughput"],
     )
-
-    # create container
     for container in containers:
         database.create_container_if_not_exists(
             id=container["container_name"],

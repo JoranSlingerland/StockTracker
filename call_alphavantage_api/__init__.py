@@ -9,35 +9,30 @@ import requests
 def main(payload: str) -> str:
     """Get data from API"""
 
-    url = payload[0]
-    api_key = payload[1]
+    url, api_key = payload
     url = f"{url}&apikey={api_key}"
 
-    errorcounter = 0
+    error_counter = 0
     while True:
         logging.info(f"Calling API: {url}")
         data = requests.get(url, timeout=10)
 
         if data.status_code != 200:
+            error_counter += 1
+            if error_counter > 3:
+                raise Exception(f"Error: {data.status_code}")
             logging.error(f"Error: {data.status_code}")
             logging.info("Retrying in 30 seconds")
-            errorcounter += 1
             time.sleep(30)
-            if errorcounter > 3:
-                logging.error("Too many errors, exiting. Error: {data.status_code}")
-                raise Exception(f"Error: {data.status_code}")
             logging.info("Retrying")
             continue
 
-        key = "Note"
-        keys = data.json()
-        if key in keys:
+        if "Note" in data.json():
+            error_counter += 1
+            if error_counter > 18:
+                raise Exception("Too many api calls, Exiting.")
             logging.warning("To many api calls, Waiting for 10 seconds")
             time.sleep(10)
-            errorcounter += 1
-            if errorcounter > 18:
-                logging.critical("Too many api calls, Exiting.")
-                raise Exception("Too many api calls, Exiting.")
             logging.info("Retrying")
             continue
 
