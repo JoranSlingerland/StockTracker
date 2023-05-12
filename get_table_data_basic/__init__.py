@@ -17,11 +17,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     andor = req.form.get("andOr", None)
     fully_realized = req.form.get("fullyRealized", None)
     partial_realized = req.form.get("partialRealized", None)
+    symbol = req.form.get("symbol", None)
 
     if fully_realized is not None:
         fully_realized = fully_realized == "true"
     if partial_realized is not None:
         partial_realized = partial_realized == "true"
+    if symbol is not None:
+        symbol = symbol.upper()
 
     if not containername:
         logging.error("No container name provided")
@@ -33,7 +36,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     userid = utils.get_user(req)["userId"]
 
-    result = get_items(containername, andor, fully_realized, partial_realized, userid)
+    result = get_items(
+        containername, andor, fully_realized, partial_realized, userid, symbol
+    )
 
     if isinstance(result, func.HttpResponse):
         return result
@@ -60,7 +65,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def get_items(containername, andor, fully_realized, partial_realized, userid):
+def get_items(containername, andor, fully_realized, partial_realized, userid, symbol):
     """Get items from container"""
     logging.info(f"Getting data for container {containername}")
     if containername not in ("input_invested", "input_transactions", "stocks_held"):
@@ -77,9 +82,21 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
         "input_transactions",
         "input_invested",
     ]:
-        result = list(container.read_all_items())
+        query = "select * from c where c.userid = @userid"
+        if symbol is not None and containername == "input_transactions":
+            query = f"{query} and c.symbol = @symbol"
+        result = list(
+            container.query_items(
+                query=query,
+                parameters=[
+                    {"name": "@userid", "value": userid},
+                    {"name": "@symbol", "value": symbol},
+                ],
+                enable_cross_partition_query=True,
+            )
+        )
         return result
-    query = construct_query(andor, fully_realized, partial_realized)
+    query = construct_query(andor, fully_realized, partial_realized, symbol)
     start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
     end_date = date.today().strftime("%Y-%m-%d")
     result = list(
@@ -91,6 +108,7 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
                 {"name": "@partial_realized", "value": partial_realized},
                 {"name": "@start_date", "value": start_date},
                 {"name": "@end_date", "value": end_date},
+                {"name": "@symbol", "value": symbol},
             ],
             enable_cross_partition_query=True,
         )
@@ -107,18 +125,34 @@ def get_items(containername, andor, fully_realized, partial_realized, userid):
     return result
 
 
-def construct_query(andor, fully_realized, partial_realized):
+def construct_query(andor, fully_realized, partial_realized, symbol):
     """Construct query"""
     query = None
-    if fully_realized is not None:
-        query = "select * from c where c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
-    if partial_realized is not None:
-        query = "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
-    if fully_realized is not None and partial_realized is not None:
-        if andor == "or":
-            query = "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date"
-        if andor == "and":
-            query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
-    if query is None:
-        query = "select * from c where c.userid = @userid and c.date > @start_date and c.date < @end_date"
+
+    query_map = {
+        (
+            True,
+            None,
+        ): "select * from c where c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
+        (
+            None,
+            True,
+        ): "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
+        (True, True): {
+            "or": "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date",
+            "and": "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
+        },
+        (
+            None,
+            None,
+        ): "select * from c where c.userid = @userid and c.date > @start_date and c.date < @end_date",
+    }
+
+    query = query_map.get((fully_realized, partial_realized))
+
+    if isinstance(query, dict):
+        query = query.get(andor)
+    if symbol is not None:
+        query = f"{query} and c.symbol = @symbol"
+
     return query

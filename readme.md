@@ -114,6 +114,7 @@ Body
 | andOr           |       | text | and \| or                               | false    |
 | fullyRealized   |       | text | true \| false                           | false    |
 | partialRealized |       | text | true \| false                           | false    |
+| symbol          |       | text | `string`                                | false    |
 
 ### get_linechart_data
 
