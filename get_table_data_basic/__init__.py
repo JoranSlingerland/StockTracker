@@ -95,32 +95,31 @@ def get_items(containername, andor, fully_realized, partial_realized, userid, sy
                 enable_cross_partition_query=True,
             )
         )
-        return result
-    query = construct_query(andor, fully_realized, partial_realized, symbol)
-    start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
-    end_date = date.today().strftime("%Y-%m-%d")
-    result = list(
-        container.query_items(
-            query=query,
-            parameters=[
-                {"name": "@userid", "value": userid},
-                {"name": "@fully_realized", "value": fully_realized},
-                {"name": "@partial_realized", "value": partial_realized},
-                {"name": "@start_date", "value": start_date},
-                {"name": "@end_date", "value": end_date},
-                {"name": "@symbol", "value": symbol},
-            ],
-            enable_cross_partition_query=True,
+    else:
+        query = construct_query(andor, fully_realized, partial_realized, symbol)
+        start_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+        end_date = date.today().strftime("%Y-%m-%d")
+        result = list(
+            container.query_items(
+                query=query,
+                parameters=[
+                    {"name": "@userid", "value": userid},
+                    {"name": "@fully_realized", "value": fully_realized},
+                    {"name": "@partial_realized", "value": partial_realized},
+                    {"name": "@start_date", "value": start_date},
+                    {"name": "@end_date", "value": end_date},
+                    {"name": "@symbol", "value": symbol},
+                ],
+                enable_cross_partition_query=True,
+            )
         )
-    )
+        if result:
+            result = sorted(result, key=lambda k: k["date"], reverse=True)
+            most_recent_date = result[0]["date"]
+            result = [item for item in result if item["date"] == most_recent_date]
 
     for key in ["userid", "_rid", "_self", "_etag", "_attachments", "_ts"]:
         [item.pop(key, None) for item in result]
-
-    if result:
-        result = sorted(result, key=lambda k: k["date"], reverse=True)
-        most_recent_date = result[0]["date"]
-        result = [item for item in result if item["date"] == most_recent_date]
 
     return result
 
@@ -129,29 +128,17 @@ def construct_query(andor, fully_realized, partial_realized, symbol):
     """Construct query"""
     query = None
 
-    query_map = {
-        (
-            True,
-            None,
-        ): "select * from c where c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
-        (
-            None,
-            True,
-        ): "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
-        (True, True): {
-            "or": "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date",
-            "and": "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date",
-        },
-        (
-            None,
-            None,
-        ): "select * from c where c.userid = @userid and c.date > @start_date and c.date < @end_date",
-    }
-
-    query = query_map.get((fully_realized, partial_realized))
-
-    if isinstance(query, dict):
-        query = query.get(andor)
+    if fully_realized is not None:
+        query = "select * from c where c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+    if partial_realized is not None:
+        query = "select * from c where c.partial_realized = @partial_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+    if fully_realized is not None and partial_realized is not None:
+        if andor == "or":
+            query = "select * from c where (c.partial_realized = @partial_realized or c.fully_realized = @fully_realized) and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+        if andor == "and":
+            query = "select * from c where c.partial_realized = @partial_realized and c.fully_realized = @fully_realized and c.userid = @userid and c.date > @start_date and c.date < @end_date"
+    if query is None:
+        query = "select * from c where c.userid = @userid and c.date > @start_date and c.date < @end_date"
     if symbol is not None:
         query = f"{query} and c.symbol = @symbol"
 
