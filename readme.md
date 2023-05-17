@@ -108,12 +108,13 @@ If allData is true then startDate and endDate can not be set. If allData is fals
 
 Body
 
-| Param           | value | Type | Allowed values                          | Required |
-| --------------- | ----- | ---- | --------------------------------------- | -------- |
-| containerName   |       | text | totals \| stocks_held \| input_invested | true     |
-| andOr           |       | text | and \| or                               | false    |
-| fullyRealized   |       | text | true \| false                           | false    |
-| partialRealized |       | text | true \| false                           | false    |
+| Param           | value | Type | Allowed values                                       | Required |
+| --------------- | ----- | ---- | ---------------------------------------------------- | -------- |
+| containerName   |       | text | input_invested \| input_transactions \| stocks_held" | true     |
+| andOr           |       | text | and \| or                                            | false    |
+| fullyRealized   |       | text | true \| false                                        | false    |
+| partialRealized |       | text | true \| false                                        | false    |
+| symbol          |       | text | `string`                                             | false    |
 
 ### get_linechart_data
 
