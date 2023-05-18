@@ -35,7 +35,7 @@ def create_totals_object(
 
     totals = {
         "date": single_date,
-        "total_invested": invested[0]["invested"],
+        "total_invested": invested[0]["invested"] if invested else 1,
         "realized": {
             "dividends": sum(d["realized"]["total_dividends"] for d in stocks),
             "transaction_cost": sum(d["realized"]["transaction_cost"] for d in stocks),
