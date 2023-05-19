@@ -56,6 +56,7 @@
       "transaction_cost_percentage": 0.0027397260273972603,
       "total_pl_percentage": 0.4488972602739727
     },
+    "weight": 0,
     "userid": "123",
     "id": "b0a79b71-2045-408d-bd2f-190d22afbb00",
     "_rid": "+qI9AO8k4CsFNgAAAAAAAA==",
@@ -121,6 +122,7 @@
       "transaction_cost_percentage": 0.003449919710959454,
       "total_pl_percentage": 0.012062503010839231
     },
+    "weight": 1,
     "userid": "123",
     "id": "1584b4dc-72a3-4420-8393-635045454e0c",
     "_rid": "+qI9AO8k4CsGNgAAAAAAAA==",
@@ -186,6 +188,7 @@
       "transaction_cost_percentage": 0.0027397260273972603,
       "total_pl_percentage": 0.4488972602739727
     },
+    "weight": 0,
     "userid": "123",
     "id": "564faf16-d658-4542-940f-a25c59416726",
     "_rid": "+qI9AO8k4CsHNgAAAAAAAA==",
@@ -251,6 +254,7 @@
       "transaction_cost_percentage": 0.003449919710959454,
       "total_pl_percentage": 0.07003196494881574
     },
+    "weight": 1,
     "userid": "123",
     "id": "b8913991-067d-42d6-871d-71f0b434f9ed",
     "_rid": "+qI9AO8k4CsINgAAAAAAAA==",
