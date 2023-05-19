@@ -73,7 +73,6 @@ For the azure environment you can either use the [One time deployment](#one-time
 
 ## Usage
 
-- Go to /authenticated/settings admin page and create the containers.
 - Go to /authenticated/settings Account page and add your api keys.
 - Add data in /authenticated/actions
 - Refresh the data by going to /authenticated/settings and clicking the refresh data button.
@@ -210,24 +209,6 @@ Body
 | Param      | value | Type | Allowed values | Required |
 | ---------- | ----- | ---- | -------------- | -------- |
 | instanceId |       | text | `string`       | true     |
-
-### create_cosmosdb_and_container
-
-| Method | URL                                                   | content-type | Usage                                         |
-| ------ | ----------------------------------------------------- | ------------ | --------------------------------------------- |
-| GET    | {{base_url}}/privileged/create_cosmosdb_and_container | form-data    | Function will create a cosmosdb and container |
-
-### delete_cosmosdb_container
-
-| Method | URL                                               | content-type | Usage                                     |
-| ------ | ------------------------------------------------- | ------------ | ----------------------------------------- |
-| POST   | {{base_url}}/privileged/delete_cosmosdb_container | form-data    | Function will delete a cosmosdb container |
-
-Body
-
-| Param              | value       | Type | Allowed values     | Required |
-| ------------------ | ----------- | ---- | ------------------ | -------- |
-| containersToDelete | output_only | text | all \| output_only | true     |
 
 ### delete_input_items
 

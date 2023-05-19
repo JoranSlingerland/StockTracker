@@ -132,7 +132,6 @@ class TestGetConfig:
             "COSMOSDB_ENDPOINT": "test_endpoint",
             "COSMOSDB_KEY": "test_key",
             "COSMOSDB_DATABASE": "test_database",
-            "COSMOSDB_OFFER_THROUGHPUT": "test_offer_throughput",
         },
     )
     def test_get_cosmosdb(self):
@@ -141,15 +140,6 @@ class TestGetConfig:
         assert cosmosdb["endpoint"] == "test_endpoint"
         assert cosmosdb["key"] == "test_key"
         assert cosmosdb["database"] == "test_database"
-        assert cosmosdb["offer_throughput"] == "test_offer_throughput"
-
-    def test_get_containers(self):
-        """Test get containers"""
-        containers = get_config.get_containers()
-        assert isinstance(containers, dict)
-        assert "containers" in containers
-        assert isinstance(containers["containers"], list)
-        assert len(containers["containers"]) > 0
 
 
 class TestDateTimeHelper:
