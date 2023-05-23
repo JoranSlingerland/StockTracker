@@ -1,4 +1,4 @@
-requests==2.30.0
+requests==2.31.0
 pandas==2.0.1
 python-dotenv==1.0.0
 azure-functions==1.14.0
