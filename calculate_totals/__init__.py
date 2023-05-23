@@ -23,6 +23,8 @@ def main(payload: str) -> str:
             stocks_single_date, invested_single_date, userid, single_date
         )
 
+        add_stock_weight(stocks_single_date, totals)
+
         output.append(totals)
 
     return None, None, {"stocks_held": stocks_held, "totals": output}
@@ -35,7 +37,7 @@ def create_totals_object(
 
     totals = {
         "date": single_date,
-        "total_invested": invested[0]["invested"],
+        "total_invested": invested[0]["invested"] if invested else 1,
         "realized": {
             "dividends": sum(d["realized"]["total_dividends"] for d in stocks),
             "transaction_cost": sum(d["realized"]["transaction_cost"] for d in stocks),
@@ -104,3 +106,17 @@ def create_totals_object(
     )
 
     return totals
+
+
+def add_stock_weight(stocks_single_date: dict, totals: dict):
+    """Add stock weight"""
+
+    for stock in stocks_single_date:
+        stock.update(
+            {
+                "weight": stock["unrealized"]["total_value"]
+                / totals["unrealized"]["total_value"]
+                if totals["unrealized"]["total_value"] != 0
+                else 0
+            }
+        )

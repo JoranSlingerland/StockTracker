@@ -48,12 +48,13 @@ async def test_invalid_schema():
 async def test_main(cosmosdb_container_mock, get_user_mock):
     """Test add_item_to_input"""
     body = {
-        "dark_mode": True,
+        "dark_mode": "system",
         "clearbit_api_key": "123",
         "alpha_vantage_api_key": "123",
         "brandfetch_api_key": "123",
         "currency": "USD",
         "isLoading": False,
+        "isError": False,
     }
 
     req = func.HttpRequest(
