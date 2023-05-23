@@ -20,6 +20,7 @@ def stock_input() -> dict:
                 "transaction_cost": {"type": "number"},
                 "currency": {"type": "string", "pattern": "[a-zA-Z]"},
                 "domain": {"type": "string"},
+                "id": {"type": "string", "minLength": 1},
             },
             "required": [
                 "symbol",
@@ -50,6 +51,7 @@ def transaction_input() -> dict:
                 },
                 "date": {"type": "string", "pattern": "[0-9a-zA-Z]"},
                 "amount": {"type": "number"},
+                "id": {"type": "string", "minLength": 1},
             },
             "required": ["transaction_type", "date", "amount"],
         },
