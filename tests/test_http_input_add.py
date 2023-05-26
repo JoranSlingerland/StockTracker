@@ -1,4 +1,5 @@
-"""Test add_item_to_input.py"""
+"""Test http_input_add"""
+
 import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -6,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import azure.functions as func
 from azure.cosmos import ContainerProxy
 
-from add_item_to_input import main
+from http_input_add import main
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)

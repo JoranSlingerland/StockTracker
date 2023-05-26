@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from get_user_data import main
+from http_user_get import main
 from shared_code.utils import create_form_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:

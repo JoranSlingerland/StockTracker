@@ -1,10 +1,10 @@
-"""test get_table_data_performance_v2.py"""
+"""test http_table_performance"""
 
 import json
 from pathlib import Path
 from unittest.mock import patch
 
-from get_table_data_performance import main
+from http_table_performance import main
 from shared_code.utils import create_form_func_request
 
 with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:

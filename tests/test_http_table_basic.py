@@ -1,4 +1,4 @@
-"""Test get_table_data_basic"""
+"""Test http_table_basic"""
 
 import json
 from copy import deepcopy
@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import time_machine
 
-from get_table_data_basic import main
+from http_table_basic import main
 from shared_code.utils import create_form_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:

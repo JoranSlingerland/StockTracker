@@ -1,4 +1,4 @@
-"""Test Orchestrator Terminate."""
+"""Test http_orchestrator_terminate"""
 
 import json
 from copy import deepcopy
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import azure.durable_functions as df
 import pytest
 
-from orchestrator_terminate import main
+from http_orchestrator_terminate import main
 from shared_code.utils import create_form_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:

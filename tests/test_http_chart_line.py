@@ -1,4 +1,4 @@
-"""Test get_linechart_data.py"""
+"""Test http_chart_line"""
 
 import json
 from pathlib import Path
@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import time_machine
 
-from get_linechart_data import main
+from http_chart_line import main
 from shared_code.utils import create_form_func_request
 
 with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:

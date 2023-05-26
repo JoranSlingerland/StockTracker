@@ -1,4 +1,4 @@
-"""Test Orchestrator purge."""
+"""Test http_orchestrator_purge"""
 
 import json
 from copy import deepcopy
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import azure.durable_functions as df
 import pytest
 
-from orchestrator_purge import main
+from http_orchestrator_purge import main
 from shared_code.utils import create_form_func_request
 
 starter = MagicMock()

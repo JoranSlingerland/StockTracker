@@ -1,4 +1,4 @@
-"""Test Orchestrator List."""
+"""Test http_orchestrator_list"""
 
 import json
 from pathlib import Path
@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import azure.durable_functions as df
 import pytest
 
-from orchestrator_list import main
+from http_orchestrator_list import main
 from shared_code.utils import create_form_func_request
 
 starter = MagicMock()

@@ -1,4 +1,4 @@
-"""Test Durable Functions Http Start."""
+"""Test  http_orchestrator_start"""
 
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ import azure.durable_functions as df
 import azure.functions as func
 import pytest
 
-from orchestrator_start import main
+from http_orchestrator_start import main
 from shared_code.utils import create_form_func_request
 
 starter = MagicMock()

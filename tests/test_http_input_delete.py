@@ -1,4 +1,4 @@
-"""Test delete_item_inputs"""
+"""Test http_input_delete"""
 
 import json
 from pathlib import Path
@@ -7,7 +7,7 @@ from unittest.mock import patch
 import azure.functions as func
 from azure.cosmos import exceptions
 
-from delete_input_items import main
+from http_input_delete import main
 
 body = {
     "itemIds": ["123"],
