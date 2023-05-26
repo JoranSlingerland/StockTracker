@@ -32,8 +32,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
         )
 
-    result[0].update({"isLoading": False})
-
     keys_to_pop = [
         "_rid",
         "_self",
