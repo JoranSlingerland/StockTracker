@@ -53,8 +53,6 @@ async def test_main(cosmosdb_container_mock, get_user_mock):
         "alpha_vantage_api_key": "123",
         "brandfetch_api_key": "123",
         "currency": "USD",
-        "isLoading": False,
-        "isError": False,
     }
 
     req = func.HttpRequest(
