@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": ["post"],
-      "route": "data/get_user_data",
+      "methods": ["get"],
+      "route": "user/get",
       "authLevel": "anonymous"
     },
     {

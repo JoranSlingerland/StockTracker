@@ -7,7 +7,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "route": "orchestrator/purge",
-      "methods": ["post"]
+      "methods": ["delete"]
     },
     {
       "name": "$return",

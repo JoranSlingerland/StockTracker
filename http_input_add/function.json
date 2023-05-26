@@ -5,9 +5,9 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": ["POST"],
+      "methods": ["post"],
       "authLevel": "anonymous",
-      "route": "add/add_item_to_input"
+      "route": "input/add"
     },
     {
       "type": "http",

@@ -7,7 +7,7 @@
       "direction": "in",
       "methods": ["POST"],
       "authLevel": "anonymous",
-      "route": "add/add_user_data"
+      "route": "user/add"
     },
     {
       "type": "http",

@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "name": "req",
       "direction": "in",
-      "methods": ["post"],
-      "route": "data/get_table_data_performance/",
+      "methods": ["get"],
+      "route": "table/performance",
       "authLevel": "anonymous"
     },
     {
