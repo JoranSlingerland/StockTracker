@@ -15,10 +15,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """ "HTTP trigger function to get line chart data"""
     logging.info("Getting linechart data")
 
-    start_date = req.form.get("startDate", None)
-    end_date = req.form.get("endDate", None)
-    all_data = req.form.get("allData", None)
-    datatype = req.form.get("dataType", None)
+    start_date = req.params.get("startDate", None)
+    end_date = req.params.get("endDate", None)
+    all_data = req.params.get("allData", None)
+    datatype = req.params.get("dataType", None)
 
     # convert all_data to boolean
     if all_data:

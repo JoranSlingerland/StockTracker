@@ -8,7 +8,7 @@ from unittest.mock import patch
 import time_machine
 
 from http_table_basic import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
@@ -71,9 +71,10 @@ class TestValidRequest:
 
         expected_result = sorted(expected_result, key=lambda x: x["date"], reverse=True)
 
-        req = create_form_func_request(
-            {"containerName": "input_transactions"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "input_transactions"},
         )
 
         result = main(req)
@@ -103,9 +104,10 @@ class TestValidRequest:
 
         expected_result = sorted(expected_result, key=lambda x: x["date"], reverse=True)
 
-        req = create_form_func_request(
-            {"containerName": "input_transactions", "symbol": "AAPL"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "input_transactions", "symbol": "AAPL"},
         )
 
         result = main(req)
@@ -133,9 +135,10 @@ class TestValidRequest:
             "",
         )
 
-        req = create_form_func_request(
-            {"containerName": "stocks_held"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "stocks_held"},
         )
 
         result = main(req)
@@ -176,9 +179,10 @@ class TestValidRequest:
             "",
         )
 
-        req = create_form_func_request(
-            {"containerName": "stocks_held", "symbol": "AAPL"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "stocks_held", "symbol": "AAPL"},
         )
 
         result = main(req)
@@ -214,9 +218,10 @@ class TestValidRequest:
         get_user.return_value = mock_get_user_data
 
         excepted_result = add_meta_data(mock_result, "", "")
-        req = create_form_func_request(
-            {"containerName": "stocks_held", "fullyRealized": "true"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "stocks_held", "fullyRealized": "true"},
         )
 
         result = main(req)
@@ -252,12 +257,13 @@ class TestValidRequest:
 
         excepted_result = add_meta_data(mock_result, "", "")
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={
                 "containerName": "stocks_held",
                 "partialRealized": "true",
             },
-            "http://localhost:7071/api/data/get_table_data_basic",
         )
 
         result = main(req)
@@ -297,14 +303,15 @@ class TestValidRequest:
             "",
         )
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={
                 "containerName": "stocks_held",
                 "partialRealized": "true",
                 "fullyRealized": "true",
                 "andOr": "or",
             },
-            "http://localhost:7071/api/data/get_table_data_basic",
         )
 
         result = main(req)
@@ -344,14 +351,15 @@ class TestValidRequest:
             "",
         )
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={
                 "containerName": "stocks_held",
                 "partialRealized": "true",
                 "fullyRealized": "true",
                 "andOr": "and",
             },
-            "http://localhost:7071/api/data/get_table_data_basic",
         )
 
         result = main(req)
@@ -378,9 +386,10 @@ class TestInvalidRequest:
     def test_missing_parameters(self):
         """Test missing parameters"""
 
-        req = create_form_func_request(
-            {},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={},
         )
 
         result = main(req)
@@ -396,9 +405,10 @@ class TestInvalidRequest:
 
         get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {"containerName": "invalid"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "invalid"},
         )
 
         result = main(req)
@@ -424,9 +434,10 @@ class TestEdgeCases:
         add_meta_data_to_stock_data.return_value = []
         get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {"containerName": "input_invested", "userId": "123"},
-            "http://localhost:7071/api/data/get_table_data_basic",
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/basic",
+            method="GET",
+            params={"containerName": "input_invested", "userId": "123"},
         )
 
         result = main(req)

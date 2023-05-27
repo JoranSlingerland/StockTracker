@@ -9,7 +9,7 @@ import azure.functions as func
 import pytest
 
 from http_orchestrator_start import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 starter = MagicMock()
 
@@ -25,12 +25,13 @@ with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
 )
 async def test_valid_data(mock, get_user):
     """Test Durable Functions Http Start."""
-    req = create_form_func_request(
-        {
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/start",
+        method="POST",
+        params={
             "functionName": "stocktracker_orchestrator",
             "daysToUpdate": "all",
         },
-        "http://localhost:7071/api/orchestrator/start",
     )
 
     mock_response = func.HttpResponse(
@@ -52,12 +53,13 @@ async def test_valid_data(mock, get_user):
 )
 async def test_invalid_function_name(mock):
     """Check invalid function name"""
-    req = create_form_func_request(
-        {
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/start",
+        method="POST",
+        params={
             "functionName": "stocktracker_orchestrator1",
             "daysToUpdate": "all",
         },
-        "http://localhost:7071/api/orchestrator/start",
     )
 
     expected_response = func.HttpResponse(
@@ -77,12 +79,13 @@ async def test_invalid_function_name(mock):
 )
 async def test_invalid_days_to_update(mock):
     """Check invalid days to update"""
-    req = create_form_func_request(
-        {
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/start",
+        method="POST",
+        params={
             "functionName": "stocktracker_orchestrator",
             "daysToUpdate": "all1",
         },
-        "http://localhost:7071/api/orchestrator/start",
     )
 
     expected_response = func.HttpResponse(

@@ -12,7 +12,7 @@ from shared_code import utils
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Purge orchestration"""
     client = df.DurableOrchestrationClient(starter)
-    instance_id = req.form.get("instanceId", None)
+    instance_id = req.params.get("instanceId", None)
 
     if not instance_id:
         return func.HttpResponse(

@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from http_user_get import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
@@ -29,9 +29,10 @@ mock_container_response = [
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_valid_request(cosmosdb_container, get_user):
     """Test valid request"""
-    req = create_form_func_request(
-        {},
-        "http://localhost:7071/api/data/get_user_data",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/user/get",
+        method="GET",
+        params={},
     )
 
     cosmosdb_container.return_value.query_items.return_value = mock_container_response
@@ -47,9 +48,10 @@ def test_valid_request(cosmosdb_container, get_user):
 @patch("shared_code.cosmosdb_module.cosmosdb_container")
 def test_no_data_in_cosmosdb(cosmosdb_container, get_user):
     """Test no data in cosmosdb"""
-    req = create_form_func_request(
-        {},
-        "http://localhost:7071/api/data/get_user_data",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/user/get",
+        method="GET",
+        params={},
     )
 
     cosmosdb_container.return_value.query_items.return_value = []

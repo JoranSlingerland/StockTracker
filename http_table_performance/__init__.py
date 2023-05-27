@@ -13,10 +13,10 @@ from shared_code import cosmosdb_module, utils, validate_input
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Getting container data")
-    start_date = req.form.get("startDate", None)
-    end_date = req.form.get("endDate", None)
-    all_data = req.form.get("allData", None)
-    container_name = req.form.get("containerName", None)
+    start_date = req.params.get("startDate", None)
+    end_date = req.params.get("endDate", None)
+    all_data = req.params.get("allData", None)
+    container_name = req.params.get("containerName", None)
     result = []
 
     # convert all_data to boolean

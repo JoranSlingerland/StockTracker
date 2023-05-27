@@ -17,7 +17,7 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     client = df.DurableOrchestrationClient(starter)
 
     output = []
-    days = req.form.get("days", None)
+    days = req.params.get("days", None)
     end_date = datetime.today()
 
     if not days:

@@ -12,8 +12,8 @@ async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     """Http Trigger"""
     client = df.DurableOrchestrationClient(starter)
 
-    function_name = req.form.get("functionName", None)
-    days_to_update = req.form.get("daysToUpdate", None)
+    function_name = req.params.get("functionName", None)
+    days_to_update = req.params.get("daysToUpdate", None)
 
     if function_name != "stocktracker_orchestrator":
         return func.HttpResponse(

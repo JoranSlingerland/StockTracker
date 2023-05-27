@@ -334,19 +334,6 @@ class TestUtils:
             {"symbol": "XYZ", "meta": {}},
         ]
 
-    def test_create_form_func_request(self):
-        """Test create form func request"""
-        body = {"symbol": "ABC"}
-        url = "http://localhost:5000/stocks"
-
-        request = utils.create_form_func_request(body, url)
-
-        assert request.method == "POST"
-        assert request.url == url
-        assert isinstance(request, func.HttpRequest)
-        assert 'form-data; name="symbol"' in request.get_body().decode("utf-8")
-        assert "ABC" in request.get_body().decode("utf-8")
-
     def test_get_user(self):
         """Test get user"""
         x_ms_client_principal = base64.b64encode(

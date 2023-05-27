@@ -8,7 +8,7 @@ import azure.durable_functions as df
 import pytest
 
 from http_orchestrator_list import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 starter = MagicMock()
 
@@ -20,7 +20,11 @@ with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
 @patch("azure.durable_functions.DurableOrchestrationClient")
 async def test_empty_request(df):
     """Test Orchestrator List."""
-    req = create_form_func_request({}, "http://localhost:7071/api/orchestrator/list")
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/list",
+        method="GET",
+        params={},
+    )
     response = await main(req, starter)
     assert response.status_code == 400
     assert response.get_body() == b'{"error": "Missing days"}'
@@ -34,8 +38,10 @@ async def test_empty_request(df):
 )
 async def test_no_data(mock_df, get_user):
     """Test Orchestrator List."""
-    req = create_form_func_request(
-        {"days": "7", "userId": "123"}, "http://localhost:7071/api/orchestrator/list"
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/list",
+        method="GET",
+        params={"days": "7", "userId": "123"},
     )
     mock_df.get_status_by = AsyncMock()
     mock_df().get_status_by.return_value = []
@@ -55,8 +61,10 @@ async def test_no_data(mock_df, get_user):
 )
 async def test_main(mock_client, get_user):
     """Test Orchestrator List."""
-    request = create_form_func_request(
-        {"days": "1", "userId": "123"}, "http://localhost:7071/api/orchestrator/list"
+    request = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/list",
+        method="GET",
+        params={"days": "1", "userId": "123"},
     )
 
     json_1 = MagicMock()

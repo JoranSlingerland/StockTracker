@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from http_table_performance import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 with open(Path(__file__).parent / "data" / "totals_data.json", "r") as f:
     mock_totals_data = json.load(f)
@@ -32,14 +32,15 @@ class TestInvalidRequest:
     def test_invalid_start_date(self):
         """Test invalid request."""
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2021-13-02",
                 "endDate": "2022-02-02",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -53,14 +54,15 @@ class TestInvalidRequest:
     def test_invalid_end_date(self):
         """Test invalid request."""
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2021-12-02",
                 "endDate": "2022-13-02",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -73,14 +75,15 @@ class TestInvalidRequest:
     def test_end_date_before_start_date(self):
         """Test invalid request."""
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2023-12-02",
                 "endDate": "2022-12-02",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -91,15 +94,16 @@ class TestInvalidRequest:
     def test_invalid_combination(self):
         """Test invalid request."""
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2021-12-02",
                 "endDate": "2022-12-02",
                 "allData": "true",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -122,13 +126,14 @@ class TestValidRequest:
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "allData": "true",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -145,14 +150,15 @@ class TestValidRequest:
         mock_cosmosdb_container.return_value.query_items.return_value = mock_totals_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2023-05-03",
                 "endDate": "2023-05-04",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -211,14 +217,15 @@ class TestValidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "stocks_held",
                 "startDate": "2023-05-03",
                 "endDate": "2023-05-04",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -364,13 +371,14 @@ class TestEdgeCases:
         mock_cosmosdb_container.return_value.query_items.return_value = []
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "allData": "true",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -386,14 +394,15 @@ class TestEdgeCases:
         mock_cosmosdb_container.return_value.query_items.return_value = []
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "totals",
                 "startDate": "2021-12-02",
                 "endDate": "2022-12-02",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)
@@ -409,14 +418,15 @@ class TestEdgeCases:
         mock_cosmosdb_container.return_value.query_items.return_value = []
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/table/performance",
+            method="GET",
+            params={
                 "userId": "123",
                 "containerName": "stocks_held",
                 "startDate": "2021-12-02",
                 "endDate": "2022-12-02",
             },
-            "https://localhost:7071/api/data/get_table_data_performance_v2",
         )
 
         result = main(req)

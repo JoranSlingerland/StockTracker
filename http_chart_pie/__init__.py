@@ -15,7 +15,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function"""
     logging.info("Getting table data")
 
-    datatype = req.form.get("dataType", None)
+    datatype = req.params.get("dataType", None)
 
     if not datatype:
         logging.error("No datatype provided")

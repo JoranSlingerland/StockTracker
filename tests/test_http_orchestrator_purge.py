@@ -9,7 +9,7 @@ import azure.durable_functions as df
 import pytest
 
 from http_orchestrator_purge import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 starter = MagicMock()
 
@@ -34,7 +34,11 @@ get_status.to_json.return_value = {
 @patch("azure.durable_functions.DurableOrchestrationClient")
 async def test_empty_request(mock_df):
     """Test Orchestrator Purge."""
-    req = create_form_func_request({}, "http://localhost:7071/api/orchestrator/purge")
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={},
+    )
     response = await main(req, starter)
     assert response.status_code == 400
     assert response.get_body() == b'{"error": "Missing instanceId"}'
@@ -48,9 +52,10 @@ async def test_empty_request(mock_df):
 )
 async def test_no_data(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     custom_get_status = deepcopy(get_status)
@@ -71,9 +76,10 @@ async def test_no_data(mock_df, get_user):
 )
 async def test_unauthorized(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     mock_df.return_value.get_status.return_value = get_status
@@ -94,9 +100,10 @@ async def test_unauthorized(mock_df, get_user):
 )
 async def test_invalid_json(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     custom_get_status = deepcopy(get_status)
@@ -117,9 +124,10 @@ async def test_invalid_json(mock_df, get_user):
 )
 async def test_failed_purge(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     mock_df.return_value.get_status.return_value = get_status
@@ -139,9 +147,10 @@ async def test_failed_purge(mock_df, get_user):
 )
 async def test_zero_instances_purged(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     mock_df.return_value.get_status.return_value = get_status
@@ -161,9 +170,10 @@ async def test_zero_instances_purged(mock_df, get_user):
 )
 async def test_valid_purge(mock_df, get_user):
     """Test Orchestrator Purge."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/purge",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/purge",
+        method="DELETE",
+        params={"instanceId": "123"},
     )
 
     mock_df.return_value.get_status.return_value = get_status

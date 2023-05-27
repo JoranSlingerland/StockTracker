@@ -9,7 +9,7 @@ import azure.durable_functions as df
 import pytest
 
 from http_orchestrator_terminate import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 with open(Path(__file__).parent / "data" / "get_user_data.json", "r") as f:
     mock_get_user_data = json.load(f)
@@ -34,8 +34,10 @@ get_status.to_json.return_value = {
 @patch("azure.durable_functions.DurableOrchestrationClient")
 async def test_empty_request(mock_df):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {}, "http://localhost:7071/api/orchestrator/terminate"
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={},
     )
     response = await main(req, starter)
     assert response.status_code == 400
@@ -50,9 +52,10 @@ async def test_empty_request(mock_df):
 )
 async def test_no_data(mock_df, get_user):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123"},
     )
 
     custom_get_status = deepcopy(get_status)
@@ -76,9 +79,10 @@ async def test_no_data(mock_df, get_user):
 )
 async def test_not_running(mock_df, get_user):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123", "userId": "456"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123", "userId": "456"},
     )
 
     mock_df.return_value.get_status.return_value = get_status
@@ -97,9 +101,10 @@ async def test_not_running(mock_df, get_user):
 )
 async def test_unauthorized(mock_df, get_user):
     """ "Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123"},
     )
 
     mock_df.return_value.get_status.return_value = get_status
@@ -123,9 +128,10 @@ async def test_unauthorized(mock_df, get_user):
 )
 async def test_invalid_json(mock_df, get_user):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123", "userId": "456"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123", "userId": "456"},
     )
 
     custom_get_status = deepcopy(get_status)
@@ -147,9 +153,10 @@ async def test_invalid_json(mock_df, get_user):
 )
 async def test_failed_termination(mock_df, get_user):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123", "userId": "456"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123", "userId": "456"},
     )
 
     custom_get_status = deepcopy(get_status)
@@ -171,9 +178,10 @@ async def test_failed_termination(mock_df, get_user):
 )
 async def test_terminate(mock_df, get_user):
     """Test Orchestrator Terminate."""
-    req = create_form_func_request(
-        {"instanceId": "123", "userId": "456"},
-        "http://localhost:7071/api/orchestrator/terminate",
+    req = create_params_func_request(
+        url="http://localhost:7071/api/orchestrator/terminate",
+        method="POST",
+        params={"instanceId": "123", "userId": "456"},
     )
 
     custom_get_status = deepcopy(get_status)

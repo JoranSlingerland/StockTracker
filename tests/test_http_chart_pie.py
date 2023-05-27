@@ -7,7 +7,7 @@ from unittest.mock import patch
 import time_machine
 
 from http_chart_pie import main
-from shared_code.utils import create_form_func_request
+from shared_code.utils import create_params_func_request
 
 with open(Path(__file__).parent / "data" / "stocks_held_data.json", "r") as f:
     mock_stocks_held_data = json.load(f)
@@ -44,11 +44,12 @@ class TestValidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "dataType": "stocks",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
         expected_body = {
             "labels": ["AMD", "MSFT"],
@@ -76,11 +77,12 @@ class TestValidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "dataType": "currency",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
 
         expected_body = {
@@ -109,12 +111,13 @@ class TestValidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "userId": "123",
                 "dataType": "country",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
 
         expected_body = {
@@ -143,12 +146,13 @@ class TestValidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "userId": "123",
                 "dataType": "sector",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
 
         expected_body = {
@@ -169,8 +173,8 @@ class TestInvalidRequest:
     @time_machine.travel("2023-04-02")
     def test_invalid_input(self):
         """Test invalid input"""
-        req = create_form_func_request(
-            {}, "http://localhost:7071/api/data/get_pie_data"
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie", method="GET", params={}
         )
 
         result = main(req)
@@ -195,11 +199,12 @@ class TestInvalidRequest:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "dataType": "invalid",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
 
         result = main(req)
@@ -226,11 +231,12 @@ class TestEdgeCases:
         mock_add_meta_data_to_stock_data.side_effect = add_meta_data
         mock_get_user.return_value = mock_get_user_data
 
-        req = create_form_func_request(
-            {
+        req = create_params_func_request(
+            url="http://localhost:7071/api/chart/pie",
+            method="GET",
+            params={
                 "dataType": "sector",
             },
-            "http://localhost:7071/api/data/get_pie_data",
         )
 
         result = main(req)
