@@ -4,7 +4,6 @@ import json
 
 import azure.functions as func
 from jsonschema import validate
-from urllib3 import encode_multipart_formdata
 
 from shared_code import cosmosdb_module
 
@@ -59,17 +58,25 @@ def add_meta_data_to_stock_data(
     return stock_data
 
 
-def create_form_func_request(body: dict, url: str) -> func.HttpRequest:
+def create_params_func_request(
+    url: str, method: str, params: dict, body: dict | None = None
+) -> func.HttpRequest:
     """Create func.HttpRequest"""
-    body, header = encode_multipart_formdata(body)
-    header = {"Content-Type": header}
+
+    query_string = ""
+    for key, value in params.items():
+        query_string += f"{key}={value}&"
+    query_string = query_string[:-1]
+    if query_string:
+        query_string = f"?{query_string}"
 
     req = func.HttpRequest(
-        method="POST",
-        url=url,
-        headers=header,
+        method=method,
+        url=f"{url}{query_string}",
         body=body,
+        params=params,
     )
+
     return req
 
 

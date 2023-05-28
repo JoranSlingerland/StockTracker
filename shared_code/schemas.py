@@ -91,8 +91,6 @@ def user_data() -> dict:
             "alpha_vantage_api_key": {"type": "string", "minLength": 1},
             "brandfetch_api_key": {"type": "string", "minLength": 1},
             "currency": {"type": "string", "minLength": 1, "maxLength": 3},
-            "isLoading": {"type": "boolean"},
-            "isError": {"type": "boolean"},
         },
         "additionalProperties": False,
         "required": [
@@ -101,7 +99,5 @@ def user_data() -> dict:
             "alpha_vantage_api_key",
             "brandfetch_api_key",
             "currency",
-            "isLoading",
-            "isError",
         ],
     }

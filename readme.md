@@ -20,9 +20,56 @@ The project consists of three repositories:
 | [Frontend](https://github.com/JoranSlingerland/StockTracker-frontend)            | Frontend repo which will create the website | React    |
 | [Infrastructure](https://github.com/JoranSlingerland/StockTrackerInfrastructure) | Code to deploy all resources to Azure       | Bicep    |
 
+## Table of contents
+
+- [StockTracker Project - API](#stocktracker-project---api)
+  - [Related repos](#related-repos)
+  - [Table of contents](#table-of-contents)
+  - [API](#api)
+  - [Setup](#setup)
+    - [prerequisites](#prerequisites)
+    - [Azure environment](#azure-environment)
+      - [One time deployment](#one-time-deployment)
+      - [Pipeline deployment](#pipeline-deployment)
+    - [local development environment](#local-development-environment)
+  - [Usage](#usage)
+  - [Azure Functions](#azure-functions)
+    - [Orchestrator](#orchestrator)
+      - [start](#start)
+        - [Query parameters](#query-parameters)
+      - [list](#list)
+        - [Query parameters](#query-parameters-1)
+      - [purge](#purge)
+        - [Query parameters](#query-parameters-2)
+      - [terminate](#terminate)
+        - [Query parameters](#query-parameters-3)
+    - [Chart](#chart)
+      - [bar](#bar)
+        - [Query parameters](#query-parameters-4)
+      - [line](#line)
+        - [Query parameters](#query-parameters-5)
+      - [pie](#pie)
+        - [Query parameters](#query-parameters-6)
+    - [input](#input)
+      - [delete](#delete)
+        - [Body](#body)
+      - [add](#add)
+        - [Body](#body-1)
+    - [table](#table)
+      - [basic](#basic)
+        - [Query parameters](#query-parameters-7)
+      - [performance](#performance)
+        - [Query parameters](#query-parameters-8)
+    - [user](#user)
+      - [add](#add-1)
+        - [Body](#body-2)
+      - [get](#get)
+    - [Main stocktracker function](#main-stocktracker-function)
+    - [functions diagram](#functions-diagram)
+
 ## API
 
-This project will be using the [Alpha vantage API](https://www.alphavantage.co/) and [clearbit API](https://clearbit.com/).
+This project makes use of the [Alpha vantage API](https://www.alphavantage.co/) and [clearbit API](https://clearbit.com/).
 
 ## Setup
 
@@ -82,169 +129,179 @@ For the azure environment you can either use the [One time deployment](#one-time
 
 All Azure functions available in the api.
 
-### get_barchart_data
+### Orchestrator
 
-| Method | URL                                 | content-type | Usage                                |
-| ------ | ----------------------------------- | ------------ | ------------------------------------ |
-| POST   | {{base_url}}/data/get_barchart_data | form-data    | Function will get data for barcharts |
+#### start
 
-Body
+| Method | URL                             | Usage                               |
+| ------ | ------------------------------- | ----------------------------------- |
+| POST   | {{base_url}}/orchestrator/start | Function will start an orchestrator |
 
-| Param     | value | Type    | Allowed values               | Required |
-| --------- | ----- | ------- | ---------------------------- | -------- |
-| allData   |       | boolean | `boolean`                    | false    |
-| startDate |       | text    | yyyy-mm-dd                   | false    |
-| endDate   |       | text    | yyyy-mm-dd                   | false    |
-| dataType  |       | text    | dividend \| transaction_cost | true     |
+##### Query parameters
 
-If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
+| Param        | Allowed values            | Required |
+| ------------ | ------------------------- | -------- |
+| functionName | stocktracker_orchestrator | true     |
+| daysToUpdate | all \| `int`              | true     |
 
-### get_table_data_basic
+#### list
 
-| Method | URL                                    | content-type | Usage                                 |
-| ------ | -------------------------------------- | ------------ | ------------------------------------- |
-| POST   | {{base_url}}/data/get_table_data_basic | form-data    | Function will get data used by tables |
+| Method | URL                            | Usage                            |
+| ------ | ------------------------------ | -------------------------------- |
+| GET    | {{base_url}}/orchestrator/list | Function will list orchestrators |
 
-Body
+##### Query parameters
 
-| Param           | value | Type | Allowed values                                       | Required |
-| --------------- | ----- | ---- | ---------------------------------------------------- | -------- |
-| containerName   |       | text | input_invested \| input_transactions \| stocks_held" | true     |
-| andOr           |       | text | and \| or                                            | false    |
-| fullyRealized   |       | text | true \| false                                        | false    |
-| partialRealized |       | text | true \| false                                        | false    |
-| symbol          |       | text | `string`                                             | false    |
+| Param | Allowed values | Required |
+| ----- | -------------- | -------- |
+| days  | `int`          | true     |
 
-### get_linechart_data
+#### purge
 
-| Method | URL                                  | content-type | Usage                                 |
-| ------ | ------------------------------------ | ------------ | ------------------------------------- |
-| POST   | {{base_url}}/data/get_linechart_data | form-data    | Function will get data for linecharts |
+| Method | URL                             | Usage                            |
+| ------ | ------------------------------- | -------------------------------- |
+| DELETE | {{base_url}}/orchestrator/purge | Function will purge orchestrator |
 
-Body
+##### Query parameters
 
-| Param     | value | Type    | Allowed values                    | Required |
-| --------- | ----- | ------- | --------------------------------- | -------- |
-| allData   |       | boolean | `boolean`                         | false    |
-| startDate |       | text    | yyyy-mm-dd                        | false    |
-| endDate   |       | text    | yyyy-mm-dd                        | false    |
-| dataType  |       | text    | invested_and_value \| total_gains | true     |
+| Param      | Allowed values | Required |
+| ---------- | -------------- | -------- |
+| instanceId | `string`       | true     |
 
-If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
+#### terminate
 
-### get_pie_data
+| Method | URL                                 | Usage                                |
+| ------ | ----------------------------------- | ------------------------------------ |
+| POST   | {{base_url}}/orchestrator/terminate | Function will terminate orchestrator |
 
-| Method | URL                            | content-type | Usage                                |
-| ------ | ------------------------------ | ------------ | ------------------------------------ |
-| POST   | {{base_url}}/data/get_pie_data | form-data    | Function will get data for piecharts |
+##### Query parameters
 
-Body
+| Param      | Allowed values | Required |
+| ---------- | -------------- | -------- |
+| instanceId | `string`       | true     |
 
-| Param    | value | Type | Allowed values                          | Required |
-| -------- | ----- | ---- | --------------------------------------- | -------- |
-| dataType |       | text | stocks \| currency \| country \| sector | true     |
+### Chart
 
-### get_table_data_performance
+#### bar
 
-| Method | URL                                          | content-type | Usage                                 |
-| ------ | -------------------------------------------- | ------------ | ------------------------------------- |
-| POST   | {{base_url}}/data/get_table_data_performance | form-data    | Function will get data used by tables |
+| Method | URL                    | Usage                                |
+| ------ | ---------------------- | ------------------------------------ |
+| GET    | {{base_url}}/chart/bar | Function will get data for barcharts |
 
-Body
+##### Query parameters
 
-| Param         | value | Type    | Allowed values        | Required |
-| ------------- | ----- | ------- | --------------------- | -------- |
-| allData       |       | boolean | `boolean`             | false    |
-| startDate     |       | text    | yyyy-mm-dd            | false    |
-| endDate       |       | text    | yyyy-mm-dd            | false    |
-| containerName |       | text    | stocks_held \| totals | true     |
+| Param     | Allowed values               | Required |
+| --------- | ---------------------------- | -------- |
+| allData   | `boolean`                    | false    |
+| startDate | yyyy-mm-dd                   | false    |
+| endDate   | yyyy-mm-dd                   | false    |
+| dataType  | dividend \| transaction_cost | true     |
 
 If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
-### orchestrator_start
+#### line
 
-| Method | URL                             | content-type | Usage                               |
-| ------ | ------------------------------- | ------------ | ----------------------------------- |
-| POST   | {{base_url}}/orchestrator/start | form-data    | Function will start an orchestrator |
+| Method | URL                     | Usage                                 |
+| ------ | ----------------------- | ------------------------------------- |
+| GET    | {{base_url}}/chart/line | Function will get data for linecharts |
 
-Body
+##### Query parameters
 
-| Param        | value | Type | Allowed values            | Required |
-| ------------ | ----- | ---- | ------------------------- | -------- |
-| functionName |       | text | stocktracker_orchestrator | true     |
-| daysToUpdate |       | text | all \| `int`              | true     |
+| Param     | Allowed values                    | Required |
+| --------- | --------------------------------- | -------- |
+| allData   | `boolean`                         | false    |
+| startDate | yyyy-mm-dd                        | false    |
+| endDate   | yyyy-mm-dd                        | false    |
+| dataType  | invested_and_value \| total_gains | true     |
 
-### orchestrator_list
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
-| Method | URL                            | content-type | Usage                            |
-| ------ | ------------------------------ | ------------ | -------------------------------- |
-| POST   | {{base_url}}/orchestrator/list | form-data    | Function will list orchestrators |
+#### pie
 
-Body
+| Method | URL                    | Usage                                |
+| ------ | ---------------------- | ------------------------------------ |
+| GET    | {{base_url}}/chart/pie | Function will get data for piecharts |
 
-| Param | value | Type | Allowed values | Required |
-| ----- | ----- | ---- | -------------- | -------- |
-| days  |       | text | `int`          | true     |
+##### Query parameters
 
-### orchestrator_purge
+| Param    | Allowed values                          | Required |
+| -------- | --------------------------------------- | -------- |
+| dataType | stocks \| currency \| country \| sector | true     |
 
-| Method | URL                             | content-type | Usage                            |
-| ------ | ------------------------------- | ------------ | -------------------------------- |
-| POST   | {{base_url}}/orchestrator/purge | form-data    | Function will purge orchestrator |
+### input
 
-Body
+#### delete
 
-| Param      | value | Type | Allowed values | Required |
-| ---------- | ----- | ---- | -------------- | -------- |
-| instanceId |       | text | `string`       | true     |
+| Method | URL                       | Usage                                                        |
+| ------ | ------------------------- | ------------------------------------------------------------ |
+| POST   | {{base_url}}/input/delete | Function will delete a list of items in the input containers |
 
-### orchestrator_terminate
+##### Body
 
-| Method | URL                                 | content-type | Usage                                |
-| ------ | ----------------------------------- | ------------ | ------------------------------------ |
-| POST   | {{base_url}}/orchestrator/terminate | form-data    | Function will terminate orchestrator |
+Body needs to confirm to the stock_input or transaction_input in the [schema](.\shared_code\schemas.py) file.
 
-Body
+#### add
 
-| Param      | value | Type | Allowed values | Required |
-| ---------- | ----- | ---- | -------------- | -------- |
-| instanceId |       | text | `string`       | true     |
+| Method | URL                    | content-type | Usage                           |
+| ------ | ---------------------- | ------------ | ------------------------------- |
+| POST   | {{base_url}}/input/add | json         | Function will add item to input |
 
-### delete_input_items
+##### Body
 
-| Method | URL                                    | content-type | Usage                                                        |
-| ------ | -------------------------------------- | ------------ | ------------------------------------------------------------ |
-| POST   | {{base_url}}/delete/delete_input_items | json         | Function will delete a list of items in the input containers |
+Body needs to confirm to the stock_input or transaction_input in the [schema](.\shared_code\schemas.py) file.
 
-Body
+### table
 
-Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
+#### basic
 
-### add_item_to_input
+| Method | URL                      | Usage                                 |
+| ------ | ------------------------ | ------------------------------------- |
+| GET    | {{base_url}}/table/basic | Function will get data used by tables |
 
-| Method | URL                                | content-type | Usage                           |
-| ------ | ---------------------------------- | ------------ | ------------------------------- |
-| POST   | {{base_url}}/add/add_item_to_input | json         | Function will add item to input |
+##### Query parameters
 
-Body
+| Param           | Allowed values                                       | Required |
+| --------------- | ---------------------------------------------------- | -------- |
+| containerName   | input_invested \| input_transactions \| stocks_held" | true     |
+| andOr           | and \| or                                            | false    |
+| fullyRealized   | `Boolean`                                            | false    |
+| partialRealized | `Boolean`                                            | false    |
+| symbol          | `string`                                             | false    |
 
-Body needs to confirm to either of the schema found in the [schema](.\shared_code\schemas.py) file.
+#### performance
 
-### add_user_data
+| Method | URL                            | Usage                                 |
+| ------ | ------------------------------ | ------------------------------------- |
+| GET    | {{base_url}}/table/performance | Function will get data used by tables |
 
-| Method | URL                            | content-type | Usage                          |
-| ------ | ------------------------------ | ------------ | ------------------------------ |
-| POST   | {{base_url}}/add/add_user_data | json         | Function will update user data |
+##### Query parameters
 
-Body
+| Param         | Allowed values        | Required |
+| ------------- | --------------------- | -------- |
+| allData       | `boolean`             | false    |
+| startDate     | yyyy-mm-dd            | false    |
+| endDate       | yyyy-mm-dd            | false    |
+| containerName | stocks_held \| totals | true     |
 
-Body needs to confirm to the schema found in the [schema](.\shared_code\schemas.py) file.
+If allData is true then startDate and endDate can not be set. If allData is false then startDate and endDate must be set.
 
-### get_user_data
+### user
 
-| Method | URL                             | content-type | Usage                       |
-| ------ | ------------------------------- | ------------ | --------------------------- |
-| POST   | {{base_url}}/data/get_user_data | None         | Function will get user data |
+#### add
+
+| Method | URL                   | Usage                          |
+| ------ | --------------------- | ------------------------------ |
+| POST   | {{base_url}}/user/add | Function will update user data |
+
+##### Body
+
+Body needs to confirm to the user_data schema in the [schema](.\shared_code\schemas.py) file.
+
+#### get
+
+| Method | URL                   | Usage                       |
+| ------ | --------------------- | --------------------------- |
+| GET    | {{base_url}}/user/get | Function will get user data |
 
 ### Main stocktracker function
 

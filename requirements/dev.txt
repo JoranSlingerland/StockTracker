@@ -1,7 +1,7 @@
 -r common.txt
 pytest == 7.3.1
 pytest-asyncio== 0.21.0
-pytest-cov == 4.0.0
-ruff == 0.0.265
+pytest-cov == 4.1.0
+ruff == 0.0.270
 black==23.3.0
 time-machine == 2.9.0
