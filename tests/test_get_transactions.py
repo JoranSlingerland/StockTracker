@@ -62,8 +62,8 @@ user_data = [
     {
         "id": "123",
         "dark_mode": True,
-        "clearbit_api_key": "sk_34b1f39ac8e8fba6fde27dbb0d813e24",
-        "alpha_vantage_api_key": "V9CQXQUZYUA8F1JD",
+        "clearbit_api_key": "123",
+        "alpha_vantage_api_key": "123",
         "_rid": "+qI9AL5k7vYCAAAAAAAAAA==",
         "_self": "dbs/+qI9AA==/colls/+qI9AL5k7vY=/docs/+qI9AL5k7vYCAAAAAAAAAA==/",
         "_etag": '"00000000-0000-0000-7956-ed2637b301d9"',
@@ -130,8 +130,8 @@ def test_get_transactions(cosmosdb_container_mock):
     assert result["user_data"] == {
         "id": "123",
         "dark_mode": True,
-        "clearbit_api_key": "sk_34b1f39ac8e8fba6fde27dbb0d813e24",
-        "alpha_vantage_api_key": "V9CQXQUZYUA8F1JD",
+        "clearbit_api_key": "123",
+        "alpha_vantage_api_key": "123",
     }
     assert cosmosdb_container_mock.return_value.query_items.call_count == 3
     assert cosmosdb_container_mock.return_value.query_items.call_args_list[0][1] == {
