@@ -122,7 +122,6 @@ def add_stock_data(
                     f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_subtract} day(s)'
                 )
 
-                break
         temp_total_dividends += single_day_dividend_data
         total_dividends.update({stock["symbol"]: temp_total_dividends})
 
