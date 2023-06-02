@@ -6,7 +6,7 @@ import logging
 from datetime import date, timedelta
 
 import azure.functions as func
-from colorhash import ColorHash
+import seaborn as sns
 
 from shared_code import cosmosdb_module, utils
 
@@ -156,8 +156,11 @@ def remove_duplicates(datatype, input_list):
 def convert_pie_object_to_chartjs_output(data):
     """Converts the pie object to a chartjs compatible object"""
     output = {"labels": [], "data": [], "color": []}
-    for item in data:
+
+    colors = sns.color_palette("crest_r", n_colors=max(len(data), 10)).as_hex()
+
+    for i, item in enumerate(data):
         output["labels"].append(item["type"])
         output["data"].append(item["value"])
-        output["color"].append(ColorHash(item).hex)
+        output["color"].append(colors[i])
     return output
