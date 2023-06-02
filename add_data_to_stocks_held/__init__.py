@@ -63,37 +63,37 @@ def add_stock_data(
     for stock in stocks_held:
         days_to_subtract = 0
         temp_total_dividends = total_dividends[stock["symbol"]]
-        stock = copy.deepcopy(stock)
+        # add id
         stock.update(
             {
                 "userid": userid,
                 "id": str(uuid.uuid4()),
             }
         )
-
+        stock = copy.deepcopy(stock)
         while True:
             try:
                 date_string = f"{stock['date']} 00:00:00"
                 date_object = datetime.fromisoformat(date_string)
                 date_object = date_object - timedelta(days=days_to_subtract)
-                date_string = date_object.strftime("%Y-%m-%d")
+                date_object = date_object.strftime("%Y-%m-%d")
                 stock_open = float(
-                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_string][
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                         "1. open"
                     ]
                 )
                 stock_high = float(
-                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_string][
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                         "2. high"
                     ]
                 )
                 stock_low = float(
-                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_string][
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                         "3. low"
                     ]
                 )
                 stock_close = float(
-                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_string][
+                    stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                         "4. close"
                     ]
                 )
@@ -102,13 +102,13 @@ def add_stock_data(
                 else:
                     forex_close = float(
                         forex_data[stock["currency"]]["Time Series FX (Daily)"][
-                            date_string
+                            date_object
                         ]["4. close"]
                     )
 
                 single_day_dividend_data = (
                     float(
-                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_string][
+                        stock_data[stock["symbol"]]["Time Series (Daily)"][date_object][
                             "7. dividend amount"
                         ]
                     )
@@ -117,9 +117,8 @@ def add_stock_data(
             except KeyError:
                 days_to_subtract += 1
                 logging.debug(
-                    f'KeyError for {stock["symbol"]} on {date_string}. Attempting to subtract {days_to_subtract} day(s)'
+                    f'KeyError for {stock["symbol"]} on {date_object}. Attempting to subtract {days_to_subtract} day(s)'
                 )
-                break
             temp_total_dividends += single_day_dividend_data
             total_dividends.update({stock["symbol"]: temp_total_dividends})
 
