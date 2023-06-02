@@ -157,10 +157,10 @@ def convert_pie_object_to_chartjs_output(data):
     """Converts the pie object to a chartjs compatible object"""
     output = {"labels": [], "data": [], "color": []}
 
-    colors = sns.color_palette("crest_r", n_colors=max(len(data), 10)).as_hex()
+    colors = sns.color_palette("crest", n_colors=max(len(data), 10)).as_hex()
 
-    for i, item in enumerate(data):
+    for item in data:
         output["labels"].append(item["type"])
         output["data"].append(item["value"])
-        output["color"].append(colors[i])
+        output["color"].append(colors.pop())
     return output
