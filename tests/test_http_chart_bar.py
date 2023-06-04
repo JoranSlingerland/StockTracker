@@ -177,18 +177,10 @@ class TestValidRequest:
         temp_copy[0]["date"] = "2023-04-03"
 
         mock_cosmosdb_container.return_value.query_items.return_value = temp_copy
-        expected_result = [
-            {"date": "Q2 2023", "value": 0, "category": "MSFT"},
-            {"date": "Q2 2023", "value": 0, "category": "AMD"},
-            {"date": "Q3 2023", "value": 0.0, "category": "MSFT"},
-            {"date": "Q3 2023", "value": 0.0, "category": "AMD"},
-            {"date": "Q4 2023", "value": 0.0, "category": "MSFT"},
-            {"date": "Q4 2023", "value": 0.0, "category": "AMD"},
-            {"date": "Q1 2024", "value": 0.0, "category": "MSFT"},
-            {"date": "Q1 2024", "value": 0.0, "category": "AMD"},
-            {"date": "Q2 2024", "value": 0.0, "category": "MSFT"},
-            {"date": "Q2 2024", "value": 0.0, "category": "AMD"},
-        ]
+        expected_result = {
+            "datasets": [],
+            "labels": ["Q2 2023", "Q3 2023", "Q4 2023", "Q1 2024", "Q2 2024"],
+        }
 
         mock_get_user.return_value = mock_get_user_data
 
@@ -210,18 +202,21 @@ class TestValidRequest:
 
         mock_cosmosdb_container.return_value.query_items.return_value = temp_copy
 
-        expected_result = [
-            {"date": "Q4 2021", "value": 0.5, "category": "AMD"},
-            {"date": "Q4 2021", "value": 0.5, "category": "MSFT"},
-            {"date": "Q1 2022", "value": 0.0, "category": "AMD"},
-            {"date": "Q1 2022", "value": 0.0, "category": "MSFT"},
-            {"date": "Q2 2022", "value": 0.0, "category": "AMD"},
-            {"date": "Q2 2022", "value": 0.0, "category": "MSFT"},
-            {"date": "Q3 2022", "value": 0.0, "category": "AMD"},
-            {"date": "Q3 2022", "value": 0.0, "category": "MSFT"},
-            {"date": "Q4 2022", "value": 0.0, "category": "AMD"},
-            {"date": "Q4 2022", "value": 0.0, "category": "MSFT"},
-        ]
+        expected_result = {
+            "datasets": [
+                {
+                    "label": "AMD",
+                    "data": [0.5, 0.0, 0.0, 0.0, 0.0],
+                    "backgroundColor": "#29427a",
+                },
+                {
+                    "label": "MSFT",
+                    "data": [0.5, 0.0, 0.0, 0.0, 0.0],
+                    "backgroundColor": "#225282",
+                },
+            ],
+            "labels": ["Q4 2021", "Q1 2022", "Q2 2022", "Q3 2022", "Q4 2022"],
+        }
 
         mock_get_user.return_value = mock_get_user_data
 
@@ -243,12 +238,13 @@ class TestValidRequest:
 
         mock_cosmosdb_container.return_value.query_items.return_value = temp_copy
 
-        expected_result = [
-            {"date": "2021 December", "value": 0.5, "category": "AMD"},
-            {"date": "2021 December", "value": 0.5, "category": "MSFT"},
-            {"date": "2022 January", "value": 0.0, "category": "AMD"},
-            {"date": "2022 January", "value": 0.0, "category": "MSFT"},
-        ]
+        expected_result = {
+            "datasets": [
+                {"label": "AMD", "data": [0.5, 0.0], "backgroundColor": "#29427a"},
+                {"label": "MSFT", "data": [0.5, 0.0], "backgroundColor": "#225282"},
+            ],
+            "labels": ["2021 December", "2022 January"],
+        }
 
         mock_get_user.return_value = mock_get_user_data
 
@@ -266,12 +262,7 @@ class TestValidRequest:
         temp_copy[0]["date"] = "2023-04-03"
 
         mock_cosmosdb_container.return_value.query_items.return_value = temp_copy
-        expected_result = [
-            {"date": "2023 April", "value": 0, "category": "MSFT"},
-            {"date": "2023 April", "value": 0.0, "category": "AMD"},
-            {"date": "2023 May", "value": 0, "category": "MSFT"},
-            {"date": "2023 May", "value": 0, "category": "AMD"},
-        ]
+        expected_result = {"datasets": [], "labels": ["2023 April", "2023 May"]}
 
         mock_get_user.return_value = mock_get_user_data
 
@@ -288,10 +279,7 @@ class TestValidRequest:
         mock_cosmosdb_container.return_value.query_items.return_value = (
             mock_stocks_held_data
         )
-        expected_result = [
-            {"date": "2023 19", "value": 0, "category": "MSFT"},
-            {"date": "2023 19", "value": 0, "category": "AMD"},
-        ]
+        expected_result = {"datasets": [], "labels": ["2023 19"]}
 
         mock_get_user.return_value = mock_get_user_data
 
@@ -315,10 +303,13 @@ class TestValidRequest:
 
         mock_get_user.return_value = mock_get_user_data
 
-        expected_result = [
-            {"date": "2021 49", "value": 0.5, "category": "AMD"},
-            {"date": "2021 49", "value": 0.5, "category": "MSFT"},
-        ]
+        expected_result = {
+            "datasets": [
+                {"label": "AMD", "data": [0.5], "backgroundColor": "#29427a"},
+                {"label": "MSFT", "data": [0.5], "backgroundColor": "#225282"},
+            ],
+            "labels": ["2021 49"],
+        }
 
         response = main(transaction_cost_req)
         assert response.status_code == 200

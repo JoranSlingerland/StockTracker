@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 
 import azure.functions as func
 import pandas as pd
+import seaborn as sns
 
 from shared_code import cosmosdb_module, date_time_helper, utils, validate_input
 
@@ -71,6 +72,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result = month_interval(items, start_date, end_date, datatype)
     elif days > 0:
         result = week_interval(items, start_date, end_date, datatype)
+
+    result = convert_to_chartjs_object(result)
 
     return func.HttpResponse(
         body=json.dumps(result), mimetype="application/json", status_code=200
@@ -257,5 +260,30 @@ def week_interval(items, start_date, end_date, datatype):
                     "category": symbol,
                 }
             result.append(temp_object)
+
+    return result
+
+
+def convert_to_chartjs_object(data: list[dict]) -> dict:
+    """Convert data to chartjs object"""
+    result = {
+        "datasets": [],
+        "labels": utils.get_unique_items(data, "date"),
+    }
+    categories = utils.get_unique_items(data, "category")
+    colors = sns.color_palette("crest", n_colors=max(len(categories), 10)).as_hex()
+
+    for category in categories:
+        data_list = [d["value"] for d in data if d["category"] == category]
+        if sum(data_list) == 0:
+            continue
+
+        result["datasets"].append(
+            {
+                "label": category,
+                "data": data_list,
+                "backgroundColor": colors.pop(),
+            }
+        )
 
     return result
