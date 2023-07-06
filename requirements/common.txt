@@ -4,6 +4,6 @@ python-dotenv==1.0.0
 azure-functions==1.14.0
 azure-functions-durable==1.2.3
 azure-cosmos == 4.3.1
-jsonschema == 4.17.3
+jsonschema == 4.18.0
 python-dateutil == 2.8.2
 seaborn == 0.12.2
